@@ -1,0 +1,51 @@
+#container_top {
+    padding: 1%;
+}
+
+#container_middle {
+    padding: 1%;
+}
+
+#container_bottom {
+    padding: 1%;
+}
+
+#focus {
+    background: red;
+    width: 100%;
+}
+
+#context {
+    background: blue;
+    width: 100%;
+}
+
+#deviation {
+    background: green;
+    width: 33%;
+    display: inline-block;
+}
+
+#fitness {
+    background: violet;
+    width: 33%;
+    display: inline-block;
+}
+
+#incident {
+    background: yellow;
+    width: 32%;
+    display: inline-block;
+}
+
+#detail {
+    background: gray;
+    width: 49%;
+    display: inline-block;
+}
+
+#pattern {
+    background: darkorange;
+    width: 50%;
+    display: inline-block;
+}

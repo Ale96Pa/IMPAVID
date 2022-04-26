@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>TODO</title>
+    <link rel="stylesheet" href="style/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script type="text/javascript" src="/eel.js"></script>
+    <script type="text/javascript" src="script/hello.js"></script>
+</head>
+
+<body>
+
+  <div id="container_top">
+    <div id="focus">FOCUS</div>
+    <div id="context">CONTEXT</div>
+  </div>
+
+  <div id="container_middle">
+    <div id="deviation">DEVIATION</div>
+    <div id="fitness">FITNESS</div>
+    <div id="incident">INCIDENT</div>
+  </div>
+
+  <div id="container_bottom">
+    <div id="detail">DETAILS</div>
+    <div id="pattern">MULTI-DIMENSIONAL</div>
+  </div>
+
+
+  <script type="text/javascript">
+    eel.expose(say_hello_js); // Expose this function to Python
+    function say_hello_js(x) {
+      console.log("Hello from " + x);
+    }
+    
+    say_hello_js("Javascript World!");
+    eel.say_hello_py("Javascript World!"); // Call a Python function
+    </script>
+    
+    <script>
+        test()
+    </script>
+
+</body>
+
+</html>
