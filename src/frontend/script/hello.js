@@ -1,14 +1,10 @@
-function test() {
-    el = say_hello_py(10); // This calls the Python function that was decorated
-    
-    d3.select("body").append("span")
-    .text("Hello, world!");
+eel.expose(say_hello_js); // Expose this function to Python
+function say_hello_js(x) {
+  console.log("Hello from " + x);
+  return "Hello from " + x;
+}
 
-    d3.select("body").append("span")
-    .text(el);
-
-    eel.expose(say_hello_js)
-    
-    say_hello_js("Javascript World!");
-    eel.say_hello_py("Javascript World!");
+async function test() {
+    const tt = await eel.say_hello_py("js")();
+    d3.select("body").append("span").text(tt);
 }
