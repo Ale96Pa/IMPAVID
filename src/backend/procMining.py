@@ -6,6 +6,9 @@ from pm4py.objects.conversion.log import converter as log_converter
 from pm4py.objects.petri_net.importer import importer as pnml_importer
 from pm4py.algo.conformance.alignments.petri_net import algorithm as alignments
 
+import devDetection as dd
+import utilsPM as upm
+
 import eel
 eel.init("./frontend")
 
@@ -56,13 +59,38 @@ def compute_trace_alignment(inputFile, modelFile):
         i+=1
     return resAlignments
 
+"""
+This function computes the deviation on the alignments and collect data about error categories
+of missing, repetition and mismatch
+"""
+def compute_deviations(traces):
+    deviationsDict = {}
+    for elem in traces:
+        trace = upm.convertTraceList(elem["alignment"])
+        resMissing = dd.detectMissing(trace)
+        resRepetition = dd.detectMutliple(trace)
+        resMismatch = dd.detectMismatch(trace)
+
+        deviationsDict[elem["incident_id"]] = {
+            "alignment": elem["alignment"],
+            "fitness": elem["fitness"],
+            "cost": elem["cost"],
+            "visited_states": elem["visited_states"],
+            "traversed_arcs": elem["traversed_arcs"],
+            "missing": resMissing,
+            "repetition": resRepetition,
+            "mismatch": resMismatch
+        }
+    return deviationsDict
+
+
 @eel.expose
 def alignmentsToJson():
     aligns = compute_trace_alignment(fileLog,fileModel)
-    final = json.dumps(aligns)
-    return final
+    fullData = compute_deviations(aligns)
+    return json.dumps(fullData)
 eel.start('index.html', mode='edge')
 
 # if __name__ == "__main__":
 #     traces = compute_trace_alignment(fileLog,fileModel)
-#     print(traces)
+#     fullDict = compute_deviations(traces)
