@@ -38,7 +38,7 @@ function sumErrorsDeviation(data){
     return {missing:sumMissing, repetition:sumRepetition, mismatch: sumMismatch};
 }
 
-function renderDeviationErrorBars(objDeviations, selector){
+function renderDeviationErrorBars(objDeviations, selectorBar){
     const sumTotal = Object.values(objDeviations).reduce((a, b) => a + b, 0);
     const sumN = objDeviations.N;
     const sumA = objDeviations.A;
@@ -47,74 +47,107 @@ function renderDeviationErrorBars(objDeviations, selector){
     const sumC = objDeviations.C;
 
     const height = 20;
-    const width = 950;
+    const h_gap=10;
+    const width = 500;
 
-    var svgContainerMissing = d3.select(selector).append("svg")
+    var svg = d3.select(selectorBar).append("svg")
     .attr("width",width)
     .attr("height",height*3)
     .append("g"); 
 
-    var rectangleMissing = svgContainerMissing.append("rect")
+    var rectTotal = svg.append("rect")
     .attr("y", 0)
     .attr("x",0)
-    .attr("width",sumTotal)
+    .attr("width",width)
     .attr("height",height)
     .attr("style", "fill:blue");
 
-    var rectMissN = svgContainerMissing.append("rect")
-    .attr("y", 30)
+    const wN = Math.round(sumN*width/sumTotal);
+    var rectN = svg.append("rect")
+    .attr("y", height+h_gap)
     .attr("x",0)
-    .attr("width",sumN)
+    .attr("width",wN)
     .attr("height",height)
     .attr("style", "fill:red");
-    var textN =sumN>0 && svgContainerMissing.append("text")
-    .attr("y", 30+(30/2))
-    .attr("x",sumN/2)
+    var textN =sumN>0 && svg.append("text")
+    .attr("y", 2*height+h_gap/2)
+    .attr("x",wN/2)
     .text("N");
 
-    var rectMissA = svgContainerMissing.append("rect")
-    .attr("y", 30)
-    .attr("x",sumN)
-    .attr("width",sumA)
+    const wA =  Math.round(sumA*width/sumTotal);
+    var rectA = svg.append("rect")
+    .attr("y", height+h_gap)
+    .attr("x",wN)
+    .attr("width",wA)
     .attr("height",height)
     .attr("style", "fill:green");
-    var textA = sumA >0 && svgContainerMissing.append("text")
-    .attr("y", 30+(30/2))
-    .attr("x",sumN)
+    var textA = sumA >0 && svg.append("text")
+    .attr("y", 2*height+h_gap/2)
+    .attr("x",wN+(wA/2))
     .text("A");
 
-    var rectMissW = svgContainerMissing.append("rect")
-    .attr("y", 30)
-    .attr("x",sumN+sumA)
-    .attr("width",sumW)
+    const wW =  Math.round(sumW*width/sumTotal);
+    var rectW = svg.append("rect")
+    .attr("y", height+h_gap)
+    .attr("x",wN+wA)
+    .attr("width",wW)
     .attr("height",height)
     .attr("style", "fill:pink");
-    var textW = sumW>0 && svgContainerMissing.append("text")
-    .attr("y", 30+(30/2))
-    .attr("x",sumN+sumA)
+    var textW =  sumW>0 && svg.append("text")
+    .attr("y", 2*height+h_gap/2)
+    .attr("x",wN+wA+(wW/2))
     .text("W");
 
-    var rectMissR = svgContainerMissing.append("rect")
-    .attr("y", 30)
-    .attr("x",sumN+sumA+sumW)
-    .attr("width",sumR)
+    const wR =  Math.round(sumR*width/sumTotal);
+    var rectR = svg.append("rect")
+    .attr("y", height+h_gap)
+    .attr("x",wN+wA+wW)
+    .attr("width",wR)
     .attr("height",height)
     .attr("style", "fill:grey");
-    var textR = sumR>0 && svgContainerMissing.append("text")
-    .attr("y", 30+(30/2))
-    .attr("x",sumN+sumA+sumW)
+    var textR = sumR>0 && svg.append("text")
+    .attr("y", 2*height+h_gap/2)
+    .attr("x",wN+wA+wW+(wR/2))
     .text("R");
 
-    var rectMissC = svgContainerMissing.append("rect")
-    .attr("y", 30)
-    .attr("x",sumN+sumA+sumW+sumR)
-    .attr("width",sumC)
+    const wC =  Math.round(sumC*width/sumTotal);
+    var rectC = svg.append("rect")
+    .attr("y", height+h_gap)
+    .attr("x",wN+wA+wW+wR)
+    .attr("width",wC)
     .attr("height",height)
     .attr("style", "fill:black");
-    var textC = sumC>0 && svgContainerMissing.append("text")
-    .attr("y", 30+(30/2))
-    .attr("x",sumN+sumA+sumW+sumR)
+    var textC = sumC>0 && svg.append("text")
+    .attr("y", 2*height+h_gap/2)
+    .attr("x",wN+wA+wW+wR)
     .text("C");
+}
+
+function renderCheckboxes(){
+    checkMissing = document.getElementById('checkMissing');
+    checkMissing.addEventListener('change', e => {
+        if(e.target.checked){
+            console.log(e.target.checked + " missing");
+        } else {
+            console.log(e.target.checked + " missing");
+        }
+    });
+    checkRepetition = document.getElementById('checkRepetition');
+    checkRepetition.addEventListener('change', e => {
+        if(e.target.checked){
+            console.log(e.target.checked + " repetition");
+        } else {
+            console.log(e.target.checked + " repetition");
+        }
+    });
+    checkMismatch = document.getElementById('checkMismatch');
+    checkMismatch.addEventListener('change', e => {
+        if(e.target.checked){
+            console.log(e.target.checked + " Mismatch");
+        } else {
+            console.log(e.target.checked + " Mismatch");
+        }
+    });
 }
 
 async function retrieveAlignment() {
@@ -129,9 +162,11 @@ async function retrieveAlignment() {
 
     console.log(errorSum);
 
-    renderDeviationErrorBars(errorSum.missing, "#divMissing");
-    renderDeviationErrorBars(errorSum.repetition, "#divRepetition");
-    renderDeviationErrorBars(errorSum.mismatch, "#divMismatch");
+    renderDeviationErrorBars(errorSum.missing, "#barMissing");
+    renderDeviationErrorBars(errorSum.repetition, "#barRepetition");
+    renderDeviationErrorBars(errorSum.mismatch, "#barMismatch");
+
+    renderCheckboxes();
 
     d3.select("body").append("span").text("LOADED");
 }

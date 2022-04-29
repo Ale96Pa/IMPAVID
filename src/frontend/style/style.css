@@ -21,9 +21,12 @@
 }
 
 #deviation {
-    /*background: green;*/
     width: 33%;
     display: inline-block;
+}
+
+#divMissing, #divRepetition, #divMismatch {
+    display: inline-flex;
 }
 
 #fitness {
