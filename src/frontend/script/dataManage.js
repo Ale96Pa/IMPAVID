@@ -48,19 +48,25 @@ function renderDeviationErrorBars(objDeviations, selectorBar){
 
     const height = 20;
     const h_gap=10;
-    const width = 500;
+    const width = 250;//document.getElementById(selectorBar).offsetWidth;
+    console.log(document.getElementById(selectorBar).offsetWidth);
 
-    var svg = d3.select(selectorBar).append("svg")
+    var svg = d3.select("#"+selectorBar).append("svg")
     .attr("width",width)
     .attr("height",height*3)
-    .append("g"); 
-
+    .append("g");
+    
+    const color = selectorBar.includes("Miss") ? "blue" : selectorBar.includes("Rep") ? "red" : "green";
     var rectTotal = svg.append("rect")
     .attr("y", 0)
     .attr("x",0)
     .attr("width",width)
     .attr("height",height)
-    .attr("style", "fill:blue");
+    .attr("style", "fill:"+color);
+    var textTot =sumTotal>0 && svg.append("text")
+    .attr("y", (height+h_gap)/2)
+    .attr("x",width/2)
+    .text(sumTotal);
 
     const wN = Math.round(sumN*width/sumTotal);
     var rectN = svg.append("rect")
@@ -68,11 +74,11 @@ function renderDeviationErrorBars(objDeviations, selectorBar){
     .attr("x",0)
     .attr("width",wN)
     .attr("height",height)
-    .attr("style", "fill:red");
+    .attr("style", "fill:brown");
     var textN =sumN>0 && svg.append("text")
     .attr("y", 2*height+h_gap/2)
     .attr("x",wN/2)
-    .text("N");
+    .text(sumN);
 
     const wA =  Math.round(sumA*width/sumTotal);
     var rectA = svg.append("rect")
@@ -80,11 +86,11 @@ function renderDeviationErrorBars(objDeviations, selectorBar){
     .attr("x",wN)
     .attr("width",wA)
     .attr("height",height)
-    .attr("style", "fill:green");
+    .attr("style", "fill:olive");
     var textA = sumA >0 && svg.append("text")
     .attr("y", 2*height+h_gap/2)
     .attr("x",wN+(wA/2))
-    .text("A");
+    .text(sumA);
 
     const wW =  Math.round(sumW*width/sumTotal);
     var rectW = svg.append("rect")
@@ -96,7 +102,7 @@ function renderDeviationErrorBars(objDeviations, selectorBar){
     var textW =  sumW>0 && svg.append("text")
     .attr("y", 2*height+h_gap/2)
     .attr("x",wN+wA+(wW/2))
-    .text("W");
+    .text(sumW);
 
     const wR =  Math.round(sumR*width/sumTotal);
     var rectR = svg.append("rect")
@@ -108,7 +114,7 @@ function renderDeviationErrorBars(objDeviations, selectorBar){
     var textR = sumR>0 && svg.append("text")
     .attr("y", 2*height+h_gap/2)
     .attr("x",wN+wA+wW+(wR/2))
-    .text("R");
+    .text(sumR);
 
     const wC =  Math.round(sumC*width/sumTotal);
     var rectC = svg.append("rect")
@@ -120,7 +126,7 @@ function renderDeviationErrorBars(objDeviations, selectorBar){
     var textC = sumC>0 && svg.append("text")
     .attr("y", 2*height+h_gap/2)
     .attr("x",wN+wA+wW+wR)
-    .text("C");
+    .text(sumC);
 }
 
 function renderCheckboxes(){
@@ -150,6 +156,122 @@ function renderCheckboxes(){
     });
 }
 
+function renderDeviationTopErrors(objDeviations, selectorBar){
+
+    // const sumTotal = Object.values(objDeviations).reduce((a, b) => a + b, 0);
+    // const sumN = objDeviations.N;
+    // const sumA = objDeviations.A;
+    // const sumW = objDeviations.W;
+    // const sumR = objDeviations.R;
+    // const sumC = objDeviations.C;
+
+    const height = 20;
+    const h_gap=10;
+    const width = 250;//document.getElementById(selectorBar).offsetWidth;
+
+    var svg = d3.select("#"+selectorBar).append("svg")
+    .attr("width",width)
+    .attr("height",height*3)
+    .append("g");
+    
+    //const color = selectorBar.includes("Miss") ? "blue" : selectorBar.includes("Rep") ? "red" : "green";
+    const sumMiss = Object.values(objDeviations.missing).reduce((a, b) => a + b, 0);
+    const sumRep = Object.values(objDeviations.repetition).reduce((a, b) => a + b, 0);
+    const sumMism = Object.values(objDeviations.mismatch).reduce((a, b) => a + b, 0);
+    const sumTot = sumMiss+sumRep+sumMism;
+    const wMiss = Math.round(sumMiss*width/sumTot); 
+    const wRep = Math.round(sumRep*width/sumTot); 
+    const wMism = Math.round(sumMism*width/sumTot); 
+    var rectMiss = svg.append("rect")
+    .attr("y", 0)
+    .attr("x",0)
+    .attr("width",wMiss)
+    .attr("height",height)
+    .attr("style", "fill:blue");
+    var rectRep = svg.append("rect")
+    .attr("y", 0)
+    .attr("x",wMiss)
+    .attr("width",wRep)
+    .attr("height",height)
+    .attr("style", "fill:red");
+    var rectMism = svg.append("rect")
+    .attr("y", 0)
+    .attr("x",wMiss+wRep)
+    .attr("width",wMism)
+    .attr("height",height)
+    .attr("style", "fill:green");
+
+    // const wN = Math.round(sumN*width/sumTotal);
+    // var rectN = svg.append("rect")
+    // .attr("y", height+h_gap)
+    // .attr("x",0)
+    // .attr("width",wN)
+    // .attr("height",height)
+    // .attr("style", "fill:brown");
+    // var textN =sumN>0 && svg.append("text")
+    // .attr("y", 2*height+h_gap/2)
+    // .attr("x",wN/2)
+    // .text("N");
+
+    // const wA =  Math.round(sumA*width/sumTotal);
+    // var rectA = svg.append("rect")
+    // .attr("y", height+h_gap)
+    // .attr("x",wN)
+    // .attr("width",wA)
+    // .attr("height",height)
+    // .attr("style", "fill:olive");
+    // var textA = sumA >0 && svg.append("text")
+    // .attr("y", 2*height+h_gap/2)
+    // .attr("x",wN+(wA/2))
+    // .text("A");
+
+    // const wW =  Math.round(sumW*width/sumTotal);
+    // var rectW = svg.append("rect")
+    // .attr("y", height+h_gap)
+    // .attr("x",wN+wA)
+    // .attr("width",wW)
+    // .attr("height",height)
+    // .attr("style", "fill:pink");
+    // var textW =  sumW>0 && svg.append("text")
+    // .attr("y", 2*height+h_gap/2)
+    // .attr("x",wN+wA+(wW/2))
+    // .text("W");
+
+    // const wR =  Math.round(sumR*width/sumTotal);
+    // var rectR = svg.append("rect")
+    // .attr("y", height+h_gap)
+    // .attr("x",wN+wA+wW)
+    // .attr("width",wR)
+    // .attr("height",height)
+    // .attr("style", "fill:grey");
+    // var textR = sumR>0 && svg.append("text")
+    // .attr("y", 2*height+h_gap/2)
+    // .attr("x",wN+wA+wW+(wR/2))
+    // .text("R");
+
+    // const wC =  Math.round(sumC*width/sumTotal);
+    // var rectC = svg.append("rect")
+    // .attr("y", height+h_gap)
+    // .attr("x",wN+wA+wW+wR)
+    // .attr("width",wC)
+    // .attr("height",height)
+    // .attr("style", "fill:black");
+    // var textC = sumC>0 && svg.append("text")
+    // .attr("y", 2*height+h_gap/2)
+    // .attr("x",wN+wA+wW+wR)
+    // .text("C");
+}
+
+function renderTopTraces(arr){
+    const sorter = (a, b) => a.totMissing+a.totRepetition+a.totMismatch < b.totMissing+b.totRepetition+b.totMismatch ? 1 : -1;
+    const aa = arr.sort(sorter);
+    console.log(aa[0].missing);
+
+    renderDeviationTopErrors(aa[0], "divTopOne");
+    renderDeviationTopErrors(aa[1], "divTopTwo");
+    renderDeviationTopErrors(aa[2], "divTopThree");
+}
+
 async function retrieveAlignment() {
     const alignments = await eel.alignmentsToJson()();
     const alignmentData = Object.entries(JSON.parse(alignments)).map(entry => {
@@ -157,16 +279,19 @@ async function retrieveAlignment() {
             ...entry[1]
         };
     });
+    // console.log(alignmentData);
     
     const errorSum = sumErrorsDeviation(alignmentData);
 
-    console.log(errorSum);
+    // console.log(errorSum);
 
-    renderDeviationErrorBars(errorSum.missing, "#barMissing");
-    renderDeviationErrorBars(errorSum.repetition, "#barRepetition");
-    renderDeviationErrorBars(errorSum.mismatch, "#barMismatch");
+    renderDeviationErrorBars(errorSum.missing, "barMissing");
+    renderDeviationErrorBars(errorSum.repetition, "barRepetition");
+    renderDeviationErrorBars(errorSum.mismatch, "barMismatch");
 
     renderCheckboxes();
+
+    renderTopTraces(alignmentData);
 
     d3.select("body").append("span").text("LOADED");
 }

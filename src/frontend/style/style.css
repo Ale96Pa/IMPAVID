@@ -20,14 +20,48 @@
     width: 100%;
 }
 
+/* DEVIATION BLOCK */
 #deviation {
     width: 33%;
     display: inline-block;
 }
 
+#containerDev {
+    float: left;
+    width: 49%;
+    border-style: solid; /*todo: eliminare*/
+    display: table;
+}
+
 #divMissing, #divRepetition, #divMismatch {
     display: inline-flex;
+    width: 100%;
 }
+
+#divCheckMissing, #divCheckRepetition, #divCheckMismatch {
+    float: left;
+    width: 20%;
+}
+
+#barMissing, #barRepetition, #barMismatch {
+    float: right;
+    width: 80%;
+}
+
+#containerTop {
+    float: right;
+    width: 49%;
+    border-style: solid; /*todo: eliminare*/
+}
+
+#containerState {
+    width: 100%;
+    border-style: solid; /*todo: eliminare*/
+    height: 200px; /*todo: eliminare*/
+    clear: both;
+}
+
+/* FITNESS BLOCK */
 
 #fitness {
     background: violet;

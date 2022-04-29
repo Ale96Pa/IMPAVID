@@ -79,7 +79,10 @@ def compute_deviations(traces):
             "traversed_arcs": elem["traversed_arcs"],
             "missing": resMissing,
             "repetition": resRepetition,
-            "mismatch": resMismatch
+            "mismatch": resMismatch,
+            "totMissing": sum(resMissing.values()),
+            "totRepetition": sum(resRepetition.values()),
+            "totMismatch": sum(resMismatch.values())
         }
     return deviationsDict
 
