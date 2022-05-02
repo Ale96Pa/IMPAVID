@@ -77,6 +77,7 @@ def compute_deviations(traces):
         costMissing = cm.calculateMissing(resMissing)
         costRepetition = cm.calculateMultiple(upm.addAllActivities(resRepetition), numEvents)
         costMismatch = cm.calculateMismatch(upm.addAllActivities(resMismatch), numEvents)
+        cost = cm.calculateCost(costMissing,costRepetition,costMismatch)
 
         deviationsDict[elem["incident_id"]] = {
             "alignment": elem["alignment"],
@@ -93,7 +94,8 @@ def compute_deviations(traces):
             "costMissing": costMissing,
             "costRepetition": costRepetition,
             "costMismatch": costMismatch,
-            "costTotal": cm.calculateCost(costMissing,costRepetition,costMismatch)
+            "costTotal": cost,
+            "severity": cm.calculateSeverity(cost)
         }
     return deviationsDict
 

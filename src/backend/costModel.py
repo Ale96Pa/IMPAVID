@@ -11,6 +11,8 @@ dictAlfaMismatch = {"aN":0.35,"aA":0.35,"aW":0.1,"aR":0.1,"aC":0.1}
 Tmism = 4
 dictAlfaCost = {"miss":0.33,"mult":0.34,"mism":0.33}
 
+threshold = {"low":0.37,"medium":0.69,"high":0.89}
+
 def calculateMissing(dfMiss):
     if int(dfMiss["N"])+int(dfMiss["A"])+int(dfMiss["R"])+int(dfMiss["C"]) > Tmiss:
         tot = 1
@@ -45,3 +47,15 @@ def calculateMismatch(dfMism, numEv):
 
 def calculateCost(cMiss, cRep, cMism):
     return dictAlfaCost["miss"]*cMiss+ dictAlfaCost["mult"]*cRep+ dictAlfaCost["mism"]*cMism
+
+def calculateSeverity(cost):
+    if(cost == 0):
+        return "none"
+    elif(cost>0 and cost<=threshold["low"]):
+        return "low"
+    elif(cost >threshold["low"] and cost<=threshold["medium"]):
+        return "medium"
+    elif(cost>threshold["medium"] and cost<=threshold["high"]):
+        return "high"
+    else:
+        return "critical"
