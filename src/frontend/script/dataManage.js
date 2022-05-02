@@ -347,7 +347,7 @@ function renderDeviationTopErrors(objDeviations, selectorBar){
 function renderTopTraces(arr){
     const sorter = (a, b) => a.totMissing+a.totRepetition+a.totMismatch < b.totMissing+b.totRepetition+b.totMismatch ? 1 : -1;
     const aa = arr.sort(sorter);
-    console.log(aa[0].missing);
+    // console.log(aa[0].missing);
 
     renderDeviationTopErrors(aa[0], "divTopOne");
     renderDeviationTopErrors(aa[1], "divTopTwo");

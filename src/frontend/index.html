@@ -10,6 +10,8 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script type="text/javascript" src="/eel.js"></script>
     <script type="text/javascript" src="script/dataManage.js"></script>
+    <script type="text/javascript" src="script/renderDeviations.js"></script>
+    <script type="text/javascript" src="script/renderFitness.js"></script>
 </head>
 
 <body>
@@ -62,7 +64,11 @@
     </div>
 
 
-    <div id="fitness">FITNESS</div>
+    <div id="fitness">
+      <div id="fitnessBar">FITNESS</div>
+      <div id="costBar">COST</div>
+    </div>
+    
     <div id="incident">INCIDENT</div>
   </div>
 
@@ -73,6 +79,7 @@
     
     <script>
         retrieveAlignment()
+        fooTODO()
     </script>
 
 </body>
