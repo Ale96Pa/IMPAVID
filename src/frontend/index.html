@@ -21,45 +21,44 @@
 
   <div id="container_middle">
 
+    <div id="deviation">DEVIATION <br>
 
-    <div id="deviation">
-      DEVIATION <br>
-
-        <div id="containerDev">
-          <div id="divMissing">
-            <div id="divCheckMissing">
-              <input type="checkbox" id="checkMissing">
-              <label for="checkMissing">Missing</label>
-            </div>
-            <div id="barMissing"></div>
+      <div id="containerDev">
+        <div id="divMissing">
+          <div id="divCheckMissing">
+            <input type="checkbox" name="checkDeviations" value="missing" id="checkMissing" checked>
+            <label for="checkMissing">Missing</label>
           </div>
-
-          <div id="divRepetition">
-            <div id="divCheckRepetition">
-              <input type="checkbox" id="checkRepetition">
-              <label for="checkRepetition">Repetition</label>
-            </div>
-            <div id="barRepetition"></div>
-          </div>
-
-          <div id="divMismatch">
-            <div id="divCheckMismatch">
-              <input type="checkbox" id="checkMismatch">
-              <label for="checkMismatch">Mismatch</label>
-            </div>
-            <div id="barMismatch"></div>
-          </div>
+          <div id="barMissing"></div>
         </div>
 
-        <div id="containerTop">
-          <div id="divTopOne">INCIDENT 0XXXXXXXXXX0X</div>
-          <div id="divTopTwo">INCIDENT 0XXXXXXXXXX0y</div>
-          <div id="divTopThree">INCIDENT 0XXXXXXXXXX0Z</div>
+        <div id="divRepetition">
+          <div id="divCheckRepetition">
+            <input type="checkbox" name="checkDeviations" value="repetition" id="checkRepetition" checked>
+            <label for="checkRepetition">Repetition</label>
+          </div>
+          <div id="barRepetition"></div>
         </div>
 
-        <div id="containerState">
-          
+        <div id="divMismatch">
+          <div id="divCheckMismatch">
+            <input type="checkbox" name="checkDeviations" value="mismatch" id="checkMismatch" checked>
+            <label for="checkMismatch">Mismatch</label>
+          </div>
+          <div id="barMismatch"></div>
         </div>
+      </div>
+
+      <div id="containerTop">
+        <div id="divTopOne">INCIDENT 0XXXXXXXXXX0X</div>
+        <div id="divTopTwo">INCIDENT 0XXXXXXXXXX0y</div>
+        <div id="divTopThree">INCIDENT 0XXXXXXXXXX0Z</div>
+      </div>
+
+      <div id="containerState">
+        <div id="divCheckedDeviations"></div>
+      </div>
+
     </div>
 
 

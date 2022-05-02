@@ -1,3 +1,4 @@
+from posixpath import split
 import pandas as pd
 import pm4py
 import json
@@ -7,6 +8,7 @@ from pm4py.objects.petri_net.importer import importer as pnml_importer
 from pm4py.algo.conformance.alignments.petri_net import algorithm as alignments
 
 import devDetection as dd
+import costModel as cm
 import utilsPM as upm
 
 import eel
@@ -71,6 +73,13 @@ def compute_deviations(traces):
         resRepetition = dd.detectMutliple(trace)
         resMismatch = dd.detectMismatch(trace)
 
+        numEvents = upm.countEvents(trace)
+        costMissing = cm.calculateMissing(resMissing)
+        costRepetition = cm.calculateMultiple(upm.addAllActivities(resRepetition), numEvents)
+        costMismatch = cm.calculateMismatch(upm.addAllActivities(resMismatch), numEvents)
+
+        print(cm.calculateCost(costMissing,costRepetition,costMismatch))
+
         deviationsDict[elem["incident_id"]] = {
             "alignment": elem["alignment"],
             "fitness": elem["fitness"],
@@ -82,7 +91,11 @@ def compute_deviations(traces):
             "mismatch": resMismatch,
             "totMissing": sum(resMissing.values()),
             "totRepetition": sum(resRepetition.values()),
-            "totMismatch": sum(resMismatch.values())
+            "totMismatch": sum(resMismatch.values()),
+            "costMissing": costMissing,
+            "costRepetition": costRepetition,
+            "costMismatch": costMismatch,
+            "costTotal": cm.calculateCost(costMissing,costRepetition,costMismatch)
         }
     return deviationsDict
 

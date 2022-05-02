@@ -59,6 +59,7 @@
     border-style: solid; /*todo: eliminare*/
     height: 200px; /*todo: eliminare*/
     clear: both;
+    overflow-y: scroll;
 }
 
 /* FITNESS BLOCK */
