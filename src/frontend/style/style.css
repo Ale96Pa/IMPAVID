@@ -82,8 +82,25 @@
 /* INCIDENT BLOCK */
 
 #incident {
-    background: yellow;
     width: 32%;
+    display: inline-block;
+}
+
+#parallelIncidents{
+    width: 50%;
+    float: left;
+}
+
+#barIncidents{
+    width: 40%;
+    float: right;
+}
+
+/* */
+
+#pattern {
+    background: darkorange;
+    width: 50%;
     display: inline-block;
 }
 
@@ -93,8 +110,3 @@
     display: inline-block;
 }
 
-#pattern {
-    background: darkorange;
-    width: 50%;
-    display: inline-block;
-}

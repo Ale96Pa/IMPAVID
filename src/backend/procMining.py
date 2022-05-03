@@ -100,12 +100,12 @@ def compute_deviations(traces):
     return deviationsDict
 
 
-@eel.expose
-def alignmentsToJson():
-    aligns = compute_trace_alignment(fileLog,fileModel)
-    fullData = compute_deviations(aligns)
-    return json.dumps(fullData)
-eel.start('index.html', mode='edge')
+# @eel.expose
+# def alignmentsToJson():
+#     aligns = compute_trace_alignment(fileLog,fileModel)
+#     fullData = compute_deviations(aligns)
+#     return json.dumps(fullData)
+# eel.start('index.html', mode='edge')
 
 # if __name__ == "__main__":
 #     traces = compute_trace_alignment(fileLog,fileModel)

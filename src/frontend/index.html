@@ -13,6 +13,7 @@
     <script type="text/javascript" src="script/dataManage.js"></script>
     <script type="text/javascript" src="script/renderDeviations.js"></script>
     <script type="text/javascript" src="script/renderFitness.js"></script>
+    <script type="text/javascript" src="script/renderIncidents.js"></script>
 </head>
 
 <body>
@@ -74,7 +75,10 @@
       <!-- <div id="severityBar">SEVERITY</div> -->
     </div>
     
-    <div id="incident">INCIDENT</div>
+    <div id="incident">
+      <div id="parallelIncidents"></div>
+      <div id="barIncidents"></div>
+    </div>
   </div>
 
   <div id="container_bottom">
@@ -85,6 +89,7 @@
     <script>
         retrieveAlignment()
         fooTODO()
+        renderIncidents()
     </script>
 
 </body>
