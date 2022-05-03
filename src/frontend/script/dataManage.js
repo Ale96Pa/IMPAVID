@@ -3,6 +3,8 @@
 //   console.log("Hello from " + x);
 //   return "Hello from " + x;
 // }
+const colorDev = { miss: "#bebada", rep: "#fdb462", mism: "#8dd3c7",
+                n:"#80b1d3", a:"#b3de69", w:"#fb8072",r:"#fccde5",c:"#ffffb3"};
 
 function sumErrorsDeviation(data){
     const sumMissing = data.reduce((accumulator, object) => {
@@ -49,14 +51,15 @@ function renderDeviationErrorBars(objDeviations, selectorBar){
     const height = 20;
     const h_gap=10;
     const width = 250;//document.getElementById(selectorBar).offsetWidth;
-    console.log(document.getElementById(selectorBar).offsetWidth);
+    //console.log(document.getElementById(selectorBar).offsetWidth);
+
 
     var svg = d3.select("#"+selectorBar).append("svg")
     .attr("width",width)
     .attr("height",height*3)
     .append("g");
     
-    const color = selectorBar.includes("Miss") ? "blue" : selectorBar.includes("Rep") ? "red" : "green";
+    const color = selectorBar.includes("Miss") ? colorDev.miss : selectorBar.includes("Rep") ? colorDev.rep : colorDev.mism;
     var rectTotal = svg.append("rect")
     .attr("y", 0)
     .attr("x",0)
@@ -74,7 +77,7 @@ function renderDeviationErrorBars(objDeviations, selectorBar){
     .attr("x",0)
     .attr("width",wN)
     .attr("height",height)
-    .attr("style", "fill:brown");
+    .attr("style", "fill:"+colorDev.n);
     var textN =sumN>0 && svg.append("text")
     .attr("y", 2*height+h_gap/2)
     .attr("x",wN/2)
@@ -86,7 +89,7 @@ function renderDeviationErrorBars(objDeviations, selectorBar){
     .attr("x",wN)
     .attr("width",wA)
     .attr("height",height)
-    .attr("style", "fill:olive");
+    .attr("style", "fill:"+colorDev.a);
     var textA = sumA >0 && svg.append("text")
     .attr("y", 2*height+h_gap/2)
     .attr("x",wN+(wA/2))
@@ -98,7 +101,7 @@ function renderDeviationErrorBars(objDeviations, selectorBar){
     .attr("x",wN+wA)
     .attr("width",wW)
     .attr("height",height)
-    .attr("style", "fill:pink");
+    .attr("style", "fill:"+colorDev.w);
     var textW =  sumW>0 && svg.append("text")
     .attr("y", 2*height+h_gap/2)
     .attr("x",wN+wA+(wW/2))
@@ -110,7 +113,7 @@ function renderDeviationErrorBars(objDeviations, selectorBar){
     .attr("x",wN+wA+wW)
     .attr("width",wR)
     .attr("height",height)
-    .attr("style", "fill:grey");
+    .attr("style", "fill:"+colorDev.r);
     var textR = sumR>0 && svg.append("text")
     .attr("y", 2*height+h_gap/2)
     .attr("x",wN+wA+wW+(wR/2))
@@ -122,7 +125,7 @@ function renderDeviationErrorBars(objDeviations, selectorBar){
     .attr("x",wN+wA+wW+wR)
     .attr("width",wC)
     .attr("height",height)
-    .attr("style", "fill:black");
+    .attr("style", "fill:"+colorDev.c);
     var textC = sumC>0 && svg.append("text")
     .attr("y", 2*height+h_gap/2)
     .attr("x",wN+wA+wW+wR)
@@ -130,76 +133,15 @@ function renderDeviationErrorBars(objDeviations, selectorBar){
 }
 
 function renderCheckboxes(arr){
-    // var checkMiss = false;
-    // var checkRep = false;
-    // var checkMism = false;
-    // var resultFilters=arr;
+    const sorter = (a, b) => a.totMissing+a.totRepetition+a.totMismatch < b.totMissing+b.totRepetition+b.totMismatch ? 1 : -1;
+    arr = arr.sort(sorter);
 
-    // console.log(resultFilters)
-
-    // checkMissing = document.getElementById('checkMissing');
-    // checkMissing.addEventListener('change', e => {
-    //     checkMiss = e.target.checked;
-    //     if(e.target.checked){
-    //         resultFilters = resultFilters.filter(elem => elem.totMissing > 0)
-    //     }
-    //     for(var i=0;i<resultFilters.length;i++){
-    //         renderDeviationTopErrors(resultFilters[i],"divCheckedDeviations")
-    //     }
-    // });
-    // checkRepetition = document.getElementById('checkRepetition');
-    // checkRepetition.addEventListener('change', e => {
-    //     checkRep = e.target.checked;
-    //     if(e.target.checked){
-    //         resultFilters = resultFilters.filter(elem => elem.totRepetition>0);
-    //     }
-
-    //     for(var i=0;i<resultFilters.length;i++){
-    //         renderDeviationTopErrors(resultFilters[i],"divCheckedDeviations")
-    //     }
-
-    //     console.log(resultFilters);
-    // });
-    // checkMismatch = document.getElementById('checkMismatch');
-    // checkMismatch.addEventListener('change', e => {
-    //     checkMism = e.target.checked;
-    //     if(e.target.checked){
-    //         resultFilters =resultFilters.filter(elem => elem.totMismatch>0);
-    //     }
-
-    //     for(var i=0;i<resultFilters.length;i++){
-    //         renderDeviationTopErrors(resultFilters[i],"divCheckedDeviations")
-    //     }
-
-    //     console.log(resultFilters);
-    // });
-
-    // // console.log(resultFilters);
-
-    // // for(var i=0;i<resultFilters.length;i++){
-    // //     renderDeviationTopErrors(resultFilters[i],"divCheckedDeviations")
-    // // }
-
-    // // const filterMiss = checkMiss ? arr.filter(elem => elem.sumMiss > 0) : arr;
-    // // const filterRep = checkRep ? filterMiss.filter(elem => elem.sumRep>0) : filterMiss;
-    // // const filterMism = checkMism ? filterRep .filter(elem => elem.sumMism>0) : filterRep;
-
-
-    // Select all checkboxes with the name 'settings' using querySelectorAll.
-
-    //d3.select("#divCheckedDeviations").selectAll("*").remove();
     for(var i=0;i<arr.length;i++){
         renderDeviationTopErrors(arr[i],"divCheckedDeviations")
     }
 
     var checkboxes = document.querySelectorAll("input[type=checkbox][name=checkDeviations]");
     let enabledSettings = []
-
-    /*
-    For IE11 support, replace arrow functions with normal functions and
-    use a polyfill for Array.forEach:
-    https://vanillajstoolkit.com/polyfills/arrayforeach/
-    */
 
     // Use Array.forEach to add an event listener to each checkbox.
     checkboxes.forEach(function(checkbox) {
@@ -215,18 +157,36 @@ function renderCheckboxes(arr){
 
         // MIGLIORARE FILTRO !!!
         fiteredRes= arr.filter(function(elem) {
-                if (
-                    !(enabledSettings.includes("missing") && elem.totMissing>0) ||
-                    !(enabledSettings.includes("repetition") && elem.totRepetition>0) ||
-                    !(enabledSettings.includes("mismatch") && elem.totMismatch>0)){
-                        return false;
-                    }                                        
-            return true;
+            if(enabledSettings.includes("missing") && enabledSettings.includes("repetition") && enabledSettings.includes("mismatch")){
+                return elem.totMissing>0 && elem.totRepetition>0 && elem.totMismatch>0
+            }
+            else if(enabledSettings.includes("missing") && enabledSettings.includes("repetition")){
+                return elem.totMissing>0 && elem.totRepetition>0 && elem.totMismatch<=0
+            }
+            else if(enabledSettings.includes("missing") && enabledSettings.includes("mismatch")){
+                return elem.totMissing>0 && elem.totMismatch>0 && elem.totRepetition<=0
+            }
+            else if(enabledSettings.includes("repetition") && enabledSettings.includes("mismatch")){
+                return elem.totRepetition>0 && elem.totMismatch>0 && elem.totMissing<=0
+            }
+            else if(enabledSettings.includes("missing")){
+                return elem.totMissing>0 && elem.totRepetition<=0 && elem.totMismatch<=0
+            }
+            else if(enabledSettings.includes("repetition")){
+                return elem.totRepetition>0 && elem.totMissing<=0 && elem.totMismatch<=0
+            }
+            else if(enabledSettings.includes("mismatch")){
+                return elem.totMismatch>0 && elem.totMissing<=0 && elem.totRepetition<=0
+            }
+            else{
+                return true
+            }
           });
 
-        console.log(enabledSettings);
-        console.log(fiteredRes);
-
+        // console.log(enabledSettings);
+        const sorter = (a, b) => a.totMissing+a.totRepetition+a.totMismatch < b.totMissing+b.totRepetition+b.totMismatch ? 1 : -1;
+        fiteredRes = fiteredRes.sort(sorter);
+        //console.log(fiteredRes);
 
         d3.select("#divCheckedDeviations").selectAll("*").remove();
         for(var i=0;i<fiteredRes.length;i++){
@@ -248,8 +208,8 @@ function renderDeviationTopErrors(objDeviations, selectorBar){
     // const sumC = objDeviations.C;
 
     const height = 20;
-    const h_gap=10;
-    const width = 250;//document.getElementById(selectorBar).offsetWidth;
+    const h_gap=25;
+    const width = 450;//document.getElementById(selectorBar).offsetWidth;
 
     var svg = d3.select("#"+selectorBar).append("svg")
     .attr("width",width)
@@ -263,25 +223,45 @@ function renderDeviationTopErrors(objDeviations, selectorBar){
     const sumTot = sumMiss+sumRep+sumMism;
     const wMiss = Math.round(sumMiss*width/sumTot); 
     const wRep = Math.round(sumRep*width/sumTot); 
-    const wMism = Math.round(sumMism*width/sumTot); 
+    const wMism = Math.round(sumMism*width/sumTot);
+
+    var textInc = svg.append("text")
+    .attr("y",h_gap-5)
+    .attr("x",0)
+    .text(objDeviations.incident_id);
+
     var rectMiss = svg.append("rect")
-    .attr("y", 0)
+    .attr("y", h_gap)
     .attr("x",0)
     .attr("width",wMiss)
     .attr("height",height)
-    .attr("style", "fill:blue");
+    .attr("style", "fill:"+colorDev.miss);
+    var textTotMiss =sumMiss>0 && svg.append("text")
+    .attr("y", height*2/3+h_gap)
+    .attr("x",wMiss/2)
+    .text(sumMiss);
+
     var rectRep = svg.append("rect")
-    .attr("y", 0)
+    .attr("y", h_gap)
     .attr("x",wMiss)
     .attr("width",wRep)
     .attr("height",height)
-    .attr("style", "fill:red");
+    .attr("style", "fill:"+colorDev.rep);
+    var textTotRep =sumRep>0 && svg.append("text")
+    .attr("y", height*2/3+h_gap)
+    .attr("x",wMiss+(wRep/2))
+    .text(sumRep);
+
     var rectMism = svg.append("rect")
-    .attr("y", 0)
+    .attr("y", h_gap)
     .attr("x",wMiss+wRep)
     .attr("width",wMism)
     .attr("height",height)
-    .attr("style", "fill:green");
+    .attr("style", "fill:"+colorDev.mism);
+    var textTotMism =sumMism>0 && svg.append("text")
+    .attr("y", height*2/3+h_gap)
+    .attr("x",wMiss+wRep+(wMism/2))
+    .text(sumMism);
 
     // const wN = Math.round(sumN*width/sumTotal);
     // var rectN = svg.append("rect")
@@ -360,8 +340,9 @@ async function retrieveAlignment() {
         return {incident_id: entry[0],
             ...entry[1]
         };
-    });
-    // console.log(alignmentData);
+    }).filter(inc => inc.totMissing+inc.totRepetition+inc.totMismatch>0);
+    
+    //console.log(alignmentData);
     
     const errorSum = sumErrorsDeviation(alignmentData);
 

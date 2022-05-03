@@ -1,3 +1,5 @@
+const colorSeverity = {none:"#1a9641",low:"#a6d96a",medium:"#ffffbf",high:"#fdae61",critical:"#d7191c"}
+
 function renderFitnessBar(data, selector){
     // set the dimensions and margins of the graph
     const margin = {top: 30, right: 30, bottom: 70, left: 60},
@@ -164,6 +166,107 @@ function renderSeverityBar(data,selector){
     .attr("fill", "#69b3a2");
 }
 
+/*
+{metric: "fitness", value: 0.5},...,{}
+*/
+function renderViolinChart(data, selector, metric){
+    // set the dimensions and margins of the graph
+    var margin = {top: 10, right: 30, bottom: 30, left: 40},
+    width = 250 - margin.left - margin.right,
+    height = 200 - margin.top - margin.bottom;
+    // console.log(document.getElementById(selector).offsetWidth)
+    // console.log(document.getElementById(selector).offsetHeight)
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#"+selector)
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+    
+    // Build and Show the Y scale
+    var y = d3.scaleLinear()
+    .domain([0,1])          // Note that here the Y scale is set manually
+    .range([height, 0])
+    svg.append("g").call( d3.axisLeft(y) )
+
+    // Build and Show the X scale. It is a band scale like for a boxplot: each group has an dedicated RANGE on the axis. This range has a length of x.bandwidth
+    var x = d3.scaleBand()
+    .range([ 0, width ])
+    .domain([metric])
+    .padding(0.05)     // This is important: it is the space between 2 groups. 0 means no padding. 1 is the maximum.
+    svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x))
+
+    // Features of the histogram
+    var histogram = d3.histogram()
+        .domain(y.domain())
+        .thresholds(y.ticks(10))    // Important: how many bins approx are going to be made? It is the 'resolution' of the violin plot
+        .value(d => d)
+
+    var sumstat = d3.rollup(data, d => {
+        input = d.map(function(g) { return g.value;})    // Keep the variable called Sepal_Length
+        bins = histogram(input)   // And compute the binning on it.
+        return(bins)
+    }, d=> d.metric)
+
+    sumstat = Array.from(sumstat, ([name, value]) => ({ name, value }));
+
+    // What is the biggest number of value in a bin? We need it cause this value will have a width of 100% of the bandwidth.
+    var maxNum = 0
+    for ( i in sumstat ){
+    allBins = sumstat[i].value
+    lengths = allBins.map(function(a){return a.length;})
+    longuest = d3.max(lengths)
+    if (longuest > maxNum) { maxNum = longuest }
+    }
+
+    // The maximum width of a violin must be x.bandwidth = the width dedicated to a group
+    var xNum = d3.scaleLinear()
+    .range([0, x.bandwidth()])
+    .domain([-maxNum,maxNum])
+
+    // Color scale for dots
+    var myColor = d3.scaleSequential()
+    .interpolator(d3.interpolateInferno)
+    .domain([3,9]) //TODOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+
+    // Add the shape to this svg!
+    svg
+    .selectAll("myViolin")
+    .data(sumstat)
+    .enter()        // So now we are working group per group
+    .append("g")
+        .attr("transform", function(d){return("translate(" + x(d.name) +" ,0)") } ) // Translation on the right to be at the group position
+    .append("path")
+        .datum(function(d){ return(d.value)})     // So now we are working bin per bin
+        .style("stroke", "none")
+        .style("fill","grey") //TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+        .attr("d", d3.area()
+            .x0( xNum(0) )
+            .x1(function(d){ return(xNum(d.length)) } )
+            .y(function(d){ return(y(d.x0)) } )
+            .curve(d3.curveCatmullRom)    // This makes the line smoother to give the violin appearance. Try d3.curveStep to see the difference
+        )
+
+    // Add individual points with jitter
+    var jitterWidth = 40 //TODOOOOOOOOOOOOOOO
+    svg
+    .selectAll("indPoints")
+    .data(data)
+    .enter()
+    .append("circle")
+        .attr("cx", function(d){return(x(d.metric) + x.bandwidth()/2 - Math.random()*jitterWidth )})
+        .attr("cy", function(d){return(y(d.value))})
+        .attr("r", 5)
+        .style("fill", function(d){ return(myColor(d.value))})
+        .attr("stroke", "white")
+    
+    }
+
 async function fooTODO() {
     const alignments = await eel.alignmentsToJson()();
     const alignmentData = Object.entries(JSON.parse(alignments)).map(entry => {
@@ -189,12 +292,22 @@ async function fooTODO() {
         };
     });
 
+    const sorterF = (a, b) => a.value < b.value ? 1 : -1;
+    filterFitness = filterFitness.sort(sorterF).slice(0, 100);
+
     renderFitnessBar(filterFitness, "fitnessBar")
 
     // var costTodo = alignmentData.map(elem => {
     //     return {incident_id: elem.incident_id, value: elem.costTotal};
     // });
     // renderFitnessBar(costTodo, "costTodo")
+
+    // filterCostsInPercentage = filterCostsInPercentage.filter(elem => {
+    //     return 
+    // });
+    var keyFit = filterFitness.map(elem => elem.incident_id);
+    //filterCostsInPercentage = filterCostsInPercentage.filter(elem => keyFit.includes(elem.incident_id))
+    filterCostsInPercentage = filterCostsInPercentage.sort((a, b) => keyFit.indexOf(a.incident_id) - keyFit.indexOf(b.incident_id));
 
     renderCostBar(filterCostsInPercentage, "costBar")
 
@@ -220,9 +333,19 @@ async function fooTODO() {
         }
         return accumulator;
     }, [{severity:"none", value:0}, {severity:"low", value:0}, {severity:"medium", value:0}, {severity:"high", value:0}, {severity:"critical", value:0}]);
-    console.log(filterSeverity)
+    //console.log(filterSeverity)
 
-    renderSeverityBar(filterSeverity, "severityBar")
+    //renderSeverityBar(filterSeverity, "severityBar")
+
+    var filterViolinF = alignmentData.map(elem => {
+        return {metric: "fitness", value: elem.fitness};
+    });
+    var filterViolinC = alignmentData.map(elem => {
+        return {metric: "cost", value: elem.costTotal};
+    });
+    //console.log(filterViolinF);
+    renderViolinChart(filterViolinF, "fitnessViolin", "fitness")
+    renderViolinChart(filterViolinC, "costViolin", "cost")
 
     d3.select("body").append("span").text("LOADED-FITNESS");
 }

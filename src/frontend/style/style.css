@@ -69,6 +69,18 @@
     display: inline-block;
 }
 
+#fitnessViolin, #costViolin {
+    float: left;
+    width: 20%;
+}
+
+#fitnessBar, #costBar {
+    float: right;
+    width: 70%;
+}
+
+/* INCIDENT BLOCK */
+
 #incident {
     background: yellow;
     width: 32%;

@@ -9,6 +9,7 @@
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script type="text/javascript" src="/eel.js"></script>
+    <!-- <script type="text/javascript" src="script/configViz.js"></script> -->
     <script type="text/javascript" src="script/dataManage.js"></script>
     <script type="text/javascript" src="script/renderDeviations.js"></script>
     <script type="text/javascript" src="script/renderFitness.js"></script>
@@ -28,7 +29,7 @@
       <div id="containerDev">
         <div id="divMissing">
           <div id="divCheckMissing">
-            <input type="checkbox" name="checkDeviations" value="missing" id="checkMissing" checked>
+            <input type="checkbox" name="checkDeviations" value="missing" id="checkMissing">
             <label for="checkMissing">Missing</label>
           </div>
           <div id="barMissing"></div>
@@ -36,7 +37,7 @@
 
         <div id="divRepetition">
           <div id="divCheckRepetition">
-            <input type="checkbox" name="checkDeviations" value="repetition" id="checkRepetition" checked>
+            <input type="checkbox" name="checkDeviations" value="repetition" id="checkRepetition">
             <label for="checkRepetition">Repetition</label>
           </div>
           <div id="barRepetition"></div>
@@ -44,7 +45,7 @@
 
         <div id="divMismatch">
           <div id="divCheckMismatch">
-            <input type="checkbox" name="checkDeviations" value="mismatch" id="checkMismatch" checked>
+            <input type="checkbox" name="checkDeviations" value="mismatch" id="checkMismatch">
             <label for="checkMismatch">Mismatch</label>
           </div>
           <div id="barMismatch"></div>
@@ -52,9 +53,9 @@
       </div>
 
       <div id="containerTop">
-        <div id="divTopOne">INCIDENT 0XXXXXXXXXX0X</div>
-        <div id="divTopTwo">INCIDENT 0XXXXXXXXXX0y</div>
-        <div id="divTopThree">INCIDENT 0XXXXXXXXXX0Z</div>
+        <div id="divTopOne"></div>
+        <div id="divTopTwo"></div>
+        <div id="divTopThree"></div>
       </div>
 
       <div id="containerState">
@@ -65,9 +66,12 @@
 
 
     <div id="fitness">
-      <div id="fitnessBar">FITNESS</div>
-      <div id="costBar">COST</div>
-      <div id="severityBar">SEVERITY</div>
+      <div id="fitnessViolin"></div>
+      <div id="fitnessBar"></div>
+
+      <div id="costViolin"></div>
+      <div id="costBar"></div>
+      <!-- <div id="severityBar">SEVERITY</div> -->
     </div>
     
     <div id="incident">INCIDENT</div>
