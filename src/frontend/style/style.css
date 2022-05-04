@@ -40,12 +40,13 @@
 
 #divCheckMissing, #divCheckRepetition, #divCheckMismatch {
     float: left;
-    width: 20%;
+    width: 10%;
+    align-self: center;
 }
 
 #barMissing, #barRepetition, #barMismatch {
     float: right;
-    width: 80%;
+    width: 85%;
 }
 
 #containerTop {
@@ -62,11 +63,16 @@
     overflow-y: scroll;
 }
 
+.rectDevs {
+    min-width: 20px;
+}
+
 /* FITNESS BLOCK */
 
 #fitness {
     width: 33%;
     display: inline-block;
+    border-style: solid; /*todo: eliminare*/
 }
 
 #fitnessViolin, #costViolin {
@@ -84,6 +90,7 @@
 #incident {
     width: 32%;
     display: inline-block;
+    border-style: solid; /*todo: eliminare*/
 }
 
 #parallelIncidents{
@@ -99,9 +106,9 @@
 /* */
 
 #pattern {
-    background: darkorange;
     width: 50%;
     display: inline-block;
+    border-style: solid; /*todo: eliminare*/
 }
 
 #detail {

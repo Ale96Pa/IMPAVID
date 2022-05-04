@@ -7,13 +7,16 @@
     <link rel="stylesheet" href="style/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script type="text/javascript" src="/eel.js"></script>
+    <script src="__d3-radviz.js"></script>
     <!-- <script type="text/javascript" src="script/configViz.js"></script> -->
     <script type="text/javascript" src="script/dataManage.js"></script>
     <script type="text/javascript" src="script/renderDeviations.js"></script>
     <script type="text/javascript" src="script/renderFitness.js"></script>
     <script type="text/javascript" src="script/renderIncidents.js"></script>
+    <script type="text/javascript" src="script/renderPattern.js"></script>
 </head>
 
 <body>
@@ -83,13 +86,18 @@
 
   <div id="container_bottom">
     <div id="detail">DETAILS</div>
-    <div id="pattern">MULTI-DIMENSIONAL</div>
+
+    <div id="pattern">
+      <div id="patternChart"></div>
+    </div>
   </div>
     
     <script>
-        retrieveAlignment()
-        fooTODO()
-        renderIncidents()
+        rendereDeviationsBlock()
+        // //retrieveAlignment()
+        // fooTODO()
+        // renderIncidents()
+        // renderPattern()
     </script>
 
 </body>

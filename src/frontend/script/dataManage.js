@@ -3,8 +3,10 @@
 //   console.log("Hello from " + x);
 //   return "Hello from " + x;
 // }
-const colorDev = { miss: "#bebada", rep: "#fdb462", mism: "#8dd3c7",
-                n:"#80b1d3", a:"#b3de69", w:"#fb8072",r:"#fccde5",c:"#ffffb3"};
+
+
+// const colorDev = { miss: "#bebada", rep: "#fdb462", mism: "#8dd3c7",
+//                 n:"#80b1d3", a:"#b3de69", w:"#fb8072",r:"#fccde5",c:"#ffffb3"};
 
 function sumErrorsDeviation(data){
     const sumMissing = data.reduce((accumulator, object) => {
