@@ -28,30 +28,20 @@
 
   <div id="container_middle">
 
-    <div id="deviation">DEVIATION <br>
-
+    <div id="deviation"> 
+      
+      <div id="legend"></div>
+      
       <div id="containerDev">
         <div id="divMissing">
-          <div id="divCheckMissing">
-            <input type="checkbox" name="checkDeviations" value="missing" id="checkMissing">
-            <label for="checkMissing">Missing</label>
-          </div>
           <div id="barMissing"></div>
         </div>
 
         <div id="divRepetition">
-          <div id="divCheckRepetition">
-            <input type="checkbox" name="checkDeviations" value="repetition" id="checkRepetition">
-            <label for="checkRepetition">Repetition</label>
-          </div>
           <div id="barRepetition"></div>
         </div>
 
         <div id="divMismatch">
-          <div id="divCheckMismatch">
-            <input type="checkbox" name="checkDeviations" value="mismatch" id="checkMismatch">
-            <label for="checkMismatch">Mismatch</label>
-          </div>
           <div id="barMismatch"></div>
         </div>
       </div>
@@ -63,7 +53,7 @@
       </div>
 
       <div id="containerState">
-        <div id="divCheckedDeviations"></div>
+        <div id="stateDeviations"></div>
       </div>
 
     </div>
@@ -93,11 +83,90 @@
   </div>
     
     <script>
-        rendereDeviationsBlock()
-        // //retrieveAlignment()
-        // fooTODO()
+
+      /* Filters */
+      var selectedErrors = {missing: true, repetition:true, mismatch:true};
+      var selectedActivities = {n:true, a:true, w:true, r:true, c:true};
+      var fitnessRange = [0,1];
+      var costRange = [0,1];
+
+      async function loadData(){
+        return await eel.alignmentsToJson()();
+      }
+      loadData().then(alignments => {
+
+        const alignmentData = Object.entries(JSON.parse(alignments)).map(entry => {
+          return {incident_id: entry[0],
+            ...entry[1]
+          };
+        });
+        var selectedData = alignmentData;
+
+        // Render legend
+        renderLegendError("legend");
+        renderDeviationsBlock(alignmentData, selectedData)
+        renderFitnessBlock(selectedData)
         // renderIncidents()
         // renderPattern()
+
+          d3.selectAll(".barErr").on("click", function(d,i) {
+            switch(i){
+              case "Missing":
+                selectedErrors.missing = !selectedErrors.missing;
+                d3.select(this).style("opacity", selectedErrors.missing ? "1" : "0.5");
+                break;
+              case "Repetition":
+                selectedErrors.repetition = !selectedErrors.repetition;
+                d3.select(this).style("opacity", selectedErrors.repetition ? "1" : "0.5");
+                break;
+              case "Mismatch":
+                selectedErrors.mismatch = !selectedErrors.mismatch
+                d3.select(this).style("opacity", selectedErrors.mismatch ? "1" : "0.5");
+                break;
+              default:
+                selectedErrors;
+                break;
+            }
+            selectedData = filterError(alignmentData, selectedErrors);
+            renderDeviationsBlock(alignmentData, selectedData);
+            renderFitnessBlock(selectedData)
+          });
+
+          d3.selectAll(".barAct").on("click", function(d,i) {
+            switch(i){
+              case "Detection":
+                selectedActivities.n = !selectedActivities.n
+                d3.select(this).style("opacity", selectedActivities.n ? "1" : "0.5");
+                break;
+              case "Activation":
+                selectedActivities.a = !selectedActivities.a
+                d3.select(this).style("opacity", selectedActivities.a ? "1" : "0.5");
+                break;
+              case "Awaiting":
+                selectedActivities.w = !selectedActivities.w
+                d3.select(this).style("opacity", selectedActivities.w ? "1" : "0.5");
+                break;
+              case "Resolution":
+                selectedActivities.r = !selectedActivities.r
+                d3.select(this).style("opacity", selectedActivities.r ? "1" : "0.5");
+                break;
+              case "Closure":
+                selectedActivities.c = !selectedActivities.c
+                d3.select(this).style("opacity", selectedActivities.c ? "1" : "0.5");
+                break;
+              default:
+                selectedActivities;
+                break;
+            }
+            //TODO: da rifare meglio assolutamente
+            selectedData = filterActivities(alignmentData, selectedActivities);
+          });
+
+          
+        });
+
+
+
     </script>
 
 </body>

@@ -26,6 +26,10 @@
     display: inline-block;
 }
 
+#legend {
+    width: 100%;
+}
+
 #containerDev {
     float: left;
     width: 49%;
@@ -36,12 +40,6 @@
 #divMissing, #divRepetition, #divMismatch {
     display: inline-flex;
     width: 100%;
-}
-
-#divCheckMissing, #divCheckRepetition, #divCheckMismatch {
-    float: left;
-    width: 10%;
-    align-self: center;
 }
 
 #barMissing, #barRepetition, #barMismatch {
