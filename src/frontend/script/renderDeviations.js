@@ -237,11 +237,11 @@ function renderErrorsBars(objAlignment, selector){
     
     /* data = [{error:"missing", N:3,A:5, ...}] */
     const data = [{error: "tot", missing: objAlignment.totMissing, repetition:objAlignment.totRepetition, mismatch:objAlignment.totMismatch}]
-
     const subgroups = ["missing","repetition","mismatch"];
+    const fullW = selector == "stateDeviations" ? 800 : 400;
 
     var margin = {top: 10, right: 10, bottom: 20, left: 40},
-    width = 400 - margin.left - margin.right,
+    width = fullW - margin.left - margin.right,
     height = 60 - margin.top - margin.bottom;
 
     var svg = d3.select("#"+selector)
@@ -252,7 +252,7 @@ function renderErrorsBars(objAlignment, selector){
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     sumTotal>0 && svg.append("text")
-    .attr("y", height/2)
+    .attr("y", height/2+margin.top)
     .attr("x",width/2)
     .text(objAlignment.incident_id)
 

@@ -47,6 +47,7 @@
       </div>
 
       <div id="containerTop">
+        <p style="text-align: center; margin: 0;"><b>WORST 3 INCIDENTS</b></p>
         <div id="divTopOne"></div>
         <div id="divTopTwo"></div>
         <div id="divTopThree"></div>
@@ -162,8 +163,27 @@
             selectedData = filterActivities(alignmentData, selectedActivities);
           });
 
+
+          // TODO: FARE UNA FUNZIONE CHE FILTRA TUTTO
+          const y = d3.scaleLinear()
+          .domain([0, 1])
+          .range([ 160, 0]); //TODO: non mettere hardcodato
+
+          function brushAxis({selection}) {
+            fitnessRange = selection.map(y.invert, y);
+            selectedData = alignmentData.filter(elem => {
+                return elem.fitness<=fitnessRange[0] && elem.fitness>=fitnessRange[1]
+            })
+            renderDeviationsBlock(alignmentData, selectedData);
+            //renderFitnessBlock(selectedData);
+          }
+
+          d3.selectAll(".brushAxis")
+          .call(d3.brushY()
+          .on("brush", brushAxis))
+
           
-        });
+      });
 
 
 

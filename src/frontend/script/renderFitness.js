@@ -95,7 +95,7 @@ function renderViolinChart(data, selector, metric){
         .attr("stroke", "white")
 }
 
-function renderFitnessBar(data, selector){
+function renderFitnessBar(alignmentData, data, selector){
     const margin = {top: 10, right: 30, bottom: 30, left: 50},
     width = 550 - margin.left - margin.right,
     height = 200 - margin.top - margin.bottom;
@@ -133,8 +133,8 @@ function renderFitnessBar(data, selector){
     svg.append("g")
     .attr("class", "brushAxis")
     .call(d3.axisLeft(y))
-    .call(d3.brushY()
-        .on("brush", brushAxis))
+    // .call(d3.brushY()
+    //     .on("brush", brushAxis))
     svg.append("text")
         .attr("text-anchor", "end")
         .attr("transform", "rotate(-90)")
@@ -142,16 +142,16 @@ function renderFitnessBar(data, selector){
         .attr("x", -margin.top)
         .text("fitness");
 
-    function brushAxis({selection}) {
-        fitnessRange = selection.map(y.invert, y);
-        filteredFitnessData = data.filter(elem => {
-            return elem.value<=fitnessRange[0] && elem.value>=fitnessRange[1]
-        })
-        //console.log(filteredFitnessData)
-        // Riformattare dati in base alla fitness facendo il matching tramite incident_id con il dataset pieno
-        // renderDeviationsBlock(alignmentData, selectedData);
-        // renderFitnessBlock(filteredFitnessData);
-    }
+    // function brushAxis({selection}) {
+    //     fitnessRange = selection.map(y.invert, y);
+    //     filteredFitnessData = data.filter(elem => {
+    //         return elem.value<=fitnessRange[0] && elem.value>=fitnessRange[1]
+    //     })
+    //     // Riformattare dati in base alla fitness facendo il matching tramite incident_id con il dataset pieno
+    //     console.log(selectedData); 
+    //     // renderDeviationsBlock(alignmentData, selectedData);
+    //     // renderFitnessBlock(filteredFitnessData);
+    // }
 
     // Bars
     svg.selectAll("mybar")
@@ -164,7 +164,7 @@ function renderFitnessBar(data, selector){
         .attr("fill", "#a6bddb");
 }
 
-function renderCostStackedBar(data,selector){
+function renderCostStackedBar(alignmentData, data,selector){
     const margin = {top: 10, right: 30, bottom: 30, left: 50},
     width = 550 - margin.left - margin.right,
     height = 200 - margin.top - margin.bottom;
@@ -246,7 +246,7 @@ function renderFitnessBlock(alignmentData) {
         return {incident_id: elem.incident_id, value: elem.fitness};
     }).sort((a, b) => a.value < b.value ? 1 : -1).slice(0, 100);
     renderViolinChart(violinDataFitness, "fitnessViolin", "fitness");
-    renderFitnessBar(filterFitness, "fitnessBar")
+    renderFitnessBar(alignmentData, filterFitness, "fitnessBar")
 
     // Render cost analysis
     var violinDataCost = alignmentData.map(elem => {
@@ -269,7 +269,7 @@ function renderFitnessBlock(alignmentData) {
     filterCostsInPercentage = filterCostsInPercentage.sort((a, b) => keyFit.indexOf(a.incident_id) - keyFit.indexOf(b.incident_id));
 
     renderViolinChart(violinDataCost, "costViolin", "cost");
-    renderCostStackedBar(filterCostsInPercentage, "costBar")
+    renderCostStackedBar(alignmentData, filterCostsInPercentage, "costBar")
 
     // const filterSeverity = alignmentData.reduce((accumulator, object) => {
     //     switch(object.severity){
@@ -300,53 +300,50 @@ function renderFitnessBlock(alignmentData) {
 
 
 
+// function renderSeverityBar(data,selector){
 
+//     var maxVal = d3.max(data, d => d.value);
 
+//     // set the dimensions and margins of the graph
+//     const margin = {top: 30, right: 30, bottom: 70, left: 60},
+//     width = 460 - margin.left - margin.right,
+//     height = 200 - margin.top - margin.bottom;
 
-function renderSeverityBar(data,selector){
+//     // append the svg object to the body of the page
+//     const svg = d3.select("#"+selector)
+//     .append("svg")
+//     .attr("width", width + margin.left + margin.right)
+//     .attr("height", height + margin.top + margin.bottom)
+//     .append("g")
+//     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    var maxVal = d3.max(data, d => d.value);
+//     // X axis
+//     const x = d3.scaleBand()
+//     .range([ 0, width ])
+//     .domain(data.map(d => d.severity))
+//     .padding(0.2);
+//     var xAxis = d3.axisBottom(x);
+//     svg.append("g")
+//     .attr("transform", `translate(0, ${height})`)
+//     .call(xAxis)
+//     .selectAll("text")
+//     .attr("transform", "translate(-10,0)rotate(-45)")
+//     .style("text-anchor", "end");
 
-    // set the dimensions and margins of the graph
-    const margin = {top: 30, right: 30, bottom: 70, left: 60},
-    width = 460 - margin.left - margin.right,
-    height = 200 - margin.top - margin.bottom;
+//     // Add Y axis
+//     const y = d3.scaleLinear()
+//     .domain([0, maxVal])
+//     .range([ height, 0]);
+//     svg.append("g")
+//     .call(d3.axisLeft(y));
 
-    // append the svg object to the body of the page
-    const svg = d3.select("#"+selector)
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
-
-    // X axis
-    const x = d3.scaleBand()
-    .range([ 0, width ])
-    .domain(data.map(d => d.severity))
-    .padding(0.2);
-    var xAxis = d3.axisBottom(x);
-    svg.append("g")
-    .attr("transform", `translate(0, ${height})`)
-    .call(xAxis)
-    .selectAll("text")
-    .attr("transform", "translate(-10,0)rotate(-45)")
-    .style("text-anchor", "end");
-
-    // Add Y axis
-    const y = d3.scaleLinear()
-    .domain([0, maxVal])
-    .range([ height, 0]);
-    svg.append("g")
-    .call(d3.axisLeft(y));
-
-    // Bars
-    svg.selectAll("mybar")
-    .data(data)
-    .join("rect")
-    .attr("x", d => x(d.severity))
-    .attr("y", d => y(d.value))
-    .attr("width", x.bandwidth())
-    .attr("height", d => height - y(d.value))
-    .attr("fill", "#69b3a2");
-}
+//     // Bars
+//     svg.selectAll("mybar")
+//     .data(data)
+//     .join("rect")
+//     .attr("x", d => x(d.severity))
+//     .attr("y", d => y(d.value))
+//     .attr("width", x.bandwidth())
+//     .attr("height", d => height - y(d.value))
+//     .attr("fill", "#69b3a2");
+// }
