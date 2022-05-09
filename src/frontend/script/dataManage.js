@@ -43,13 +43,26 @@ function filterActivities(data, activityFilter){
 
 function filterBrushes(data, rangeFilter, brushType){
     return data.filter(elem => {
-        console.log(elem);
         return elem[brushType]<=rangeFilter[0] && elem[brushType]>=rangeFilter[1]
     });
 }
 
-function filterCategory(data, selectedCat){
+function filterAlignmentsByCategory(alignment, incidents, selectedCat){
+    var listFilteredInc = incidents.reduce((acc, elem) => {
+        if(selectedCat.includes(elem.category)){
+            acc.push(elem.incident_id);
+        }
+        return acc;
+    }, []);
+    return alignment.filter(elem => {
+        return listFilteredInc.includes(elem.incident_id);
+    })
+}
 
+function filterIncidentsByAlignments(alignment, incidents){
+    return incidents.filter(elem => {
+        return alignment.map(e => e.incident_id).includes(elem.incident_id);
+    });
 }
 
 

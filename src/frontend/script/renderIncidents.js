@@ -95,6 +95,10 @@ function renderBarCategory(data, selector){
 }
 
 async function renderIncidentsBlock(incidentData) {
+
+    d3.select("#parallelIncidents").selectAll("*").remove();
+    d3.select("#barIncidents").selectAll("*").remove();
+
     renderParallelIncidents(incidentData, "parallelIncidents");
 
     const countCategories = incidentData.reduce((accumulator, object) => {

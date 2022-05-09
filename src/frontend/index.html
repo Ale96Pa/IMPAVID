@@ -138,6 +138,9 @@
             selectedAlignments = filterError(alignmentData, selectedErrors);
             renderDeviationsBlock(alignmentData, selectedAlignments);
             renderFitnessBlock(selectedAlignments);
+
+            selectedIncidents = filterIncidentsByAlignments(selectedAlignments, incidentData);
+            renderIncidentsBlock(selectedIncidents);
           });
 
           d3.selectAll(".barAct").on("click", function(d,i) {
@@ -168,35 +171,22 @@
             }
             //TODO: da rifare meglio assolutamente
             selectedAlignments = filterActivities(alignmentData, selectedActivities);
+
+            selectedIncidents = filterIncidentsByAlignments(selectedAlignments, incidentData);
+            renderIncidentsBlock(selectedIncidents);
           });
 
           d3.selectAll(".barCat").on("click", function(d,i) {
-            console.log(i.category);
-            // switch(i){
-            //   case "Detection":
-            //     selectedActivities.n = !selectedActivities.n
-            //     d3.select(this).style("opacity", selectedActivities.n ? "1" : "0.5");
-            //     break;
-            //   case "Activation":
-            //     selectedActivities.a = !selectedActivities.a
-            //     d3.select(this).style("opacity", selectedActivities.a ? "1" : "0.5");
-            //     break;
-            //   case "Awaiting":
-            //     selectedActivities.w = !selectedActivities.w
-            //     d3.select(this).style("opacity", selectedActivities.w ? "1" : "0.5");
-            //     break;
-            //   case "Resolution":
-            //     selectedActivities.r = !selectedActivities.r
-            //     d3.select(this).style("opacity", selectedActivities.r ? "1" : "0.5");
-            //     break;
-            //   case "Closure":
-            //     selectedActivities.c = !selectedActivities.c
-            //     d3.select(this).style("opacity", selectedActivities.c ? "1" : "0.5");
-            //     break;
-            //   default:
-            //     selectedActivities;
-            //     break;
-            // }
+            if(selectedCategories.includes(i.category)){
+              selectedCategories = selectedCategories.filter(e => e !== i.category)
+              d3.select(this).style("opacity", "0.5");
+            } else {
+              selectedCategories = [...selectedCategories, i.category]
+              d3.select(this).style("opacity", "1");
+            }
+            selectedAlignments = filterAlignmentsByCategory(alignmentData, incidentData, selectedCategories);
+            renderDeviationsBlock(alignmentData, selectedAlignments);
+            renderFitnessBlock(selectedAlignments);
           });
 
 
@@ -210,12 +200,18 @@
             selectedAlignments = filterBrushes(alignmentData, fitnessRange, "fitness");
             renderDeviationsBlock(alignmentData, selectedAlignments);
             //renderFitnessBlock(selectedAlignments);
+
+            selectedIncidents = filterIncidentsByAlignments(selectedAlignments, incidentData);
+            renderIncidentsBlock(selectedIncidents);
           }
           function brushAxisC({selection}) {
             costRange = selection.map(y.invert, y);
             selectedAlignments = filterBrushes(alignmentData, costRange, "costTotal");
             renderDeviationsBlock(alignmentData, selectedAlignments);
             //renderFitnessBlock(selectedAlignments);
+
+            selectedIncidents = filterIncidentsByAlignments(selectedAlignments, incidentData);
+            renderIncidentsBlock(selectedIncidents);
           }
 
           d3.selectAll(".brushFitness")
