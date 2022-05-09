@@ -18,12 +18,6 @@ function renderOverviewBlock(alignments, incidents){
     
     renderSequences(dataGroupedStructure, "focus");
 
-    //console.log(incidents);
-
-    // const aa = incidents.reduce((acc, elem)=> {
-
-    // }, []);
-
     const countersOpen = incidents.map(object => {
         var date= moment(object.openTs).format('DD-MMM-YYYY');
         console.log(date);
