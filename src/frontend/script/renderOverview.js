@@ -18,19 +18,12 @@ function renderOverviewBlock(alignments, incidents){
     
     renderSequences(dataGroupedStructure, "focus");
 
-    const countersOpen = incidents.map(object => {
-        var date= moment(object.openTs).format('DD-MMM-YYYY');
-        console.log(date);
-        return Date.parse(object.openTs);
-    });
-    const minDate = Math.max(...countersOpen);
     // const countersClose = incidents.map(object => {
     //     return Date.parse(object.closeTs);
     // });
     // const maxDate = Math.min(...countersClose);
-    console.log(countersOpen);
 
-    renderLineLog(alignments, "context")
+    renderLineLog(incidents, "context")
 }
 
 function renderSequences(data, selector){
