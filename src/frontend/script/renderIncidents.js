@@ -10,7 +10,7 @@ function renderParallelIncidents(data, selector) {
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    dimensions = Object.keys(data[0]).filter(function(d) { return d != "incident_id" })
+    dimensions = Object.keys(data[0]).filter(function(d) { return d == "impact" || d=="urgency" || d=="priority" || d=="category" })
 
     var y = {}
     for (i in dimensions) {

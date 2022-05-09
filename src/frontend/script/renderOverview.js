@@ -1,6 +1,7 @@
 const colorsDev = {N:"#80b1d3", A:"#b3de69", W:"#fb8072",R:"#fccde5",C:"#ffffb3"};
+const dateRange = d3.timeDays(new Date(2016, 2, 19), new Date(2017, 2, 18));
 
-function renderOverviewBlock(alignments){
+function renderOverviewBlock(alignments, incidents){
     const dataGroupedStructure = alignments.reduce((acc, elem)=> {
         var structures = acc.map(e => e.structure);
         if(structures.includes(elem.alignment)){
@@ -16,6 +17,26 @@ function renderOverviewBlock(alignments){
     // console.log(sumTotal);
     
     renderSequences(dataGroupedStructure, "focus");
+
+    //console.log(incidents);
+
+    // const aa = incidents.reduce((acc, elem)=> {
+
+    // }, []);
+
+    const countersOpen = incidents.map(object => {
+        var date= moment(object.openTs).format('DD-MMM-YYYY');
+        console.log(date);
+        return Date.parse(object.openTs);
+    });
+    const minDate = Math.max(...countersOpen);
+    // const countersClose = incidents.map(object => {
+    //     return Date.parse(object.closeTs);
+    // });
+    // const maxDate = Math.min(...countersClose);
+    console.log(countersOpen);
+
+    renderLineLog(alignments, "context")
 }
 
 function renderSequences(data, selector){
@@ -80,4 +101,18 @@ function renderSequences(data, selector){
             .attr("y",height/2+margin.top+margin.bottom)
             .text(function(d,i) {return eventList.length-1 == i ? elem.count : ""})
     });
+}
+
+function renderLineLog(data, selector){
+
+    var margin = {top: 10, right: 30, bottom: 30, left: 60},
+    width = 460 - margin.left - margin.right,
+    height = 100 - margin.top - margin.bottom;
+
+    var svg = d3.select("#"+selector)
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 }
