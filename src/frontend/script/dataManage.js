@@ -27,6 +27,7 @@ function filterError(data, errorFilter){
     });
 }
 
+// TODO
 function filterActivities(data, activityFilter){
     return data.filter(elem => {
         Object.keys(selectedErrors).forEach(err => {
@@ -38,6 +39,17 @@ function filterActivities(data, activityFilter){
         })
         return true;
     });
+}
+
+function filterBrushes(data, rangeFilter, brushType){
+    return data.filter(elem => {
+        console.log(elem);
+        return elem[brushType]<=rangeFilter[0] && elem[brushType]>=rangeFilter[1]
+    });
+}
+
+function filterCategory(data, selectedCat){
+
 }
 
 

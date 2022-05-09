@@ -1,0 +1,3 @@
+Renderings of updates are in:
+- Legends in index.html
+- brushes of renderFitness.js

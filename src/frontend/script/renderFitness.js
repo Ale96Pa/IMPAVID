@@ -26,7 +26,9 @@ function renderViolinChart(data, selector, metric){
     var y = d3.scaleLinear()
     .domain([0,1])
     .range([height, 0])
-    svg.append("g").call(d3.axisLeft(y))
+    svg.append("g")
+    .attr("class", metric == "fitness" ? "brushFitness" : "brushCost")
+    .call(d3.axisLeft(y))
 
     // X scale
     var x = d3.scaleBand()
@@ -131,7 +133,7 @@ function renderFitnessBar(alignmentData, data, selector){
     .domain([0, 1])
     .range([ height, 0]);
     svg.append("g")
-    .attr("class", "brushAxis")
+    //.attr("class", "brushAxis")
     .call(d3.axisLeft(y))
     // .call(d3.brushY()
     //     .on("brush", brushAxis))
