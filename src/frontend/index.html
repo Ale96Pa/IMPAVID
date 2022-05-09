@@ -13,6 +13,10 @@
     <script src="__d3-radviz.js"></script>
     <!-- <script type="text/javascript" src="script/configViz.js"></script> -->
     <script type="text/javascript" src="script/dataManage.js"></script>
+
+    <script type="text/javascript" src="script/renderOverview.js"></script>
+    <script type="text/javascript" src="script/renderHeader.js"></script>
+
     <script type="text/javascript" src="script/renderDeviations.js"></script>
     <script type="text/javascript" src="script/renderFitness.js"></script>
     <script type="text/javascript" src="script/renderIncidents.js"></script>
@@ -21,8 +25,13 @@
 
 <body>
 
+  <div id="container_header">
+    <div id="metrics">METRICS</div>
+    <div id="actions">ACTIONS</div>
+  </div>
+
   <div id="container_top">
-    <div id="focus">FOCUS</div>
+    <div id="focus"></div>
     <div id="context">CONTEXT</div>
   </div>
 
@@ -107,6 +116,8 @@
         });
         selectedAlignments = alignmentData;
         selectedIncidents = incidentData;
+
+        renderOverviewBlock(alignmentData); //todo: selectedAlignments
 
         // Render legend
         renderLegendError("legend");

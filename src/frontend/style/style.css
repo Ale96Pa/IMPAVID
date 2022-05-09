@@ -1,23 +1,35 @@
-#container_top {
+#container_header, #container_top, #container_middle, #container_bottom {
     padding: 1%;
+    display: flex;
 }
 
-#container_middle {
-    padding: 1%;
+/* HEADER BLOCK */
+#metrics {
+    border-style: solid; /*todo: eliminare*/
+    width: 30%;
+    float: left;
 }
 
-#container_bottom {
-    padding: 1%;
+#actions {
+    border-style: solid; /*todo: eliminare*/
+    width: 30%;
+    float: right;
 }
 
+/* OVERVIEW BLOCK */
 #focus {
-    background: red;
-    width: 100%;
+    border-style: solid; /*todo: eliminare*/
+    width: 20%;
+    float: left;
+    height: 200px; /*todo: eliminare*/
+    /*clear: both;*/
+    overflow-y: scroll;
 }
 
 #context {
-    background: blue;
-    width: 100%;
+    border-style: solid; /*todo: eliminare*/
+    width: 78%;
+    float: right;
 }
 
 /* DEVIATION BLOCK */
