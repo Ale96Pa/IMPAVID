@@ -1,4 +1,7 @@
 function renderMetrics(alignments){
+
+    d3.select("#metrics").selectAll("*").remove();
+
     var margin = {top: 10, right: 10, bottom: 20, left: 10},
     width = 300 - margin.left - margin.right,
     height = 60 - margin.top - margin.bottom;

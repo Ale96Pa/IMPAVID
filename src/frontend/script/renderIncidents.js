@@ -10,7 +10,8 @@ function renderParallelIncidents(data, selector) {
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    dimensions = Object.keys(data[0]).filter(function(d) { return d == "impact" || d=="urgency" || d=="priority" || d=="category" })
+
+    dimensions = Object.keys(data[0]).filter(function(d) { return d == "impact" || d=="urgency" || d=="priority" || d=="category" });
 
     var y = {}
     for (i in dimensions) {
@@ -49,7 +50,7 @@ function renderParallelIncidents(data, selector) {
         .style("fill", "black")
 }
 
-function renderBarCategory(data, selector){
+function renderBarCategory(data, fullDataAlignment, fullIncidentData, selector){
     const maxVal = d3.max(data, d => d.value);
 
     var margin = {top: 20, right: 0, bottom: 30, left: 0},
@@ -71,7 +72,6 @@ function renderBarCategory(data, selector){
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x))
     .selectAll("text")
-        //.attr("transform", "translate(-10,0)")
         .style("text-anchor", "end");
 
     var y = d3.scaleBand()
@@ -91,10 +91,24 @@ function renderBarCategory(data, selector){
     .attr("width", function(d) { return x(d.value); })
     .attr("height", y.bandwidth() )
     .attr("fill", "#3182bd")
-    .style("opacity", 0.5);
+    .style("opacity", 0.5)
+    .on("click", function(d,i) {
+        if(selectedCategories.includes(i.category)){
+            selectedCategories = selectedCategories.filter(e => e !== i.category)
+            d3.select(this).style("opacity", "0.5");
+        } else {
+            selectedCategories = [...selectedCategories, i.category]
+            d3.select(this).style("opacity", "1");
+        }
+        selectedAlignments = filterAlignmentsByCategory(fullDataAlignment, fullIncidentData, selectedCategories);
+        renderDeviationsBlock(fullDataAlignment, selectedAlignments);
+        renderFitnessBlock(fullDataAlignment, fullIncidentData, selectedAlignments);
+
+        renderMetrics(selectedAlignments);
+      });
 }
 
-async function renderIncidentsBlock(incidentData) {
+function renderIncidentsBlock(fullDataAlignment, fullIncidentData, incidentData) {
 
     d3.select("#parallelIncidents").selectAll("*").remove();
     d3.select("#barIncidents").selectAll("*").remove();
@@ -112,5 +126,5 @@ async function renderIncidentsBlock(incidentData) {
     const countCategoriesArr = Object.keys(countCategories).map(elem => {
         return {category: elem, value: countCategories[elem]}
     });
-    renderBarCategory(countCategoriesArr, "barIncidents");
+    renderBarCategory(countCategoriesArr, fullDataAlignment, fullIncidentData, "barIncidents");
 }

@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>TODO</title>
+    <title>Visual Analytics for Incident Management</title>
     <link rel="stylesheet" href="style/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -21,6 +21,7 @@
     <script type="text/javascript" src="script/renderDeviations.js"></script>
     <script type="text/javascript" src="script/renderFitness.js"></script>
     <script type="text/javascript" src="script/renderIncidents.js"></script>
+
     <script type="text/javascript" src="script/renderPattern.js"></script>
 </head>
 
@@ -127,8 +128,8 @@
 
         // Render middle part
         renderDeviationsBlock(alignmentData, selectedAlignments)
-        renderFitnessBlock(selectedAlignments)
-        renderIncidentsBlock(selectedIncidents)
+        renderFitnessBlock(alignmentData, incidentData, selectedAlignments)
+        renderIncidentsBlock(alignmentData, incidentData, selectedIncidents)
         // renderPattern()
 
           d3.selectAll(".barErr").on("click", function(d,i) {
@@ -151,10 +152,12 @@
             }
             selectedAlignments = filterError(alignmentData, selectedErrors);
             renderDeviationsBlock(alignmentData, selectedAlignments);
-            renderFitnessBlock(selectedAlignments);
+            renderFitnessBlock(alignmentData, incidentData, selectedAlignments);
 
             selectedIncidents = filterIncidentsByAlignments(selectedAlignments, incidentData);
-            renderIncidentsBlock(selectedIncidents);
+            renderIncidentsBlock(alignmentData, incidentData, selectedIncidents);
+
+            renderMetrics(selectedAlignments);
           });
 
           d3.selectAll(".barAct").on("click", function(d,i) {
@@ -187,56 +190,10 @@
             selectedAlignments = filterActivities(alignmentData, selectedActivities);
 
             selectedIncidents = filterIncidentsByAlignments(selectedAlignments, incidentData);
-            renderIncidentsBlock(selectedIncidents);
-          });
+            renderIncidentsBlock(alignmentData, incidentData, selectedIncidents);
 
-          d3.selectAll(".barCat").on("click", function(d,i) {
-            if(selectedCategories.includes(i.category)){
-              selectedCategories = selectedCategories.filter(e => e !== i.category)
-              d3.select(this).style("opacity", "0.5");
-            } else {
-              selectedCategories = [...selectedCategories, i.category]
-              d3.select(this).style("opacity", "1");
-            }
-            selectedAlignments = filterAlignmentsByCategory(alignmentData, incidentData, selectedCategories);
-            renderDeviationsBlock(alignmentData, selectedAlignments);
-            renderFitnessBlock(selectedAlignments);
-          });
-
-
-          // TODO: FARE UNA FUNZIONE CHE FILTRA TUTTO
-          var y = d3.scaleLinear()
-          .domain([0,1])
-          .range([160, 0]); //TODO: non mettere hardcodato
-
-          function brushAxisF({selection}) {
-            fitnessRange = selection.map(y.invert, y);
-            selectedAlignments = filterBrushes(alignmentData, fitnessRange, "fitness");
-            renderDeviationsBlock(alignmentData, selectedAlignments);
-            //renderFitnessBlock(selectedAlignments);
-
-            selectedIncidents = filterIncidentsByAlignments(selectedAlignments, incidentData);
-            renderIncidentsBlock(selectedIncidents);
-          }
-          function brushAxisC({selection}) {
-            costRange = selection.map(y.invert, y);
-            selectedAlignments = filterBrushes(alignmentData, costRange, "costTotal");
-            renderDeviationsBlock(alignmentData, selectedAlignments);
-            //renderFitnessBlock(selectedAlignments);
-
-            selectedIncidents = filterIncidentsByAlignments(selectedAlignments, incidentData);
-            renderIncidentsBlock(selectedIncidents);
-          }
-
-          d3.selectAll(".brushFitness")
-          .call(d3.brushY()
-          .on("brush", brushAxisF));
-
-          d3.selectAll(".brushCost")
-          .call(d3.brushY()
-          .on("brush", brushAxisC));
-
-          
+            renderMetrics(selectedAlignments);
+          });    
       });
 
 
