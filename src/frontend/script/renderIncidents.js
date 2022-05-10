@@ -105,6 +105,10 @@ function renderBarCategory(data, fullDataAlignment, fullIncidentData, selector){
         renderFitnessBlock(fullDataAlignment, fullIncidentData, selectedAlignments);
 
         renderMetrics(selectedAlignments);
+
+        selectedIncidents = filterIncidentsByAlignments(selectedAlignments, fullIncidentData);
+
+        renderOverviewBlock(selectedAlignments, fullDataAlignment, selectedIncidents, fullIncidentData);
       });
 }
 

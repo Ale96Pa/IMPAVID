@@ -110,6 +110,8 @@ function renderViolinChart(data, fullData, fullIncidentData, selector, metric){
         renderIncidentsBlock(fullData, fullIncidentData, selectedIncidents);
 
         renderMetrics(selectedAlignments);
+
+        renderOverviewBlock(selectedAlignments, fullData, selectedIncidents, fullIncidentData);
     }
 }
 

@@ -65,6 +65,22 @@ function filterIncidentsByAlignments(alignment, incidents){
     });
 }
 
+function filterAlignmentsByIncidents(alignment, incidents){
+    return alignment.filter(elem => {
+        return incidents.map(e => e.incident_id).includes(elem.incident_id);
+    });
+}
+
+function filterData(rangeDate, incidents){
+    return incidents.filter(elem => {
+        var endRange = new Date(rangeDate[1]);
+        var startRange = new Date(rangeDate[0]);
+        var start = new Date(elem.openTs.replace(/(\d+[/])(\d+[/])/, '$2$1'));
+        var end = new Date(elem.closeTs.replace(/(\d+[/])(\d+[/])/, '$2$1'));
+        return (start <= endRange && start >= startRange) || (end <= endRange && end >= startRange);
+    })
+}
+
 
 // // eel.expose(say_hello_js); // Expose this function to Python
 // // function say_hello_js(x) {

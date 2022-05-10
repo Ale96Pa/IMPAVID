@@ -1,8 +1,45 @@
-const colorsDev = {N:"#80b1d3", A:"#b3de69", W:"#fb8072",R:"#fccde5",C:"#ffffb3"};
-const dateRange = d3.timeDays(new Date(2016, 2, 19), new Date(2017, 2, 18));
+// const colorsDev = {N:"#80b1d3", A:"#b3de69", W:"#fb8072",R:"#fccde5",C:"#ffffb3"};
+const dateRange = d3.timeDays(new Date(2016, 1, 19), new Date(2017, 2, 19));
 
-function renderOverviewBlock(alignments, incidents){
-    const dataGroupedStructure = alignments.reduce((acc, elem)=> {
+const formatTime = d3.timeFormat("%Y-%m-%d");
+
+function renderOverviewBlock(alignments, fullAlignmentData, incidents, fullIncidentData){
+
+    d3.select("#focus").selectAll("*").remove();
+    d3.select("#context").selectAll("*").remove();
+
+    renderSequences(alignments, "focus");
+    
+    
+    const allDates = dateRange.map(elem => {return {date: formatTime(elem), value: 0}});
+
+    // TODO: migliorare assolutamente
+    var dataIncTime = incidents.reduce((accumulator, elem) => {
+        var start = new Date(elem.openTs.replace(/(\d+[/])(\d+[/])/, '$2$1'));
+        var end = new Date(elem.closeTs.replace(/(\d+[/])(\d+[/])/, '$2$1'));
+        var numDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 3600 * 24));
+
+        for(var i=0; i<=numDays; i++){
+            var impactedDay = formatTime(start.setDate(start.getDate() + i));
+            var foundObj = accumulator.find(e => {return e.date == impactedDay});
+            if(foundObj){
+                accumulator = accumulator.filter(e => e.date != impactedDay);
+                accumulator = [...accumulator, {date:foundObj.date, value:foundObj.value+1}];
+            }
+        }
+        return accumulator;
+    },allDates);
+
+    dataIncTime = dataIncTime.sort((a,b) => Date.parse(a.date) - Date.parse(b.date))
+
+    renderLineLog(dataIncTime, "context", fullAlignmentData, fullIncidentData)
+}
+
+function renderSequences(alignments, selector){
+
+    d3.select("#focus").selectAll("*").remove();
+
+    var data = alignments.reduce((acc, elem)=> {
         var structures = acc.map(e => e.structure);
         if(structures.includes(elem.alignment)){
             const currentInc = acc.find(e => e.structure == elem.alignment);
@@ -13,20 +50,11 @@ function renderOverviewBlock(alignments, incidents){
         }
         return acc;
     }, []);
-    // const sumTotal =dataGroupedStructure.reduce((a, elem) => a+elem.count, 0);
+    /*to check correctness of data management*/
+    // const sumTotal =data.reduce((a, elem) => a+elem.count, 0);
     // console.log(sumTotal);
-    
-    renderSequences(dataGroupedStructure, "focus");
 
-    // const countersClose = incidents.map(object => {
-    //     return Date.parse(object.closeTs);
-    // });
-    // const maxDate = Math.min(...countersClose);
 
-    renderLineLog(incidents, "context")
-}
-
-function renderSequences(data, selector){
     var len = 0;
     var offset = 1;
     const dBlock = 15;
@@ -90,11 +118,11 @@ function renderSequences(data, selector){
     });
 }
 
-function renderLineLog(data, selector){
+function renderLineLog(data, selector, fullAlignmentData, fullIncidentData){
 
     var margin = {top: 10, right: 30, bottom: 30, left: 60},
-    width = 460 - margin.left - margin.right,
-    height = 100 - margin.top - margin.bottom;
+    width = 1700 - margin.left - margin.right,
+    height = 200 - margin.top - margin.bottom;
 
     var svg = d3.select("#"+selector)
     .append("svg")
@@ -102,4 +130,49 @@ function renderLineLog(data, selector){
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // Add X axis --> it is a date format
+    var x = d3.scaleTime()
+        .domain(d3.extent(data, function(d) {return d3.timeParse("%Y-%m-%d")(d.date); }))
+        .range([ 0, width ]);
+    x.ticks(d3.timeDay.every(1));
+    svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x))
+        .call(d3.brushX()
+            .on("brush", brushDate)
+            //.extent([[0, 0], [180, 163]])
+        );
+
+    // Add Y axis
+    var y = d3.scaleLinear()
+        .domain([0, d3.max(data, function(d) { return +d.value; })])
+        .range([ height, 0 ]);
+    svg.append("g")
+        .call(d3.axisLeft(y));
+
+    // Add the line
+    svg.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 1.5)
+        .attr("d", d3.line()
+            .x(function(d) {return x(d3.timeParse("%Y-%m-%d")(d.date)) })
+            .y(function(d) {return y(d.value) })
+        )
+
+    function brushDate({selection}) {
+        daterange = selection.map(x.invert, x);
+        selectedIncidents = filterData(daterange, fullIncidentData);
+        selectedAlignments = filterAlignmentsByIncidents(fullAlignmentData, selectedIncidents);
+        
+        renderMetrics(selectedAlignments);
+
+        renderSequences(selectedAlignments, "focus");
+
+        renderDeviationsBlock(fullAlignmentData, selectedAlignments);
+        renderFitnessBlock(fullAlignmentData, fullIncidentData, selectedAlignments)
+        renderIncidentsBlock(fullAlignmentData, fullIncidentData, selectedIncidents);
+    }
 }

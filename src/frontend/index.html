@@ -11,6 +11,11 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script type="text/javascript" src="/eel.js"></script>
     <script src="__d3-radviz.js"></script>
+
+    <script>
+      const colorsDev = {N:"#80b1d3", A:"#b3de69", W:"#fb8072",R:"#fccde5",C:"#ffffb3"};
+    </script>
+
     <!-- <script type="text/javascript" src="script/configViz.js"></script> -->
     <script type="text/javascript" src="script/dataManage.js"></script>
 
@@ -34,7 +39,7 @@
 
   <div id="container_top">
     <div id="focus"></div>
-    <div id="context">CONTEXT</div>
+    <div id="context"></div>
   </div>
 
   <div id="container_middle">
@@ -121,7 +126,7 @@
 
         renderMetrics(selectedAlignments);
 
-        renderOverviewBlock(alignmentData, incidentData); //todo: selectedAlignments
+        renderOverviewBlock(selectedAlignments, alignmentData, selectedIncidents, incidentData); //todo: selectedAlignments
 
         // Render legend
         renderLegendError("legend");
@@ -151,6 +156,9 @@
                 break;
             }
             selectedAlignments = filterError(alignmentData, selectedErrors);
+
+            renderOverviewBlock(selectedAlignments, alignmentData, selectedIncidents, incidentData);
+
             renderDeviationsBlock(alignmentData, selectedAlignments);
             renderFitnessBlock(alignmentData, incidentData, selectedAlignments);
 
@@ -188,6 +196,8 @@
             }
             //TODO: da rifare meglio assolutamente
             selectedAlignments = filterActivities(alignmentData, selectedActivities);
+
+            renderOverviewBlock(selectedAlignments, alignmentData, selectedIncidents, incidentData);
 
             selectedIncidents = filterIncidentsByAlignments(selectedAlignments, incidentData);
             renderIncidentsBlock(alignmentData, incidentData, selectedIncidents);
