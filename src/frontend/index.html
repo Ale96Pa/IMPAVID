@@ -16,13 +16,24 @@
       /* Configurations */
       const colorDev = { tot:"grey", miss: "#bebada", rep: "#fdb462", mism: "#8dd3c7",
                         N:"#80b1d3", A:"#b3de69", W:"#fb8072",R:"#fccde5",C:"#ffffb3"};
-      const dateRange = d3.timeDays(new Date(2016, 1, 19), new Date(2017, 2, 19));
+      const fullDateRange = d3.timeDays(new Date(2016, 1, 19), new Date(2017, 2, 19));
       const formatTime = d3.timeFormat("%Y-%m-%d");
       const colorSeverity = {none:"#1a9641",low:"#a6d96a",medium:"#ffffbf",high:"#fdae61",critical:"#d7191c"};
       const threshold = {"low":0.37,"medium":0.69,"high":0.89}
 
-      /* Shared data */
+      /* Shared filters */
+      var dateRange = [fullDateRange[0], fullDateRange[fullDateRange.length-1]];
+      var selectedErrors = {missing: false, repetition:false, mismatch:false};
+      var selectedActivities = {n:false, a:false, w:false, r:false, c:false};
+      var fitnessRange = [1,0];
+      var costRange = [1,0];
       var selectedCategories = [];
+
+      /* Shared data */
+      var filteredAlignmentsData, filteredIncidentsData;
+      async function loadData(){
+        return await eel.processData()();
+      }
 
     </script>
 
@@ -92,7 +103,6 @@
 
       <div id="costViolin"></div>
       <div id="costBar"></div>
-      <!-- <div id="severityBar">SEVERITY</div> -->
     </div>
     
     <div id="incident">
@@ -110,44 +120,34 @@
   </div>
     
     <script>
-
-      /* Filters */
-      var alignmentData, incidentData, selectedAlignments, selectedIncidents;
-      var selectedErrors = {missing: false, repetition:false, mismatch:false};
-      var selectedActivities = {n:false, a:false, w:false, r:false, c:false};
-      var fitnessRange = [0,1];
-      var costRange = [0,1];
-      // var selectedCategories = [];
-
-      async function loadData(){
-        const incidents = await eel.incidentsToJson()();
-        incidentData = JSON.parse(incidents);
-        return await eel.alignmentsToJson()();
-      }
-      loadData().then(alignments => {
-
-        const alignmentData = Object.entries(JSON.parse(alignments)).map(entry => {
+      loadData().then(data => {
+        const alignmentsData = Object.entries(JSON.parse(data[0])).map(entry => {
           return {incident_id: entry[0],
             ...entry[1]
           };
         });
-        selectedAlignments = alignmentData;
-        selectedIncidents = incidentData;
+        const incidentsData = JSON.parse(data[1]);
 
-        renderMetrics(selectedAlignments);
+        selectedCategories = [...new Set(incidentsData.map(e => e.category))];
+        filteredAlignmentsData = alignmentsData;
+        filteredIncidentsData = incidentsData;
 
-        renderOverviewBlock(selectedAlignments, alignmentData, selectedIncidents, incidentData); //todo: selectedAlignments
-
-        // Render legend
+        /* FIRST RENDER: default viz*/
+        // Render top part
+        renderMetrics();
         renderLegendError("legend");
+        renderOverviewBlock(alignmentsData, incidentsData);
 
         // Render middle part
-        renderDeviationsBlock(alignmentData, selectedAlignments)
-        renderFitnessBlock(alignmentData, incidentData, selectedAlignments)
-        renderIncidentsBlock(alignmentData, incidentData, selectedIncidents)
+        renderDeviationsBlock(alignmentsData)
+        renderFitnessBlock(alignmentsData, incidentsData)
+        renderIncidentsBlock(alignmentsData, incidentsData)
 
+        // Render bottom part
         // renderPattern()
-                
+
+
+        /* LISTENER LEGEND */        
         d3.selectAll(".barErr").on("click", function(d,i) {
           switch(i){
             case "Missing":
@@ -166,17 +166,18 @@
               selectedErrors;
               break;
           }
-          selectedAlignments = filterError(alignmentData, selectedErrors);
+          combineFilters(alignmentsData, incidentsData);
 
-          renderOverviewBlock(selectedAlignments, alignmentData, selectedIncidents, incidentData);
+          // filteredAlignmentsData = filterError(alignmentsData, selectedErrors);
+          // filteredIncidentsData = filterIncidentsByAlignments(filteredAlignmentsData, incidentsData);
 
-          renderDeviationsBlock(alignmentData, selectedAlignments);
-          renderFitnessBlock(alignmentData, incidentData, selectedAlignments);
+          renderMetrics();
+          renderOverviewBlock(alignmentsData, incidentsData);
 
-          selectedIncidents = filterIncidentsByAlignments(selectedAlignments, incidentData);
-          renderIncidentsBlock(alignmentData, incidentData, selectedIncidents);
+          renderDeviationsBlock(alignmentsData);
+          renderFitnessBlock(alignmentsData, incidentsData);
+          renderIncidentsBlock(alignmentsData, incidentsData);
 
-          renderMetrics(selectedAlignments);
         });
 
         d3.selectAll(".barAct").on("click", function(d,i) {
@@ -206,16 +207,17 @@
               break;
           }
           //TODO: da rifare meglio assolutamente
-          selectedAlignments = filterActivities(alignmentData, selectedActivities);
+          filteredAlignmentsData = filterActivities(alignmentsData, selectedActivities);
 
-          renderOverviewBlock(selectedAlignments, alignmentData, selectedIncidents, incidentData);
+          renderOverviewBlock(alignmentsData, incidentsData);
 
-          selectedIncidents = filterIncidentsByAlignments(selectedAlignments, incidentData);
-          renderIncidentsBlock(alignmentData, incidentData, selectedIncidents);
+          filteredIncidentsData = filterIncidentsByAlignments(filteredAlignmentsData, incidentsData);
+          renderIncidentsBlock(alignmentsData, incidentsData);
 
-          renderMetrics(selectedAlignments);
+          renderMetrics();
         });    
       });
+
 
 
 

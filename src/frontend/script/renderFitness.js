@@ -1,9 +1,53 @@
 /* TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 - OTTENERE width in modo dinamico
+- MANTERE IL BRUSH NELLA SELEZIONE FATTA
 */
 
-function renderViolinChart(data, fullData, fullIncidentData, selector, metric){
-    const jitterWidth = 30; //Right dots spread
+const maxTracesBarchart = 100;
+
+function renderFitnessBlock(fullAlignmentData, fullIncidentData) {
+
+    d3.select("#fitnessViolin").selectAll("*").remove();
+    d3.select("#fitnessBar").selectAll("*").remove();
+    d3.select("#costViolin").selectAll("*").remove();
+    d3.select("#costBar").selectAll("*").remove();
+
+    // Render fitness analysis
+    var violinDataFitness = filteredAlignmentsData.map(elem => {
+        return {metric: "fitness", value: elem.fitness};
+    });
+    var filterFitness = filteredAlignmentsData.map(elem => {
+        return {incident_id: elem.incident_id, value: elem.fitness};
+    }).sort((a, b) => a.value < b.value ? 1 : -1).slice(0, maxTracesBarchart);
+    renderViolinChart(violinDataFitness, fullAlignmentData, fullIncidentData, "fitnessViolin", "fitness");
+    renderFitnessBar(filterFitness, "fitnessBar")
+
+    // Render cost analysis
+    var violinDataCost = filteredAlignmentsData.map(elem => {
+        return {metric: "cost", value: elem.costTotal};
+    });
+    var filterCostsInPercentage = filteredAlignmentsData.map(elem => {
+        const tot = elem.costMissing+elem.costMismatch+elem.costRepetition;
+        const percMiss = elem.costMissing*100/tot;
+        const percRep = elem.costRepetition*100/tot;
+        const percMism = elem.costMismatch*100/tot;
+        
+        return {incident_id: elem.incident_id, 
+            costTot: elem.costTotal, 
+            missing: percMiss*elem.costTotal/100, 
+            repetition: percRep*elem.costTotal/100, 
+            mismatch: percMism*elem.costTotal/100
+        };
+    });
+    const keyFit = filterFitness.map(elem => elem.incident_id);
+    filterCostsInPercentage = filterCostsInPercentage.sort((a, b) => keyFit.indexOf(a.incident_id) - keyFit.indexOf(b.incident_id));
+
+    renderViolinChart(violinDataCost, fullAlignmentData, fullIncidentData, "costViolin", "cost");
+    renderCostStackedBar(filterCostsInPercentage, "costBar")
+}
+
+function renderViolinChart(data, fullAlignmentData, fullIncidentData, selector, metric){
+    const jitterWidth = 30;
 
     var margin = {top: 10, right: 30, bottom: 30, left: 40},
     width = 250 - margin.left - margin.right,
@@ -24,7 +68,7 @@ function renderViolinChart(data, fullData, fullIncidentData, selector, metric){
     .attr("class", metric == "fitness" ? "brushFitness" : "brushCost")
     .call(d3.axisLeft(y))
     .call(d3.brushY()
-        .on("brush", brushAxis)
+        .on("end", brushAxis)
         .extent([[0, 0], [height, height]])
     )
 
@@ -32,7 +76,7 @@ function renderViolinChart(data, fullData, fullIncidentData, selector, metric){
     var x = d3.scaleBand()
     .range([ 0, width ])
     .domain([metric])
-    .padding(0.05)
+    //.padding(0.05)
     svg.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x))
@@ -95,22 +139,22 @@ function renderViolinChart(data, fullData, fullIncidentData, selector, metric){
         .attr("stroke", "white")
 
     function brushAxis({selection}) {
-        console.log(selectedCategories);
         metricRange = selection.map(y.invert, y);
-        selectedAlignments = filterBrushes(fullData, metricRange, metric == "fitness" ? "fitness" : "costTotal");
-        renderDeviationsBlock(fullData, selectedAlignments);
-        //renderFitnessBlock(selectedAlignments);
+        if(metric == "fitness") fitnessRange = metricRange
+        else costRange = metricRange
+        // selectedAlignments = filterBrushes(fullAlignmentData, metricRange, metric == "fitness" ? "fitness" : "costTotal");
+        // selectedIncidents = filterIncidentsByAlignments(selectedAlignments, fullIncidentData);
+        combineFilters(fullAlignmentData, fullIncidentData);
 
-        selectedIncidents = filterIncidentsByAlignments(selectedAlignments, incidentData);
-        renderIncidentsBlock(fullData, fullIncidentData, selectedIncidents);
-
-        renderMetrics(selectedAlignments);
-
-        renderOverviewBlock(selectedAlignments, fullData, selectedIncidents, fullIncidentData);
+        renderMetrics();
+        renderOverviewBlock(fullAlignmentData, fullIncidentData);
+        
+        renderDeviationsBlock(fullAlignmentData);
+        renderIncidentsBlock(fullAlignmentData, fullIncidentData);
     }
 }
 
-function renderFitnessBar(alignmentData, data, selector){
+function renderFitnessBar(data, selector){
     const margin = {top: 10, right: 30, bottom: 30, left: 50},
     width = 550 - margin.left - margin.right,
     height = 250 - margin.top - margin.bottom;
@@ -121,7 +165,6 @@ function renderFitnessBar(alignmentData, data, selector){
         .attr("height", height + margin.top + margin.bottom)
     .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
-
 
     // X axis
     const x = d3.scaleBand()
@@ -165,7 +208,7 @@ function renderFitnessBar(alignmentData, data, selector){
         .attr("fill", "#a6bddb");
 }
 
-function renderCostStackedBar(alignmentData, data,selector){
+function renderCostStackedBar(data,selector){
     const margin = {top: 10, right: 30, bottom: 30, left: 50},
     width = 550 - margin.left - margin.right,
     height = 250 - margin.top - margin.bottom;
@@ -232,72 +275,34 @@ function renderCostStackedBar(alignmentData, data,selector){
             .attr("width",x.bandwidth())
 }
 
-function renderFitnessBlock(fullData, fullIncidentData, alignmentData) {
 
-    d3.select("#fitnessViolin").selectAll("*").remove();
-    d3.select("#fitnessBar").selectAll("*").remove();
-    d3.select("#costViolin").selectAll("*").remove();
-    d3.select("#costBar").selectAll("*").remove();
 
-    // Render fitness analysis
-    var violinDataFitness = alignmentData.map(elem => {
-        return {metric: "fitness", value: elem.fitness};
-    });
-    var filterFitness = alignmentData.map(elem => {
-        return {incident_id: elem.incident_id, value: elem.fitness};
-    }).sort((a, b) => a.value < b.value ? 1 : -1).slice(0, 100);
-    renderViolinChart(violinDataFitness, fullData, fullIncidentData, "fitnessViolin", "fitness");
-    renderFitnessBar(alignmentData, filterFitness, "fitnessBar")
+// const filterSeverity = alignmentData.reduce((accumulator, object) => {
+//     switch(object.severity){
+//         case "none":
+//             accumulator[0].value++
+//             break;
+//         case "low":
+//             accumulator[1].value++
+//             break;
+//         case "medium":
+//             accumulator[2].value++
+//             break;
+//         case "high":
+//             accumulator[3].value++
+//             break;
+//         case "critical":
+//             accumulator[4].value++
+//             break;
+//         default:
+//             break;
+//     }
+//     return accumulator;
+// }, [{severity:"none", value:0}, {severity:"low", value:0}, {severity:"medium", value:0}, {severity:"high", value:0}, {severity:"critical", value:0}]);
+// //console.log(filterSeverity)
 
-    // Render cost analysis
-    var violinDataCost = alignmentData.map(elem => {
-        return {metric: "cost", value: elem.costTotal};
-    });
-    var filterCostsInPercentage = alignmentData.map(elem => {
-        const tot = elem.costMissing+elem.costMismatch+elem.costRepetition;
-        const percMiss = elem.costMissing*100/tot;
-        const percRep = elem.costRepetition*100/tot;
-        const percMism = elem.costMismatch*100/tot;
-        
-        return {incident_id: elem.incident_id, 
-            costTot: elem.costTotal, 
-            missing: percMiss*elem.costTotal/100, 
-            repetition: percRep*elem.costTotal/100, 
-            mismatch: percMism*elem.costTotal/100
-        };
-    });
-    const keyFit = filterFitness.map(elem => elem.incident_id);
-    filterCostsInPercentage = filterCostsInPercentage.sort((a, b) => keyFit.indexOf(a.incident_id) - keyFit.indexOf(b.incident_id));
+// //renderSeverityBar(filterSeverity, "severityBar")
 
-    renderViolinChart(violinDataCost, fullData, fullIncidentData, "costViolin", "cost");
-    renderCostStackedBar(alignmentData, filterCostsInPercentage, "costBar")
-
-    // const filterSeverity = alignmentData.reduce((accumulator, object) => {
-    //     switch(object.severity){
-    //         case "none":
-    //             accumulator[0].value++
-    //             break;
-    //         case "low":
-    //             accumulator[1].value++
-    //             break;
-    //         case "medium":
-    //             accumulator[2].value++
-    //             break;
-    //         case "high":
-    //             accumulator[3].value++
-    //             break;
-    //         case "critical":
-    //             accumulator[4].value++
-    //             break;
-    //         default:
-    //             break;
-    //     }
-    //     return accumulator;
-    // }, [{severity:"none", value:0}, {severity:"low", value:0}, {severity:"medium", value:0}, {severity:"high", value:0}, {severity:"critical", value:0}]);
-    // //console.log(filterSeverity)
-
-    // //renderSeverityBar(filterSeverity, "severityBar")
-}
 
 
 

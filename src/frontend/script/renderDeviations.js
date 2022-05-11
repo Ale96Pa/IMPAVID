@@ -1,28 +1,12 @@
 /* TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-- GESTIRE minWidth
 - OTTENERE width in modo dinamico
 */
 const minW = 20;
 
-/* AUXILIARY FUNCTIONS */
-
-function sumErrorsDeviation(data, error){
-    return data.reduce((accumulator, object) => {
-        return {
-            N: accumulator.N + object[error].N,
-            A: accumulator.A + object[error].A,
-            W: accumulator.W + (object[error].W || 0),
-            R: accumulator.R + object[error].R,
-            C: accumulator.C + object[error].C,
-        }
-    }, {N:0, A:0, W:0, R:0, C:0});
-}
-
-/* MAIN RENDER */
-
-function renderDeviationsBlock(fullAlignments, alignments) {
-    fullAlignments = fullAlignments.filter(inc => inc.totMissing+inc.totRepetition+inc.totMismatch>0);
-    alignments = alignments.filter(inc => inc.totMissing+inc.totRepetition+inc.totMismatch>0);
+function renderDeviationsBlock(fullAlignmentData) {
+    const sorter = (a, b) => a.totMissing+a.totRepetition+a.totMismatch < b.totMissing+b.totRepetition+b.totMismatch ? 1 : -1;
+    const sortedErrors = fullAlignmentData.filter(inc => inc.totMissing+inc.totRepetition+inc.totMismatch>0).sort(sorter);
+    const sortedFilteredErrors = filteredAlignmentsData.sort(sorter);
 
     d3.select("#barMissing").selectAll("*").remove();
     d3.select("#barRepetition").selectAll("*").remove();
@@ -35,124 +19,25 @@ function renderDeviationsBlock(fullAlignments, alignments) {
     d3.select("#stateDeviations").selectAll("*").remove();
 
     // Render bars for each error category    
-    renderActivityBars(alignments, "missing", "barMissing");
-    renderActivityBars(alignments, "repetition", "barRepetition");
-    renderActivityBars(alignments, "mismatch","barMismatch");
+    renderActivityBars(sortedFilteredErrors, "missing", "barMissing");
+    renderActivityBars(sortedFilteredErrors, "repetition", "barRepetition");
+    renderActivityBars(sortedFilteredErrors, "mismatch","barMismatch");
     
     // Render bars for the top 3 wrong traces
-    const sorter = (a, b) => a.totMissing+a.totRepetition+a.totMismatch < b.totMissing+b.totRepetition+b.totMismatch ? 1 : -1;
-    const sortedErrors = fullAlignments.sort(sorter);
     renderErrorsBars(sortedErrors[0], "divTopOne");
     renderErrorsBars(sortedErrors[1], "divTopTwo");
     renderErrorsBars(sortedErrors[2], "divTopThree");
     
-    // Render checkboxes and state block
-    const sortedFilteredErrors = alignments.sort(sorter);
-    renderState(sortedFilteredErrors, "stateDeviations", sorter);
+    // Render state block
+    renderState(sortedFilteredErrors, "stateDeviations");
 }
-
 
 /* ERROR CATEGORY BLOCK */
-function renderLegendError(selector){
-    var len = 0;
-    var offset = 100;
-    const dBlock = 20;
-    var margin = {top: 10, right: 10, bottom: 20, left: 40},
-    width = 550 - margin.left - margin.right,
-    height = 120 - margin.top - margin.bottom;
-
-    const keysError = ["Missing", "Repetition", "Mismatch"]
-    const keysActivity = ["Detection", "Activation", "Awaiting", "Resolution", "Closure"]
-    const colorError = d3.scaleOrdinal()
-    .domain(keysError)
-    .range([colorDev.miss, colorDev.rep, colorDev.mism]);
-    const colorActivity = d3.scaleOrdinal()
-    .domain(keysActivity)
-    .range([colorDev.N,colorDev.A,colorDev.W,colorDev.R,colorDev.C]);
-
-    var svg = d3.select("#"+selector)
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .style("display", "block")
-    .style("margin", "auto");
-
-    var legContainerError = svg.selectAll(selector+".itemE")
-        .data(keysError)
-        .enter().append('g')
-        .attr("class", selector+".itemE")
-        .attr("transform", function (d, i) {
-            if (i === 0) {
-                len = d.length + offset 
-                return "translate(0,0)"
-            } else { 
-                var prevLen = len
-                len +=  d.length + offset
-                return "translate(" + (prevLen) + ",0)"
-            }
-        });
-    legContainerError.append("rect")
-    .attr("class", "barErr")
-    .attr("x", dBlock)
-    .attr("y", dBlock)
-    .attr("width", dBlock)
-    .attr("height", dBlock)
-    .style("fill", function(d){ return colorError(d)})
-    .style("stroke", "black")
-    .style("stroke-width", 2)
-    .style("opacity", "0.5");
-    legContainerError.append("text")
-    .attr("x", dBlock + dBlock*1.2)
-    .attr("y", dBlock+ (dBlock/2))
-    .text(function(d){ return d})
-    .attr("text-anchor", "left")
-    .style("alignment-baseline", "middle")
-
-    var legContainerActivity = svg.selectAll(selector+".itemA")
-        .data(keysActivity)
-        .enter().append('g')
-        .attr("transform", function (d, i) {
-            if (i === 0) {
-                len = d.length + offset 
-                return "translate(0,0)"
-            } else { 
-                var prevLen = len
-                len +=  d.length + offset
-                return "translate(" + (prevLen) + ",0)"
-            }
-        })
-    legContainerActivity.append("rect")
-        .attr("class", "barAct")
-        .attr("x", dBlock)
-        .attr("y", 3*dBlock)
-        .attr("width", dBlock)
-        .attr("height", dBlock)
-        .style("fill", function(d){ return colorActivity(d)})
-        .style("stroke", "black")
-        .style("stroke-width", 2)
-        .style("opacity", "0.5");;        
-    legContainerActivity.append("text")
-        .attr("x", dBlock + dBlock*1.2)
-        .attr("y", 3*dBlock + (dBlock/2))
-        .text(function(d){ return d})
-        .attr("text-anchor", "left")
-        .style("alignment-baseline", "middle");
-
-    // svg.selectAll(".barErr").on("click", function(d,i) {console.log(i);})
-    // svg.selectAll(".barAct").on("click", function(d,i) {console.log(i);})
-
-}
-
 function renderActivityBars(alignments, error, selector){
 
-    /* objDeviations = {N:3,A:5, ...}*/
     const objDeviations = sumErrorsDeviation(alignments, error);
-    
     const sumTotal = Object.values(objDeviations).reduce((a, b) => a + b, 0);
-    
-    /* data = [{error:"missing", N:3,A:5, ...}] */
     const data = [{error:error, ...objDeviations}]
-
     const subgroups = ["N","A","W","R","C"];
 
     var margin = {top: 10, right: 10, bottom: 20, left: 40},
@@ -254,8 +139,6 @@ function renderActivityBars(alignments, error, selector){
 function renderErrorsBars(objAlignment, selector){
 
     const sumTotal = objAlignment.totMissing+objAlignment.totRepetition+objAlignment.totMismatch;
-    
-    /* data = [{error:"missing", N:3,A:5, ...}] */
     const data = [{error: "tot", missing: objAlignment.totMissing, repetition:objAlignment.totRepetition, mismatch:objAlignment.totMismatch}]
     const subgroups = ["missing","repetition","mismatch"];
     const fullW = selector == "stateDeviations" ? 800 : 400;
@@ -354,8 +237,22 @@ function renderErrorsBars(objAlignment, selector){
         .text(function(d) {/*return d[0][1]-d[0][0] == 0 ? "" : d[0][1]-d[0][0]*/return d.val == 0 ? "" : d.val})
 }
 
-function renderState(alignments, selector, sorter) {
+function renderState(alignments, selector) {
     for(var i=0;i<alignments.length;i++){
         renderErrorsBars(alignments[i],selector)
     }
+}
+
+/* AUXILIARY FUNCTIONS */
+
+function sumErrorsDeviation(data, error){
+    return data.reduce((accumulator, object) => {
+        return {
+            N: accumulator.N + object[error].N,
+            A: accumulator.A + object[error].A,
+            W: accumulator.W + (object[error].W || 0),
+            R: accumulator.R + object[error].R,
+            C: accumulator.C + object[error].C,
+        }
+    }, {N:0, A:0, W:0, R:0, C:0});
 }

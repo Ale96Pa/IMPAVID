@@ -1,15 +1,13 @@
-function renderOverviewBlock(alignments, fullAlignmentData, incidents, fullIncidentData){
+function renderOverviewBlock(fullAlignmentData, fullIncidentData){
 
     d3.select("#focus").selectAll("*").remove();
     d3.select("#context").selectAll("*").remove();
 
-    renderSequences(alignments, "focus");
+    renderSequences("focus");
     
-    
-    const allDates = dateRange.map(elem => {return {date: formatTime(elem), value: 0}});
-
+    const allDates = fullDateRange.map(elem => {return {date: formatTime(elem), value: 0}});
     // TODO: migliorare assolutamente
-    var dataIncTime = incidents.reduce((accumulator, elem) => {
+    var dataIncTime = /*incidents*/filteredIncidentsData.reduce((accumulator, elem) => {
         var start = new Date(elem.openTs.replace(/(\d+[/])(\d+[/])/, '$2$1'));
         var end = new Date(elem.closeTs.replace(/(\d+[/])(\d+[/])/, '$2$1'));
         var numDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 3600 * 24));
@@ -30,11 +28,19 @@ function renderOverviewBlock(alignments, fullAlignmentData, incidents, fullIncid
     renderLineLog(dataIncTime, "context", fullAlignmentData, fullIncidentData)
 }
 
-function renderSequences(alignments, selector){
+function renderSequences(selector){
 
     d3.select("#focus").selectAll("*").remove();
 
-    var data = alignments.reduce((acc, elem)=> {
+    var len = 0;
+    const offset = 1;
+    const dBlock = 20;
+
+    var margin = {top: 0, right: 5, bottom: 0, left: 10},
+    width = 450 - margin.left - margin.right,
+    height = 50 - margin.top - margin.bottom;
+
+    const data = filteredAlignmentsData.reduce((acc, elem)=> {
         var structures = acc.map(e => e.structure);
         if(structures.includes(elem.alignment)){
             const currentInc = acc.find(e => e.structure == elem.alignment);
@@ -44,23 +50,13 @@ function renderSequences(alignments, selector){
             acc = [...acc, {structure:elem.alignment, count:1}]
         }
         return acc;
-    }, []);
+    }, []).sort((a,b) => b.count - a.count);;
     /*to check correctness of data management*/
     // const sumTotal =data.reduce((a, elem) => a+elem.count, 0);
     // console.log(sumTotal);
 
-
-    var len = 0;
-    var offset = 1;
-    const dBlock = 20;
-
-    var margin = {top: 0, right: 5, bottom: 0, left: 10},
-    width = 450 - margin.left - margin.right,
-    height = 50 - margin.top - margin.bottom;
-    
-    const keysActivity = ["Detection", "Activation", "Awaiting", "Resolution", "Closure"]
     const colorActivity = d3.scaleOrdinal()
-    .domain(keysActivity)
+    .domain(["N","A","W","R","C"])
     .range([colorDev.N,colorDev.A,colorDev.W,colorDev.R,colorDev.C]);
 
     /* to get maximum number of events ==> maximum length */
@@ -69,7 +65,7 @@ function renderSequences(alignments, selector){
     //   });
     // const maxVal = Math.max(...counters)*dBlock;
 
-    data = data.sort((a,b) => b.count - a.count);
+    //data = data.sort((a,b) => b.count - a.count);
 
     data.map((elem,i) => {
         const eventList = elem.structure.split(";").filter(e => !e.includes("M")).map(el => el.split("]")[1]).slice(0, -1);
@@ -98,7 +94,7 @@ function renderSequences(alignments, selector){
         .attr("y", dBlock)
         .attr("width", dBlock)
         .attr("height", dBlock)
-        .style("fill", function(d){ return colorActivity(d)})
+        .style("fill", function(d){return colorActivity(d)})
         .style("stroke", "black")
         .style("stroke-width", 1); 
         container.append("text")
@@ -143,7 +139,7 @@ function renderLineLog(data, selector, fullAlignmentData, fullIncidentData){
         .tickFormat(d3.timeFormat('%-m/%-d/%y'))
         )
         .call(d3.brushX()
-            .on("brush", brushDate)
+            .on("end", brushDate)
         );
 
     // Add Y axis
@@ -171,16 +167,16 @@ function renderLineLog(data, selector, fullAlignmentData, fullIncidentData){
         )
 
     function brushDate({selection}) {
-        daterange = selection.map(x.invert, x);
-        selectedIncidents = filterData(daterange, fullIncidentData);
-        selectedAlignments = filterAlignmentsByIncidents(fullAlignmentData, selectedIncidents);
+        dateRange = selection.map(x.invert, x);
+        // selectedIncidents = filterDate(dateRange, fullIncidentData);
+        // selectedAlignments = filterAlignmentsByIncidents(fullAlignmentData, selectedIncidents);
+        combineFilters(fullAlignmentData, fullIncidentData);
         
-        renderMetrics(selectedAlignments);
+        renderMetrics();
+        renderSequences("focus");
 
-        renderSequences(selectedAlignments, "focus");
-
-        renderDeviationsBlock(fullAlignmentData, selectedAlignments);
-        renderFitnessBlock(fullAlignmentData, fullIncidentData, selectedAlignments)
-        renderIncidentsBlock(fullAlignmentData, fullIncidentData, selectedIncidents);
+        renderDeviationsBlock(fullAlignmentData);
+        renderFitnessBlock(fullAlignmentData, fullIncidentData)
+        renderIncidentsBlock(fullAlignmentData, fullIncidentData);
     }
 }

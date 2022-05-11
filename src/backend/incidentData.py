@@ -17,10 +17,10 @@ def formatIncidents(inputFile):
         for row in csv_reader:
             if line_count != 0:
                 res.append({"incident_id": row[0], "impact":row[20], "urgency":row[21], "priority":row[22], "category":row[16], "openTs":row[10], "closeTs":row[35]})
-            else:
-                print(row)
-                # for i in range(0,len(row)):
-                #     print(row[i]+"--"+str(i))
+            # else:
+            #     print(row)
+            #     for i in range(0,len(row)):
+            #         print(row[i]+"--"+str(i))
             line_count+=1
     result = list({i['incident_id']:i for i in res}.values())
     return result
