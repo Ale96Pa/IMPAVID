@@ -6,19 +6,28 @@
 /* HEADER BLOCK */
 #metrics {
     border-style: solid; /*todo: eliminare*/
-    width: 30%;
+    border-width: 2px; /*todo: eliminare*/
+    width: 20%;
     float: left;
+}
+
+#legend {
+    border-style: solid; /*todo: eliminare*/
+    border-width: 2px; /*todo: eliminare*/
+    width: 30%;
 }
 
 #actions {
     border-style: solid; /*todo: eliminare*/
-    width: 30%;
+    border-width: 2px; /*todo: eliminare*/
+    width: 20%;
     float: right;
 }
 
 /* OVERVIEW BLOCK */
 #focus {
     border-style: solid; /*todo: eliminare*/
+    border-width: 2px; /*todo: eliminare*/
     width: 20%;
     float: left;
     height: 200px; /*todo: eliminare*/
@@ -28,6 +37,7 @@
 
 #context {
     border-style: solid; /*todo: eliminare*/
+    border-width: 2px; /*todo: eliminare*/
     width: 78%;
     float: right;
 }
@@ -38,14 +48,11 @@
     display: inline-block;
 }
 
-#legend {
-    width: 100%;
-}
-
 #containerDev {
+    border-style: solid; /*todo: eliminare*/
+    border-width: 2px; /*todo: eliminare*/
     float: left;
     width: 49%;
-    border-style: solid; /*todo: eliminare*/
     display: table;
 }
 
@@ -63,11 +70,13 @@
     float: right;
     width: 49%;
     border-style: solid; /*todo: eliminare*/
+    border-width: 2px; /*todo: eliminare*/
 }
 
 #containerState {
-    width: 100%;
     border-style: solid; /*todo: eliminare*/
+    border-width: 2px; /*todo: eliminare*/
+    width: 100%;
     height: 200px; /*todo: eliminare*/
     clear: both;
     overflow-y: scroll;
@@ -80,9 +89,10 @@
 /* FITNESS BLOCK */
 
 #fitness {
+    border-style: solid; /*todo: eliminare*/
+    border-width: 2px; /*todo: eliminare*/
     width: 33%;
     display: inline-block;
-    border-style: solid; /*todo: eliminare*/
 }
 
 #fitnessViolin, #costViolin {
@@ -98,9 +108,10 @@
 /* INCIDENT BLOCK */
 
 #incident {
+    border-style: solid; /*todo: eliminare*/
+    border-width: 2px; /*todo: eliminare*/
     width: 32%;
     display: inline-block;
-    border-style: solid; /*todo: eliminare*/
 }
 
 #parallelIncidents{
@@ -116,13 +127,15 @@
 /* */
 
 #pattern {
+    border-style: solid; /*todo: eliminare*/
+    border-width: 2px; /*todo: eliminare*/
     width: 50%;
     display: inline-block;
-    border-style: solid; /*todo: eliminare*/
 }
 
 #detail {
-    background: gray;
+    border-style: solid; /*todo: eliminare*/
+    border-width: 2px; /*todo: eliminare*/
     width: 49%;
     display: inline-block;
 }

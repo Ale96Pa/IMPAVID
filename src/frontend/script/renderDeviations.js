@@ -2,9 +2,7 @@
 - GESTIRE minWidth
 - OTTENERE width in modo dinamico
 */
-
-const colorDev = { tot:"grey", miss: "#bebada", rep: "#fdb462", mism: "#8dd3c7",
-    N:"#80b1d3", A:"#b3de69", W:"#fb8072",R:"#fccde5",C:"#ffffb3"};
+const minW = 20;
 
 /* AUXILIARY FUNCTIONS */
 
@@ -19,7 +17,6 @@ function sumErrorsDeviation(data, error){
         }
     }, {N:0, A:0, W:0, R:0, C:0});
 }
-
 
 /* MAIN RENDER */
 
@@ -37,15 +34,11 @@ function renderDeviationsBlock(fullAlignments, alignments) {
 
     d3.select("#stateDeviations").selectAll("*").remove();
 
-    // // Render legend
-    // renderLegendError("legend");
-
     // Render bars for each error category    
     renderActivityBars(alignments, "missing", "barMissing");
     renderActivityBars(alignments, "repetition", "barRepetition");
     renderActivityBars(alignments, "mismatch","barMismatch");
     
-
     // Render bars for the top 3 wrong traces
     const sorter = (a, b) => a.totMissing+a.totRepetition+a.totMismatch < b.totMissing+b.totRepetition+b.totMismatch ? 1 : -1;
     const sortedErrors = fullAlignments.sort(sorter);
@@ -81,6 +74,8 @@ function renderLegendError(selector){
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
+    .style("display", "block")
+    .style("margin", "auto");
 
     var legContainerError = svg.selectAll(selector+".itemE")
         .data(keysError)
@@ -104,7 +99,8 @@ function renderLegendError(selector){
     .attr("height", dBlock)
     .style("fill", function(d){ return colorError(d)})
     .style("stroke", "black")
-    .style("stroke-width", 2);
+    .style("stroke-width", 2)
+    .style("opacity", "0.5");
     legContainerError.append("text")
     .attr("x", dBlock + dBlock*1.2)
     .attr("y", dBlock+ (dBlock/2))
@@ -133,7 +129,8 @@ function renderLegendError(selector){
         .attr("height", dBlock)
         .style("fill", function(d){ return colorActivity(d)})
         .style("stroke", "black")
-        .style("stroke-width", 2);        
+        .style("stroke-width", 2)
+        .style("opacity", "0.5");;        
     legContainerActivity.append("text")
         .attr("x", dBlock + dBlock*1.2)
         .attr("y", 3*dBlock + (dBlock/2))
@@ -155,7 +152,6 @@ function renderActivityBars(alignments, error, selector){
     
     /* data = [{error:"missing", N:3,A:5, ...}] */
     const data = [{error:error, ...objDeviations}]
-    //console.log(data)
 
     const subgroups = ["N","A","W","R","C"];
 
@@ -172,7 +168,7 @@ function renderActivityBars(alignments, error, selector){
 
     var x = d3.scaleLinear()
     .domain([0, sumTotal])
-    .range([0, width])
+    .range([0, width-40]) //TODO: modificare
 
     var y = d3.scaleBand()
     .domain(data.map(d => d.error))
@@ -183,52 +179,76 @@ function renderActivityBars(alignments, error, selector){
     .domain(subgroups)
     .range([colorDev.N,colorDev.A,colorDev.W,colorDev.R,colorDev.C]);
 
+    var stackedData = d3.stack()
+    .keys(subgroups)(data)
+
+    var count=0;
+    const dim = stackedData.reduce((acc, elem, i) => {
+        const d = elem[0];
+        const wCurr = x(d[1]) - x(d[0]) < minW && x(d[1]) - x(d[0])!=0 ? minW : x(d[1]) - x(d[0]);
+        x(d[1]) - x(d[0]) < minW && x(d[1]) - x(d[0])!=0 && count++;
+        var xCurr;
+
+        if(wCurr>0 && i!=0){
+            xCurr = acc[i-1].x+acc[i-1].w;
+        } else {
+            xCurr=0;
+        }
+        return [...acc, {err:d.data.error, k: elem.key, w: wCurr, x:xCurr, val:d[1]-d[0]}]
+    }, []);
 
     const colorTop = error=="missing" ? colorDev.miss : error=="repetition" ? colorDev.rep : colorDev.mism;
     sumTotal>0 && svg.append("rect")
     .attr("y", 0)
     .attr("x",0)
-    .attr("width",width)
-    .attr("height",height)
-    .attr("style", "fill:"+colorTop);
+    .attr("width",x(sumTotal)+minW*count)
+    .attr("height", height)
+    .attr("style", "fill:"+colorTop)
+    .style("stroke", "black")
+    .style("stroke-width", 1);;
     sumTotal>0 && svg.append("text")
-    .attr("y", height/2)
+    .attr("y", height/2+5)
     .attr("x",width/2)
+    .attr("font-family", "Helvetica")
     .text(sumTotal)
 
-    var stackedData = d3.stack()
-    .keys(subgroups)(data)
-
     svg.append("g")
-    .selectAll("g")
-    .data(stackedData)
-    .enter().append("g")
-    .attr("fill", function(d) {return color(d.key); })
+    // .selectAll("g")
+    // .data(dim).enter()
+    // .append("g")
+    // .attr("fill", function(d) {return color(d.k); })
 
     .selectAll("rect")
-    .data(function(d) {return d; })
+    .data(dim)
     .enter().append("rect")
         .attr("x", function(d) {
             // const w = x(d[1]) - x(d[0]) < 20 && x(d[1]) - x(d[0])!=0 ? 20 : x(d[1]) - x(d[0]);
             // if(d[1] == sumTotal) return x(d[0])
             // return x(d[1])-w;
-            return x(d[0]);
+            //console.log(x(d[0]));
+            //return x(d[0]);
+            return d.x;
         })
         .attr("width", function(d) {
             //return x(d[1]) - x(d[0]) < 20 && x(d[1]) - x(d[0])!=0 ? 20 : x(d[1]) - x(d[0]);
-            return x(d[1]) - x(d[0]);
+            //return x(d[1]) - x(d[0]);
+            return d.w;
         })
-        .attr("y", function(d) {return y(d.data.error)+height; })
-        .attr("height", y.bandwidth());
+        .attr("y", function(d) {/*return y(d.data.error)+height;*/ return y(d.err)+height; })
+        .attr("height", y.bandwidth())
+        .attr("fill", function(d) {return color(d.k); })
+        .style("stroke", "black")
+        .style("stroke-width", 1);
 
     svg.selectAll("text.activity")
-    .data(stackedData)
+    .data(dim)
     .enter()
     .append("text")
         .attr("text-anchor", "middle")
-        .attr("x", function(d) {return x(d[0][0]); })
-        .attr("y", y(error)*4+height)
-        .text(function(d) {return d[0][1]-d[0][0] == 0 ? "" : d[0][1]-d[0][0]})
+        .attr("x", function(d) {/*return x(d[0][0]);*/return d.x+(d.w/2) })
+        .attr("y",  function(d) {return y(d.err)*4+height})
+        .attr("font-family", "Helvetica")
+        .text(function(d) {/*return d[0][1]-d[0][0] == 0 ? "" : d[0][1]-d[0][0]*/return d.val == 0 ? "" : d.val})
 }
 
 function renderErrorsBars(objAlignment, selector){
@@ -253,7 +273,8 @@ function renderErrorsBars(objAlignment, selector){
 
     sumTotal>0 && svg.append("text")
     .attr("y", height/2+margin.top)
-    .attr("x",width/2)
+    .attr("x", 0)
+    .attr("font-family", "Helvetica")
     .text(objAlignment.incident_id)
 
     var x = d3.scaleLinear()
@@ -272,36 +293,65 @@ function renderErrorsBars(objAlignment, selector){
     var stackedData = d3.stack()
     .keys(subgroups)(data)
 
+    var count=0;
+    const dim = stackedData.reduce((acc, elem, i) => {
+        const d = elem[0];
+        const wCurr = x(d[1]) - x(d[0]) < minW && x(d[1]) - x(d[0])!=0 ? minW : x(d[1]) - x(d[0]);
+        x(d[1]) - x(d[0]) < minW && x(d[1]) - x(d[0])!=0 && count++;
+        var xCurr;
+
+        if(wCurr>0 && i!=0){
+            xCurr = acc[i-1].x+acc[i-1].w;
+        } else {
+            xCurr=0;
+        }
+        return [...acc, {err:d.data.error, k: elem.key, w: wCurr, x:xCurr, val:d[1]-d[0]}]
+    }, []);
+
     svg.append("g")
-    .selectAll("g")
-    .data(stackedData)
-    .enter().append("g")
-    .attr("fill", function(d) {return color(d.key); })
+    // .selectAll("g")
+    // .data(stackedData)
+    // .enter().append("g")
+    // .attr("fill", function(d) {return color(d.key); })
 
     .selectAll("rect")
-    .data(function(d) {return d; })
+    .data(dim)
     .enter().append("rect")
         .attr("x", function(d) {
             // const w = x(d[1]) - x(d[0]) < 20 && x(d[1]) - x(d[0])!=0 ? 20 : x(d[1]) - x(d[0]);
             // if(d[1] == sumTotal) return x(d[0])
             // return x(d[1])-w;
-            return x(d[0]);
+            /*return x(d[0]);*/return d.x;
         })
         .attr("width", function(d) {
             //return x(d[1]) - x(d[0]) < 20 && x(d[1]) - x(d[0])!=0 ? 20 : x(d[1]) - x(d[0]);
-            return x(d[1]) - x(d[0]);
+            /*return x(d[1]) - x(d[0]);*/return d.w;
         })
-        .attr("y", function(d) {return y(d.data.error)+height; })
-        .attr("height", y.bandwidth());
+        .attr("y", function(d) {/*return y(d.data.error)+height;*/ return y(d.err)+height; })
+        .attr("height", y.bandwidth())
+        .attr("fill", function(d) {return color(d.k); })
+        .style("stroke", "black")
+        .style("stroke-width", 1);;
+
+    // svg.selectAll("text.error")
+    // .data(stackedData)
+    // .enter()
+    // .append("text")
+    //     .attr("text-anchor", "middle")
+    //     .attr("x", function(d) {return x(d[0][0]); })
+    //     .attr("y", y("tot")*4+height)
+    //     .attr("font-family", "Helvetica")
+    //     .text(function(d) {return d[0][1]-d[0][0] == 0 ? "" : d[0][1]-d[0][0]})
 
     svg.selectAll("text.error")
-    .data(stackedData)
+    .data(dim)
     .enter()
     .append("text")
         .attr("text-anchor", "middle")
-        .attr("x", function(d) {return x(d[0][0]); })
-        .attr("y", y("tot")*4+height)
-        .text(function(d) {return d[0][1]-d[0][0] == 0 ? "" : d[0][1]-d[0][0]})
+        .attr("x", function(d) {/*return x(d[0][0]);*/return d.x+(d.w/2) })
+        .attr("y",  function(d) {return y(d.err)*4+height})
+        .attr("font-family", "Helvetica")
+        .text(function(d) {/*return d[0][1]-d[0][0] == 0 ? "" : d[0][1]-d[0][0]*/return d.val == 0 ? "" : d.val})
 }
 
 function renderState(alignments, selector, sorter) {

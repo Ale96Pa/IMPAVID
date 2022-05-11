@@ -1,19 +1,13 @@
 /* TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 - OTTENERE width in modo dinamico
 */
-const colorSeverity = {none:"#1a9641",low:"#a6d96a",medium:"#ffffbf",high:"#fdae61",critical:"#d7191c"};
-const threshold = {"low":0.37,"medium":0.69,"high":0.89}
 
-
-/*
-{metric: "fitness", value: 0.5},...,{}
-*/
 function renderViolinChart(data, fullData, fullIncidentData, selector, metric){
     const jitterWidth = 30; //Right dots spread
 
     var margin = {top: 10, right: 30, bottom: 30, left: 40},
     width = 250 - margin.left - margin.right,
-    height = 200 - margin.top - margin.bottom;
+    height = 250 - margin.top - margin.bottom;
 
     var svg = d3.select("#"+selector)
     .append("svg")
@@ -31,7 +25,7 @@ function renderViolinChart(data, fullData, fullIncidentData, selector, metric){
     .call(d3.axisLeft(y))
     .call(d3.brushY()
         .on("brush", brushAxis)
-        .extent([[0, 0], [180, 163]])
+        .extent([[0, 0], [height, height]])
     )
 
     // X scale
@@ -101,6 +95,7 @@ function renderViolinChart(data, fullData, fullIncidentData, selector, metric){
         .attr("stroke", "white")
 
     function brushAxis({selection}) {
+        console.log(selectedCategories);
         metricRange = selection.map(y.invert, y);
         selectedAlignments = filterBrushes(fullData, metricRange, metric == "fitness" ? "fitness" : "costTotal");
         renderDeviationsBlock(fullData, selectedAlignments);
@@ -118,7 +113,7 @@ function renderViolinChart(data, fullData, fullIncidentData, selector, metric){
 function renderFitnessBar(alignmentData, data, selector){
     const margin = {top: 10, right: 30, bottom: 30, left: 50},
     width = 550 - margin.left - margin.right,
-    height = 200 - margin.top - margin.bottom;
+    height = 250 - margin.top - margin.bottom;
 
     const svg = d3.select("#"+selector)
     .append("svg")
@@ -173,7 +168,7 @@ function renderFitnessBar(alignmentData, data, selector){
 function renderCostStackedBar(alignmentData, data,selector){
     const margin = {top: 10, right: 30, bottom: 30, left: 50},
     width = 550 - margin.left - margin.right,
-    height = 200 - margin.top - margin.bottom;
+    height = 250 - margin.top - margin.bottom;
 
     var svg = d3.select("#"+selector)
     .append("svg")

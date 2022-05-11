@@ -1,4 +1,7 @@
-function renderParallelIncidents(data, selector) {
+function renderParallelIncidents(data, fullDataIncidents, selector) {
+
+    d3.select("#parallelIncidents").selectAll("*").remove();
+
     var margin = {top: 30, right: 0, bottom: 10, left: 10},
     width = 400 - margin.left - margin.right,
     height = 450 - margin.top - margin.bottom;
@@ -11,13 +14,13 @@ function renderParallelIncidents(data, selector) {
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-    dimensions = Object.keys(data[0]).filter(function(d) { return d == "impact" || d=="urgency" || d=="priority" || d=="category" });
+    dimensions = Object.keys(fullDataIncidents[0]).filter(function(d) { return d == "impact" || d=="urgency" || d=="priority" || d=="category" });
 
     var y = {}
     for (i in dimensions) {
         name = dimensions[i]
         y[name] = d3.scalePoint()
-        .domain( data.map(function(p) {return p[name]; }).sort() )
+        .domain( fullDataIncidents.map(function(p) {return p[name]; }).sort() )
         .range([height, 0])
     }
 
@@ -31,12 +34,12 @@ function renderParallelIncidents(data, selector) {
     }
 
     svg.selectAll("myPath")
-        .data(data)
+        .data(fullDataIncidents)
         .enter().append("path")
         .attr("d",  path)
         .style("fill", "none")
-        .style("stroke", "#3182bd")
-        .style("opacity", 1)
+        .style("stroke", function(d) {return data.map(e => e.incident_id).includes(d.incident_id) ? "#e41a1c" : "#3182bd"; })
+        .style("opacity", function(d) {return data.map(e => e.incident_id).includes(d.incident_id) ? 1 : 0.3; })
 
     svg.selectAll("myAxis")
         .data(dimensions).enter()
@@ -70,7 +73,10 @@ function renderBarCategory(data, fullDataAlignment, fullIncidentData, selector){
     .range([ 0, width]);
     svg.append("g")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x))
+    .call(d3.axisBottom(x)
+        //.tickFormat(d3.format("d"))
+        //.ticks(Math.round(maxVal/2)+1, "d")
+    )
     .selectAll("text")
         .style("text-anchor", "end");
 
@@ -86,27 +92,32 @@ function renderBarCategory(data, fullDataAlignment, fullIncidentData, selector){
     .enter()
     .append("rect")
     .attr("class", "barCat")
-    .attr("x", x(0) )
+    .attr("x", 0 )
     .attr("y", function(d) { return y(d.category); })
     .attr("width", function(d) { return x(d.value); })
     .attr("height", y.bandwidth() )
-    .attr("fill", "#3182bd")
+    .attr("fill", function(d) {return selectedCategories.includes(d.category) ? "#e41a1c" : "#3182bd"})
     .style("opacity", 0.5)
     .on("click", function(d,i) {
         if(selectedCategories.includes(i.category)){
             selectedCategories = selectedCategories.filter(e => e !== i.category)
-            d3.select(this).style("opacity", "0.5");
+            //d3.select(this).style("opacity", "0.5");
+            d3.select(this).attr("fill", "#3182bd")
         } else {
             selectedCategories = [...selectedCategories, i.category]
-            d3.select(this).style("opacity", "1");
+            //d3.select(this).style("opacity", "1");
+            d3.select(this).attr("fill", "#e41a1c")
         }
+        
         selectedAlignments = filterAlignmentsByCategory(fullDataAlignment, fullIncidentData, selectedCategories);
         renderDeviationsBlock(fullDataAlignment, selectedAlignments);
         renderFitnessBlock(fullDataAlignment, fullIncidentData, selectedAlignments);
-
+        
         renderMetrics(selectedAlignments);
-
+        
         selectedIncidents = filterIncidentsByAlignments(selectedAlignments, fullIncidentData);
+        
+        renderParallelIncidents(selectedIncidents, fullIncidentData, "parallelIncidents");
 
         renderOverviewBlock(selectedAlignments, fullDataAlignment, selectedIncidents, fullIncidentData);
       });
@@ -117,13 +128,17 @@ function renderIncidentsBlock(fullDataAlignment, fullIncidentData, incidentData)
     d3.select("#parallelIncidents").selectAll("*").remove();
     d3.select("#barIncidents").selectAll("*").remove();
 
-    renderParallelIncidents(incidentData, "parallelIncidents");
+    renderParallelIncidents(incidentData, fullIncidentData, "parallelIncidents");
 
-    const countCategories = incidentData.reduce((accumulator, object) => {
-        if(Object.keys(accumulator).includes(object.category)){
-            accumulator[object.category] +=1;
+    const countCategories = fullIncidentData.reduce((accumulator, object) => {
+        if(incidentData.map(e => e.incident_id).includes(object.incident_id)){
+            if(Object.keys(accumulator).includes(object.category)){
+                accumulator[object.category] +=1;
+            } else {
+                accumulator[object.category] = 1;
+            }
         } else {
-            accumulator[object.category] = 1;
+            accumulator[object.category] = 0;
         }
         return accumulator
     }, {});

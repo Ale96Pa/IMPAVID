@@ -1,8 +1,3 @@
-// const colorsDev = {N:"#80b1d3", A:"#b3de69", W:"#fb8072",R:"#fccde5",C:"#ffffb3"};
-const dateRange = d3.timeDays(new Date(2016, 1, 19), new Date(2017, 2, 19));
-
-const formatTime = d3.timeFormat("%Y-%m-%d");
-
 function renderOverviewBlock(alignments, fullAlignmentData, incidents, fullIncidentData){
 
     d3.select("#focus").selectAll("*").remove();
@@ -57,15 +52,16 @@ function renderSequences(alignments, selector){
 
     var len = 0;
     var offset = 1;
-    const dBlock = 15;
+    const dBlock = 20;
 
     var margin = {top: 0, right: 5, bottom: 0, left: 10},
     width = 450 - margin.left - margin.right,
-    height = 80 - margin.top - margin.bottom;
+    height = 50 - margin.top - margin.bottom;
     
+    const keysActivity = ["Detection", "Activation", "Awaiting", "Resolution", "Closure"]
     const colorActivity = d3.scaleOrdinal()
-    .domain(Object.keys(colorsDev))
-    .range([colorsDev.N,colorsDev.A,colorsDev.W,colorsDev.R,colorsDev.C]);
+    .domain(keysActivity)
+    .range([colorDev.N,colorDev.A,colorDev.W,colorDev.R,colorDev.C]);
 
     /* to get maximum number of events ==> maximum length */
     // const counters = data.map(object => {
@@ -98,14 +94,17 @@ function renderSequences(alignments, selector){
         });
 
         container.append("rect")
-        //.attr("class", "barAct")
         .attr("x", function(d,i){return i*dBlock})
-        .attr("y", 2*dBlock)
+        .attr("y", dBlock)
         .attr("width", dBlock)
         .attr("height", dBlock)
         .style("fill", function(d){ return colorActivity(d)})
         .style("stroke", "black")
         .style("stroke-width", 1); 
+        container.append("text")
+        .attr("y", dBlock+(dBlock/2)+(dBlock/4))
+        .attr("x", function(d,i){return (i*dBlock)+2})
+        .text(function(d){return d});
 
         svg.selectAll("text.count")
         .data(eventList)
@@ -113,7 +112,8 @@ function renderSequences(alignments, selector){
         .append("text")
             .attr("text-anchor", "middle")
             .attr("x", width-margin.left-margin.right)
-            .attr("y",height/2+margin.top+margin.bottom)
+            .attr("y",dBlock+(dBlock/2)+(dBlock/4))
+            .attr("font-family", "Helvetica")
             .text(function(d,i) {return eventList.length-1 == i ? elem.count : ""})
     });
 }
@@ -121,7 +121,7 @@ function renderSequences(alignments, selector){
 function renderLineLog(data, selector, fullAlignmentData, fullIncidentData){
 
     var margin = {top: 10, right: 30, bottom: 30, left: 60},
-    width = 1700 - margin.left - margin.right,
+    width = 1900 - margin.left - margin.right,
     height = 200 - margin.top - margin.bottom;
 
     var svg = d3.select("#"+selector)
@@ -135,13 +135,15 @@ function renderLineLog(data, selector, fullAlignmentData, fullIncidentData){
     var x = d3.scaleTime()
         .domain(d3.extent(data, function(d) {return d3.timeParse("%Y-%m-%d")(d.date); }))
         .range([ 0, width ]);
-    x.ticks(d3.timeDay.every(1));
+
     svg.append("g")
         .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x))
+        .call(d3.axisBottom(x)
+        .ticks(d3.timeWeek.every(2))
+        .tickFormat(d3.timeFormat('%-m/%-d/%y'))
+        )
         .call(d3.brushX()
             .on("brush", brushDate)
-            //.extent([[0, 0], [180, 163]])
         );
 
     // Add Y axis
@@ -149,7 +151,13 @@ function renderLineLog(data, selector, fullAlignmentData, fullIncidentData){
         .domain([0, d3.max(data, function(d) { return +d.value; })])
         .range([ height, 0 ]);
     svg.append("g")
-        .call(d3.axisLeft(y));
+        .call(d3.axisLeft(y))
+    svg.append("text")
+        .attr("text-anchor", "end")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -margin.left+20)
+        .attr("x", -margin.top)
+        .text("Active incidents");;
 
     // Add the line
     svg.append("path")

@@ -4,8 +4,7 @@ function renderMetrics(alignments){
 
     var margin = {top: 10, right: 10, bottom: 20, left: 10},
     width = 300 - margin.left - margin.right,
-    height = 60 - margin.top - margin.bottom;
-
+    height = 100 - margin.top - margin.bottom;
 
     // Calculate number of incidents
     const numIncidents = alignments.length;
@@ -26,15 +25,27 @@ function renderMetrics(alignments){
     svg.append("text")
     .attr("y", 10)
     .attr("x", 0)
-    .text("Number of incidents: "+numIncidents);
+    .attr("font-family", "Helvetica")
+    .text("Number of selected incidents: ")
+        .append("tspan")
+        .attr("font-weight", "bold")
+        .text(numIncidents);
 
     svg.append("text")
-    .attr("y", 30)
+    .attr("y", 40)
     .attr("x", 0)
-    .text("Average fitness: "+avgF);
+    .attr("font-family", "Helvetica")
+    .text("Average fitness: ")
+        .append("tspan")
+        .attr("font-weight", "bold")
+        .text(avgF);
 
     svg.append("text")
-    .attr("y", 50)
+    .attr("y", 70)
     .attr("x", 0)
-    .text("Average cost: "+avgC);
+    .attr("font-family", "Helvetica")
+    .text("Average cost: ")
+        .append("tspan")
+        .attr("font-weight", "bold")
+        .text(avgC);
 }
