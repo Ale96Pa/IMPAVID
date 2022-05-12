@@ -1,10 +1,7 @@
-// TODOOOO:: coordinare meglio i dati -> quando modifico alignment, gli altri alignment non si modificano e viceversa
-// OPPURE: vedere perchè non funzionano sequenze nell'overview e il deviationBlock
-
 function combineFilters(alignmentsData, incidentsData){
 
     filteredAlignmentsData = filterError(alignmentsData, selectedErrors);
-    //filteredAlignmentsData = filterActivities(filteredAlignmentsData, selectedActivities);
+    filteredAlignmentsData = filterActivities(filteredAlignmentsData, selectedActivities);
     filteredAlignmentsData = filterBrushes(filteredAlignmentsData, fitnessRange, "fitness");
     filteredAlignmentsData = filterBrushes(filteredAlignmentsData, costRange, "costTotal");
     
@@ -12,11 +9,8 @@ function combineFilters(alignmentsData, incidentsData){
     
     filteredAlignmentsData = filterAlignmentsByCategory(filteredAlignmentsData, filteredIncidentsData, selectedCategories);
 
-    const copyInc = filteredIncidentsData;
-    const copyAlig = filteredAlignmentsData;
-    filteredIncidentsData = filterIncidentsByAlignments(copyAlig, incidentsData);
-    filteredAlignmentsData = filterAlignmentsByIncidents(alignmentsData, copyInc);
-    //return [filterAlignmentsByIncidents(filteredAlignmentsData, filteredIncidentsData), filterIncidentsByAlignments(filteredAlignmentsData, filteredIncidentsData)];
+    filteredIncidentsData = filterIncidentsByAlignments(filteredAlignmentsData, incidentsData);
+    filteredAlignmentsData = filterAlignmentsByIncidents(alignmentsData, filteredIncidentsData);
 }
 
 function filterIncidentsByAlignments(alignment, incidents){
@@ -60,18 +54,22 @@ function filterError(data, errorFilter){
     });
 }
 
-// TODO
 function filterActivities(data, activityFilter){
-    return data.filter(elem => {
-        Object.keys(selectedErrors).forEach(err => {
-            Object.keys(activityFilter).forEach(act => {
-                if(selectedErrors[err] && activityFilter[act] && elem.missing[act.toUpperCase()]<0){
-                    return false;
-                }
-            })
-        })
-        return true;
-    });
+    const activityIN = Object.keys(activityFilter).reduce((acc, elem) => {
+        if(activityFilter[elem]) return [...acc, elem]
+        else return acc;
+    }, []);
+    const activityOUT = Object.keys(activityFilter).filter(x => !activityIN.includes(x));
+
+    if(activityIN.length === 0) return data;
+    else {
+        return data.filter(elem => {
+            const eventList = elem.alignment.split(";").filter(e => !e.includes("M")).map(el => el.split("]")[1]).slice(0, -1);
+            console.log(eventList, activityIN, activityOUT, activityIN.some(e => !eventList.includes(e.toUpperCase())), activityOUT.some(e => eventList.includes(e.toUpperCase())));
+            if(activityIN.some(e => !eventList.includes(e.toUpperCase())) || activityOUT.some(e => eventList.includes(e.toUpperCase()))) return false;
+            else return true;
+        });
+    }
 }
 
 function filterBrushes(data, rangeFilter, brushType){
