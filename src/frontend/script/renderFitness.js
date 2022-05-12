@@ -61,7 +61,7 @@ function renderViolinChart(data, fullAlignmentData, fullIncidentData, selector, 
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var brushV = d3.brushY()
-    .on("end.violin", brushAxis)
+    .on("end", brushAxis)
     .extent([[0, 0], [height, height]])
     
     // Y scale
@@ -74,7 +74,7 @@ function renderViolinChart(data, fullAlignmentData, fullIncidentData, selector, 
     .attr("class", metric == "fitness" ? "brushFitness" : "brushCost")
     .call(d3.axisLeft(y))
     .call(brushV)
-    //.call(brushV.move, initialBrush);
+    .call(d3.brushY().move, initialBrush);
 
     // X scale
     var x = d3.scaleBand()
@@ -154,6 +154,8 @@ function renderViolinChart(data, fullAlignmentData, fullIncidentData, selector, 
         
         renderDeviationsBlock(fullAlignmentData);
         renderIncidentsBlock(fullAlignmentData, fullIncidentData);
+
+        renderPattern();
     }
 }
 

@@ -5,6 +5,7 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Visual Analytics for Incident Management</title>
     <link rel="stylesheet" href="style/style.css">
+    <link rel="shortcut icon" href="#">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -55,7 +56,9 @@
   <div id="container_header">
     <div id="metrics"></div>
     <div id="legend"></div>
-    <div id="actions">ACTIONS / ISO REFERENCE MODEL</div>
+    <div id="actions">
+      <img src="model_img.PNG" /> 
+    </div>
   </div>
 
   <div id="container_top">
@@ -112,11 +115,11 @@
   </div>
 
   <div id="container_bottom">
-    <div id="detail">DETAILS</div>
-
     <div id="pattern">
       <div id="patternChart"></div>
     </div>
+
+    <div id="detail">DETAILS</div>
   </div>
     
     <script>
@@ -144,7 +147,7 @@
         renderIncidentsBlock(alignmentsData, incidentsData)
 
         // Render bottom part
-        // renderPattern()
+        renderPattern()
 
 
         /* LISTENER LEGEND */        
@@ -177,6 +180,8 @@
           renderDeviationsBlock(alignmentsData);
           renderFitnessBlock(alignmentsData, incidentsData);
           renderIncidentsBlock(alignmentsData, incidentsData);
+
+          renderPattern()
 
         });
 
@@ -217,6 +222,8 @@
           renderDeviationsBlock(alignmentsData);
           renderFitnessBlock(alignmentsData, incidentsData);
           renderIncidentsBlock(alignmentsData, incidentsData);
+
+          renderPattern()
         });    
       });
 

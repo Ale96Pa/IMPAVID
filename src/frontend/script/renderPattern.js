@@ -1,34 +1,24 @@
 function renderRadviz(data,selector){
-    // // set the dimensions and margins of the graph
-    // var margin = {top: 10, right: 30, bottom: 20, left: 50},
-    //     width = 460 - margin.left - margin.right,
-    //     height = 200 - margin.top - margin.bottom;
+    var margin = {top: 10, right: 30, bottom: 20, left: 50},
+        width = 500 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
 
     // // append the svg object to the body of the page
     // var svg = d3.select("#"+selector)
     // .append("svg")
     //     .attr("width", width + margin.left + margin.right)
     //     .attr("height", height + margin.top + margin.bottom)
+    //     .attr("class", "radv")
     // .append("g")
     //     .attr("transform",
     //         "translate(" + margin.left + "," + margin.top + ")");
 
-
-    // svg.append("rect")
-    // .attr("y", h_gap)
-    // .attr("x",0)
-    // .attr("width",wMiss)
-    // .attr("height",height)
-    // .attr("style", "fill:"+colorDev.miss);
-
-    
-
-
-
+    //const set = radviz.data().dimensions.map(d => d.values)
     const radviz = d3.radviz()
-    
-    radviz.data(data)
-    const set = radviz.data().dimensions.map(d => d.values)
+    .data(data/*,set*/)
+
+    radviz.setMargin(0)
+    //radviz.updateRadviz([4,2,1,3,0])
     // let prova = function(_) {
     //     console.log("I have connected the fuction to the click action on a point in radviz", _)
     // }
@@ -41,8 +31,10 @@ function renderRadviz(data,selector){
     //radviz.disableDraggableAnchors(false)
     //radviz.setDefaultColorPoints('purple')
     
-    
-    d3.select('#'+selector).call(radviz)
+    d3.select('#'+selector)
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .call(radviz)
 
 
     // const radviz1 = d3.radviz()
@@ -66,11 +58,10 @@ function renderRadviz(data,selector){
     // })
 }
 
-async function renderPattern() {
-    const incidents = await eel.incidentsToJson()();
-    const formatIncidents = JSON.parse(incidents)
+function renderPattern() {
+    d3.select("#patternChart").selectAll("*").remove();
 
-    const a = formatIncidents.map(elem => {
+    const data = filteredIncidentsData.map(elem => {
         return {
             ...elem,
             impact: parseInt(elem.impact.split(" ")[0]),
@@ -79,7 +70,5 @@ async function renderPattern() {
         }
     })
 
-    renderRadviz(a, "patternChart")
-
-    d3.select("body").append("span").text("LOADED-PATTERNS");
+    renderRadviz(data, "patternChart");
 }

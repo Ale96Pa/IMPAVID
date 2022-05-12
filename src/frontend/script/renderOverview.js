@@ -141,18 +141,17 @@ function renderLineLog(data, selector, fullAlignmentData, fullIncidentData){
 
     var brushO = d3.brushX()
     .on("end", brushDate)
-    //.on("end", function(){svg.selectAll(".resize.s").style("display","inline");});
+    .extent([[0, 0], [width, width]]);
 
     const initialBrush = [x(dateRange[0]), x(dateRange[1])];
-
     svg.append("g")
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(x)
-        .ticks(d3.timeWeek.every(2))
-        .tickFormat(d3.timeFormat('%-m/%-d/%y'))
+            .ticks(d3.timeWeek.every(2))
+            .tickFormat(d3.timeFormat('%-m/%-d/%y'))
         )
         .call(brushO)
-        //.call(brushO.move, initialBrush);
+        .call(d3.brushX().move, initialBrush);
 
     // Add Y axis
     var y = d3.scaleLinear()
@@ -190,6 +189,8 @@ function renderLineLog(data, selector, fullAlignmentData, fullIncidentData){
         renderDeviationsBlock(fullAlignmentData);
         renderFitnessBlock(fullAlignmentData, fullIncidentData)
         renderIncidentsBlock(fullAlignmentData, fullIncidentData);
+
+        renderPattern();
     }
 }
 

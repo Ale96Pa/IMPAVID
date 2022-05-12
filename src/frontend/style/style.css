@@ -1,5 +1,5 @@
 #container_header, #container_top, #container_middle, #container_bottom {
-    padding: 1%;
+    padding: 0.3%;
     display: flex;
 }
 
@@ -126,12 +126,12 @@
     float: right;
 }
 
-/* */
+/* PATTERN BLOCK (radviz) */
 
 #pattern {
     border-style: solid; /*todo: eliminare*/
     border-width: 2px; /*todo: eliminare*/
-    width: 50%;
+    width: 500px;
     display: inline-block;
 }
 
