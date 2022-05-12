@@ -1,6 +1,6 @@
 /* TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 - OTTENERE width in modo dinamico
-- MANTERE IL BRUSH NELLA SELEZIONE FATTA
+- MANTENERE IL BRUSH NELLA SELEZIOE CON brush.move causa problemi nelle altre visualizzazioni
 */
 
 const maxTracesBarchart = 100;
@@ -59,24 +59,27 @@ function renderViolinChart(data, fullAlignmentData, fullIncidentData, selector, 
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var brushV = d3.brushY()
+    .on("end.violin", brushAxis)
+    .extent([[0, 0], [height, height]])
     
     // Y scale
     var y = d3.scaleLinear()
     .domain([0,1])
-    .range([height, 0])
+    .range([height, 0]);
+    
+    const initialBrush = metric === "fitness" ? [y(fitnessRange[0]), y(fitnessRange[1])] : [y(costRange[0]), y(costRange[1])]
     svg.append("g")
     .attr("class", metric == "fitness" ? "brushFitness" : "brushCost")
     .call(d3.axisLeft(y))
-    .call(d3.brushY()
-        .on("end", brushAxis)
-        .extent([[0, 0], [height, height]])
-    )
+    .call(brushV)
+    //.call(brushV.move, initialBrush);
 
     // X scale
     var x = d3.scaleBand()
     .range([ 0, width ])
     .domain([metric])
-    //.padding(0.05)
     svg.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x))

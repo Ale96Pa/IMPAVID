@@ -65,7 +65,6 @@ function filterActivities(data, activityFilter){
     else {
         return data.filter(elem => {
             const eventList = elem.alignment.split(";").filter(e => !e.includes("M")).map(el => el.split("]")[1]).slice(0, -1);
-            console.log(eventList, activityIN, activityOUT, activityIN.some(e => !eventList.includes(e.toUpperCase())), activityOUT.some(e => eventList.includes(e.toUpperCase())));
             if(activityIN.some(e => !eventList.includes(e.toUpperCase())) || activityOUT.some(e => eventList.includes(e.toUpperCase()))) return false;
             else return true;
         });

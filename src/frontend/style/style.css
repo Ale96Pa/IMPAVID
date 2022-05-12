@@ -33,6 +33,8 @@
     height: 200px; /*todo: eliminare*/
     /*clear: both;*/
     overflow-y: scroll;
+    /* overflow-x: scroll;
+    display: inline-grid; */
 }
 
 #context {

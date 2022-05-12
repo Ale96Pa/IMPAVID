@@ -206,15 +206,17 @@
               selectedActivities;
               break;
           }
-          //TODO: da rifare meglio assolutamente
-          filteredAlignmentsData = filterActivities(alignmentsData, selectedActivities);
+          combineFilters(alignmentsData, incidentsData);
 
-          renderOverviewBlock(alignmentsData, incidentsData);
-
-          filteredIncidentsData = filterIncidentsByAlignments(filteredAlignmentsData, incidentsData);
-          renderIncidentsBlock(alignmentsData, incidentsData);
+          // filteredAlignmentsData = filterError(alignmentsData, selectedErrors);
+          // filteredIncidentsData = filterIncidentsByAlignments(filteredAlignmentsData, incidentsData);
 
           renderMetrics();
+          renderOverviewBlock(alignmentsData, incidentsData);
+
+          renderDeviationsBlock(alignmentsData);
+          renderFitnessBlock(alignmentsData, incidentsData);
+          renderIncidentsBlock(alignmentsData, incidentsData);
         });    
       });
 
