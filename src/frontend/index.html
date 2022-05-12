@@ -23,6 +23,7 @@
       const threshold = {"low":0.37,"medium":0.69,"high":0.89}
 
       /* Shared filters */
+      var analysisType = "exploration";
       var dateRange = [fullDateRange[0], fullDateRange[fullDateRange.length-1]];
       var selectedErrors = {missing: false, repetition:false, mismatch:false};
       var selectedActivities = {n:false, a:false, w:false, r:false, c:false};
@@ -49,6 +50,8 @@
     <script type="text/javascript" src="script/renderIncidents.js"></script>
 
     <script type="text/javascript" src="script/renderPattern.js"></script>
+
+    <script type="text/javascript" src="script/renderParameterState.js"></script>
 </head>
 
 <body>
@@ -56,8 +59,12 @@
   <div id="container_header">
     <div id="metrics"></div>
     <div id="legend"></div>
-    <div id="actions">
-      <img src="model_img.PNG" /> 
+    <div id="image">
+      <img src="model_img.PNG" />
+    </div>
+    <div id="tab" class="tab">
+      <button id="tabExplore" class="tablinks" onclick="changeView(event, 'exploration')">Exploration analysis</button>
+      <button id="tabParam" class="tablinks" onclick="changeView(event, 'parameters')" >Parameters space analysis</button>
     </div>
   </div>
 
@@ -123,110 +130,159 @@
   </div>
     
     <script>
-      loadData().then(data => {
-        const alignmentsData = Object.entries(JSON.parse(data[0])).map(entry => {
-          return {incident_id: entry[0],
-            ...entry[1]
-          };
+      initializeExploration();
+
+      function changeView(evt, analysisType) {
+        if(analysisType === "parameters"){
+          document.getElementById("tabParam").style.backgroundColor = "#ccc";
+          document.getElementById("tabExplore").style.backgroundColor = "#ddd";
+
+          removeAllFromExploration();
+          document.getElementById("containerDev").style.display = "none";
+          document.getElementById("containerTop").style.display = "none";
+          document.getElementById("containerState").style.overflow = "hidden";
+          document.getElementById("container_bottom").style.display = "none";
+          document.getElementById("legend").style.display = "none";
+          initializeParameters();
+        } else {
+          document.getElementById("tabExplore").style.backgroundColor = "#ccc";
+          document.getElementById("tabParam").style.backgroundColor = "#ddd";
+
+          // TODO: aggiustare questa parte
+          /*d3.select("#paramDeviation").selectAll("*").remove();
+          d3.select("#paramFitness").selectAll("*").remove();
+          d3.select("#paramIncidents").selectAll("*").remove();*/
+
+          document.getElementById("legend").style.display = "";
+          document.getElementById("containerDev").style.display = "table";
+          document.getElementById("containerTop").style.display = "";
+          document.getElementById("containerState").style.overflowY = "scroll";
+          document.getElementById("container_bottom").style.display = "flex";
+          initializeExploration();
+        }
+      }
+
+      function initializeParameters(){
+        loadData().then(data => {
+          const alignmentsData = Object.entries(JSON.parse(data[0])).map(entry => {
+            return {incident_id: entry[0],
+              ...entry[1]
+            };
+          });
+          const incidentsData = JSON.parse(data[1]);
+
+          renderParamSpace();
+          renderParamAnalysis();
+          renderTraces();
         });
-        const incidentsData = JSON.parse(data[1]);
-
-        selectedCategories = [...new Set(incidentsData.map(e => e.category))];
-        filteredAlignmentsData = alignmentsData;
-        filteredIncidentsData = incidentsData;
-
-        /* FIRST RENDER: default viz*/
-        // Render top part
-        renderMetrics();
-        renderLegendError("legend");
-        renderOverviewBlock(alignmentsData, incidentsData);
-
-        // Render middle part
-        renderDeviationsBlock(alignmentsData)
-        renderFitnessBlock(alignmentsData, incidentsData)
-        renderIncidentsBlock(alignmentsData, incidentsData)
-
-        // Render bottom part
-        renderPattern()
+      }
 
 
-        /* LISTENER LEGEND */        
-        d3.selectAll(".barErr").on("click", function(d,i) {
-          switch(i){
-            case "Missing":
-              selectedErrors.missing = !selectedErrors.missing;
-              d3.select(this).style("opacity", selectedErrors.missing ? "1" : "0.5");
-              break;
-            case "Repetition":
-              selectedErrors.repetition = !selectedErrors.repetition;
-              d3.select(this).style("opacity", selectedErrors.repetition ? "1" : "0.5");
-              break;
-            case "Mismatch":
-              selectedErrors.mismatch = !selectedErrors.mismatch
-              d3.select(this).style("opacity", selectedErrors.mismatch ? "1" : "0.5");
-              break;
-            default:
-              selectedErrors;
-              break;
-          }
-          combineFilters(alignmentsData, incidentsData);
+      function initializeExploration(){
+        loadData().then(data => {
+          const alignmentsData = Object.entries(JSON.parse(data[0])).map(entry => {
+            return {incident_id: entry[0],
+              ...entry[1]
+            };
+          });
+          const incidentsData = JSON.parse(data[1]);
 
-          // filteredAlignmentsData = filterError(alignmentsData, selectedErrors);
-          // filteredIncidentsData = filterIncidentsByAlignments(filteredAlignmentsData, incidentsData);
+          selectedCategories = [...new Set(incidentsData.map(e => e.category))];
+          filteredAlignmentsData = alignmentsData;
+          filteredIncidentsData = incidentsData;
 
+          /* FIRST RENDER: default viz*/
+          // Render top part
           renderMetrics();
+          renderLegendError("legend");
           renderOverviewBlock(alignmentsData, incidentsData);
 
-          renderDeviationsBlock(alignmentsData);
-          renderFitnessBlock(alignmentsData, incidentsData);
-          renderIncidentsBlock(alignmentsData, incidentsData);
+          // Render middle part
+          renderDeviationsBlock(alignmentsData)
+          renderFitnessBlock(alignmentsData, incidentsData)
+          renderIncidentsBlock(alignmentsData, incidentsData)
 
+          // Render bottom part
           renderPattern()
 
+
+          /* LISTENER LEGEND */        
+          d3.selectAll(".barErr").on("click", function(d,i) {
+            switch(i){
+              case "Missing":
+                selectedErrors.missing = !selectedErrors.missing;
+                d3.select(this).style("opacity", selectedErrors.missing ? "1" : "0.5");
+                break;
+              case "Repetition":
+                selectedErrors.repetition = !selectedErrors.repetition;
+                d3.select(this).style("opacity", selectedErrors.repetition ? "1" : "0.5");
+                break;
+              case "Mismatch":
+                selectedErrors.mismatch = !selectedErrors.mismatch
+                d3.select(this).style("opacity", selectedErrors.mismatch ? "1" : "0.5");
+                break;
+              default:
+                selectedErrors;
+                break;
+            }
+            combineFilters(alignmentsData, incidentsData);
+
+            // filteredAlignmentsData = filterError(alignmentsData, selectedErrors);
+            // filteredIncidentsData = filterIncidentsByAlignments(filteredAlignmentsData, incidentsData);
+
+            renderMetrics();
+            renderOverviewBlock(alignmentsData, incidentsData);
+
+            renderDeviationsBlock(alignmentsData);
+            renderFitnessBlock(alignmentsData, incidentsData);
+            renderIncidentsBlock(alignmentsData, incidentsData);
+
+            renderPattern()
+
+          });
+
+          d3.selectAll(".barAct").on("click", function(d,i) {
+            switch(i){
+              case "Detection":
+                selectedActivities.n = !selectedActivities.n
+                d3.select(this).style("opacity", selectedActivities.n ? "1" : "0.5");
+                break;
+              case "Activation":
+                selectedActivities.a = !selectedActivities.a
+                d3.select(this).style("opacity", selectedActivities.a ? "1" : "0.5");
+                break;
+              case "Awaiting":
+                selectedActivities.w = !selectedActivities.w
+                d3.select(this).style("opacity", selectedActivities.w ? "1" : "0.5");
+                break;
+              case "Resolution":
+                selectedActivities.r = !selectedActivities.r
+                d3.select(this).style("opacity", selectedActivities.r ? "1" : "0.5");
+                break;
+              case "Closure":
+                selectedActivities.c = !selectedActivities.c
+                d3.select(this).style("opacity", selectedActivities.c ? "1" : "0.5");
+                break;
+              default:
+                selectedActivities;
+                break;
+            }
+            combineFilters(alignmentsData, incidentsData);
+
+            // filteredAlignmentsData = filterError(alignmentsData, selectedErrors);
+            // filteredIncidentsData = filterIncidentsByAlignments(filteredAlignmentsData, incidentsData);
+
+            renderMetrics();
+            renderOverviewBlock(alignmentsData, incidentsData);
+
+            renderDeviationsBlock(alignmentsData);
+            renderFitnessBlock(alignmentsData, incidentsData);
+            renderIncidentsBlock(alignmentsData, incidentsData);
+
+            renderPattern()
+          });    
         });
-
-        d3.selectAll(".barAct").on("click", function(d,i) {
-          switch(i){
-            case "Detection":
-              selectedActivities.n = !selectedActivities.n
-              d3.select(this).style("opacity", selectedActivities.n ? "1" : "0.5");
-              break;
-            case "Activation":
-              selectedActivities.a = !selectedActivities.a
-              d3.select(this).style("opacity", selectedActivities.a ? "1" : "0.5");
-              break;
-            case "Awaiting":
-              selectedActivities.w = !selectedActivities.w
-              d3.select(this).style("opacity", selectedActivities.w ? "1" : "0.5");
-              break;
-            case "Resolution":
-              selectedActivities.r = !selectedActivities.r
-              d3.select(this).style("opacity", selectedActivities.r ? "1" : "0.5");
-              break;
-            case "Closure":
-              selectedActivities.c = !selectedActivities.c
-              d3.select(this).style("opacity", selectedActivities.c ? "1" : "0.5");
-              break;
-            default:
-              selectedActivities;
-              break;
-          }
-          combineFilters(alignmentsData, incidentsData);
-
-          // filteredAlignmentsData = filterError(alignmentsData, selectedErrors);
-          // filteredIncidentsData = filterIncidentsByAlignments(filteredAlignmentsData, incidentsData);
-
-          renderMetrics();
-          renderOverviewBlock(alignmentsData, incidentsData);
-
-          renderDeviationsBlock(alignmentsData);
-          renderFitnessBlock(alignmentsData, incidentsData);
-          renderIncidentsBlock(alignmentsData, incidentsData);
-
-          renderPattern()
-        });    
-      });
-
+      }
 
 
 

@@ -51,6 +51,9 @@ function renderMetrics(){
 }
 
 function renderLegendError(selector){
+
+    d3.select("#"+selector).selectAll("*").remove();
+
     var len = 0;
     var offset = 100;
     const dBlock = 20;

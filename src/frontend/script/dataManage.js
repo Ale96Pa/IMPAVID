@@ -1,3 +1,27 @@
+function removeAllFromExploration(){
+    // Remove deviation
+    d3.select("#barMissing").selectAll("*").remove();
+    d3.select("#barRepetition").selectAll("*").remove();
+    d3.select("#barMismatch").selectAll("*").remove();
+    d3.select("#divTopOne").selectAll("*").remove();
+    d3.select("#divTopTwo").selectAll("*").remove();
+    d3.select("#divTopThree").selectAll("*").remove();
+    d3.select("#stateDeviations").selectAll("*").remove();
+
+    // Remove fitness
+    d3.select("#fitnessViolin").selectAll("*").remove();
+    d3.select("#fitnessBar").selectAll("*").remove();
+    d3.select("#costViolin").selectAll("*").remove();
+    d3.select("#costBar").selectAll("*").remove();
+
+    // Remove incidents
+    d3.select("#parallelIncidents").selectAll("*").remove();
+    d3.select("#barIncidents").selectAll("*").remove();
+
+    // Remove patterns
+    d3.select("#patternChart").selectAll("*").remove();
+}
+
 function combineFilters(alignmentsData, incidentsData){
 
     filteredAlignmentsData = filterError(alignmentsData, selectedErrors);
