@@ -8,15 +8,16 @@
     <link rel="shortcut icon" href="#">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script type="text/javascript" src="/eel.js"></script>
     <script src="__d3-radviz.js"></script>
 
     <script>
       /* Configurations */
+      const colorTab = {checked: "#ccc", notChecked:"#ddd"};
       const colorDev = { tot:"grey", miss: "#bebada", rep: "#fdb462", mism: "#8dd3c7",
                         N:"#80b1d3", A:"#b3de69", W:"#fb8072",R:"#fccde5",C:"#ffffb3"};
+      const colorRectCat = {checked: "#e41a1c", notChecked: "#3182bd"}
       const fullDateRange = d3.timeDays(new Date(2016, 1, 19), new Date(2017, 2, 19));
       const formatTime = d3.timeFormat("%Y-%m-%d");
       const colorSeverity = {none:"#1a9641",low:"#a6d96a",medium:"#ffffbf",high:"#fdae61",critical:"#d7191c"};
@@ -63,8 +64,8 @@
       <img src="model_img.PNG" />
     </div>
     <div id="tab" class="tab">
-      <button id="tabExplore" class="tablinks" onclick="changeView(event, 'exploration')">Exploration analysis</button>
-      <button id="tabParam" class="tablinks" onclick="changeView(event, 'parameters')" >Parameters space analysis</button>
+      <button id="tabExplore" onclick="changeView(event, 'exploration')">Exploration analysis</button>
+      <button id="tabParam" onclick="changeView(event, 'parameters')" >Parameters space analysis</button>
     </div>
   </div>
 
@@ -126,38 +127,33 @@
       <div id="patternChart"></div>
     </div>
 
-    <div id="detail">DETAILS</div>
+    <div id="detail">
+      details
+    </div>
   </div>
     
     <script>
-      initializeExploration();
+      document.getElementById("tabExplore").style.backgroundColor = colorTab.checked;
+      //initializeExploration();
+
+      // Rimuovere sotto
+      removeAllFromExploration();
+      initializeParameters();
 
       function changeView(evt, analysisType) {
         if(analysisType === "parameters"){
-          document.getElementById("tabParam").style.backgroundColor = "#ccc";
-          document.getElementById("tabExplore").style.backgroundColor = "#ddd";
+          document.getElementById("tabParam").style.backgroundColor = colorTab.checked;
+          document.getElementById("tabExplore").style.backgroundColor = colorTab.notChecked;
 
           removeAllFromExploration();
-          document.getElementById("containerDev").style.display = "none";
-          document.getElementById("containerTop").style.display = "none";
-          document.getElementById("containerState").style.overflow = "hidden";
-          document.getElementById("container_bottom").style.display = "none";
-          document.getElementById("legend").style.display = "none";
+
           initializeParameters();
         } else {
-          document.getElementById("tabExplore").style.backgroundColor = "#ccc";
-          document.getElementById("tabParam").style.backgroundColor = "#ddd";
+          document.getElementById("tabExplore").style.backgroundColor = colorTab.checked;
+          document.getElementById("tabParam").style.backgroundColor = colorTab.notChecked;
 
-          // TODO: aggiustare questa parte
-          /*d3.select("#paramDeviation").selectAll("*").remove();
-          d3.select("#paramFitness").selectAll("*").remove();
-          d3.select("#paramIncidents").selectAll("*").remove();*/
+          removeAllFromParameters();
 
-          document.getElementById("legend").style.display = "";
-          document.getElementById("containerDev").style.display = "table";
-          document.getElementById("containerTop").style.display = "";
-          document.getElementById("containerState").style.overflowY = "scroll";
-          document.getElementById("container_bottom").style.display = "flex";
           initializeExploration();
         }
       }
@@ -198,12 +194,12 @@
           renderOverviewBlock(alignmentsData, incidentsData);
 
           // Render middle part
-          renderDeviationsBlock(alignmentsData)
-          renderFitnessBlock(alignmentsData, incidentsData)
-          renderIncidentsBlock(alignmentsData, incidentsData)
+          renderDeviationsBlock(alignmentsData);
+          renderFitnessBlock(alignmentsData, incidentsData);
+          renderIncidentsBlock(alignmentsData, incidentsData);
 
           // Render bottom part
-          renderPattern()
+          renderPattern();
 
 
           /* LISTENER LEGEND */        
@@ -237,7 +233,7 @@
             renderFitnessBlock(alignmentsData, incidentsData);
             renderIncidentsBlock(alignmentsData, incidentsData);
 
-            renderPattern()
+            renderPattern();
 
           });
 
@@ -279,12 +275,10 @@
             renderFitnessBlock(alignmentsData, incidentsData);
             renderIncidentsBlock(alignmentsData, incidentsData);
 
-            renderPattern()
+            renderPattern();
           });    
         });
       }
-
-
 
     </script>
 

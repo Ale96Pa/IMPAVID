@@ -1,3 +1,17 @@
+function removeAllFromParameters(){
+    // Remove parameters elements
+    d3.select("#paramDeviation").remove();
+    d3.select("#paramFitness").remove();
+    d3.select("#paramIncidents").remove();
+
+    // Adjust display styles
+    document.getElementById("legend").style.display = "";
+    document.getElementById("containerDev").style.display = "table";
+    document.getElementById("containerTop").style.display = "";
+    document.getElementById("containerState").style.overflowY = "scroll";
+    document.getElementById("container_bottom").style.display = "flex";
+}
+
 function removeAllFromExploration(){
     // Remove deviation
     d3.select("#barMissing").selectAll("*").remove();
@@ -20,6 +34,13 @@ function removeAllFromExploration(){
 
     // Remove patterns
     d3.select("#patternChart").selectAll("*").remove();
+
+    // Adjust display styles
+    document.getElementById("containerDev").style.display = "none";
+    document.getElementById("containerTop").style.display = "none";
+    document.getElementById("containerState").style.overflow = "hidden";
+    document.getElementById("container_bottom").style.display = "none";
+    document.getElementById("legend").style.display = "none";
 }
 
 function combineFilters(alignmentsData, incidentsData){

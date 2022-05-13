@@ -62,7 +62,7 @@ function renderParallelIncidents(fullDataIncidents, selector) {
         .enter().append("path")
         .attr("d",  path)
         .style("fill", "none")
-        .style("stroke", function(d) {return filteredIncidentsData.map(e => e.incident_id).includes(d.incident_id) ? "#e41a1c" : "#3182bd"; })
+        .style("stroke", function(d) {return filteredIncidentsData.map(e => e.incident_id).includes(d.incident_id) ? colorRectCat.checked : colorRectCat.notChecked; })
         .style("opacity", function(d) {return filteredIncidentsData.map(e => e.incident_id).includes(d.incident_id) ? 1 : 0.3; })
 
     svg.selectAll("myAxis")
@@ -120,17 +120,17 @@ function renderBarCategory(data, fullDataAlignment, fullIncidentData, selector){
     .attr("y", function(d) { return y(d.category); })
     .attr("width", function(d) {return d.value ? x(d.value) : 0; })
     .attr("height", y.bandwidth() )
-    .attr("fill", function(d) {return selectedCategories.includes(d.category) ? "#e41a1c" : "#3182bd"})
+    .attr("fill", function(d) {return selectedCategories.includes(d.category) ? colorRectCat.checked : colorRectCat.notChecked})
     .style("opacity", 0.5)
     .on("click", function(d,i) {
         if(selectedCategories.includes(i.category)){
             selectedCategories = selectedCategories.filter(e => e !== i.category)
             //d3.select(this).style("opacity", "0.5");
-            d3.select(this).attr("fill", "#3182bd")
+            d3.select(this).attr("fill", colorRectCat.notChecked)
         } else {
             selectedCategories = [...selectedCategories, i.category]
             //d3.select(this).style("opacity", "1");
-            d3.select(this).attr("fill", "#e41a1c")
+            d3.select(this).attr("fill", colorRectCat.checked)
         }
         
         combineFilters(fullDataAlignment, fullIncidentData);
