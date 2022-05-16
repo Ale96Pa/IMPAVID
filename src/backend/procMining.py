@@ -1,7 +1,5 @@
-from posixpath import split
 import pandas as pd
 import pm4py
-import json
 from pm4py.objects.log.util import dataframe_utils
 from pm4py.objects.conversion.log import converter as log_converter
 from pm4py.objects.petri_net.importer import importer as pnml_importer
@@ -65,7 +63,7 @@ def compute_trace_alignment(inputFile, modelFile):
 This function computes the deviation on the alignments and collect data about error categories
 of missing, repetition and mismatch
 """
-def compute_deviations(traces):
+def compute_deviations(traces, dictAlfaMiss, Tmiss, dictAlfaMult, Tmult, dictAlfaMismatch, Tmism, dictAlfaCost, full):
     deviationsDict = {}
     for elem in traces:
         trace = upm.convertTraceList(elem["alignment"])
@@ -74,39 +72,43 @@ def compute_deviations(traces):
         resMismatch = dd.detectMismatch(trace)
 
         numEvents = upm.countEvents(trace)
-        costMissing = cm.calculateMissing(resMissing)
-        costRepetition = cm.calculateMultiple(upm.addAllActivities(resRepetition), numEvents)
-        costMismatch = cm.calculateMismatch(upm.addAllActivities(resMismatch), numEvents)
-        cost = cm.calculateCost(costMissing,costRepetition,costMismatch)
+        costMissing = cm.calculateMissing(resMissing,dictAlfaMiss, Tmiss)
+        costRepetition = cm.calculateMultiple(upm.addAllActivities(resRepetition), numEvents, dictAlfaMult, Tmult)
+        costMismatch = cm.calculateMismatch(upm.addAllActivities(resMismatch), numEvents, dictAlfaMismatch, Tmism)
+        cost = cm.calculateCost(costMissing,costRepetition,costMismatch, dictAlfaCost)
 
-        deviationsDict[elem["incident_id"]] = {
-            "alignment": elem["alignment"],
-            "fitness": elem["fitness"],
-            "cost": elem["cost"],
-            "visited_states": elem["visited_states"],
-            "traversed_arcs": elem["traversed_arcs"],
-            "missing": resMissing,
-            "repetition": resRepetition,
-            "mismatch": resMismatch,
-            "totMissing": sum(resMissing.values()),
-            "totRepetition": sum(resRepetition.values()),
-            "totMismatch": sum(resMismatch.values()),
-            "costMissing": costMissing,
-            "costRepetition": costRepetition,
-            "costMismatch": costMismatch,
-            "costTotal": cost,
-            "severity": cm.calculateSeverity(cost)
-        }
+        if full:
+            deviationsDict[elem["incident_id"]] = {
+                "alignment": elem["alignment"],
+                "fitness": elem["fitness"],
+                "cost": elem["cost"],
+                "visited_states": elem["visited_states"],
+                "traversed_arcs": elem["traversed_arcs"],
+                "missing": resMissing,
+                "repetition": resRepetition,
+                "mismatch": resMismatch,
+                "totMissing": sum(resMissing.values()),
+                "totRepetition": sum(resRepetition.values()),
+                "totMismatch": sum(resMismatch.values()),
+                "costMissing": costMissing,
+                "costRepetition": costRepetition,
+                "costMismatch": costMismatch,
+                "costTotal": cost,
+                "severity": cm.calculateSeverity(cost)
+            }
+        else:
+             deviationsDict[elem["incident_id"]] = {
+                 "alignment": elem["alignment"],
+                 "missing": resMissing,
+                "repetition": resRepetition,
+                "mismatch": resMismatch,
+                "totMissing": sum(resMissing.values()),
+                "totRepetition": sum(resRepetition.values()),
+                "totMismatch": sum(resMismatch.values()),
+                "costMissing": costMissing,
+                "costRepetition": costRepetition,
+                "costMismatch": costMismatch,
+                "costTotal": cost,
+                "severity": cm.calculateSeverity(cost)
+             }
     return deviationsDict
-
-
-# @eel.expose
-# def alignmentsToJson():
-#     aligns = compute_trace_alignment(fileLog,fileModel)
-#     fullData = compute_deviations(aligns)
-#     return json.dumps(fullData)
-# eel.start('index.html', mode='edge')
-
-# if __name__ == "__main__":
-#     traces = compute_trace_alignment(fileLog,fileModel)
-#     fullDict = compute_deviations(traces)

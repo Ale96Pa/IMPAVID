@@ -8,6 +8,7 @@
     <link rel="shortcut icon" href="#">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <script src="https://unpkg.com/d3-simple-slider"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script type="text/javascript" src="/eel.js"></script>
     <script src="__d3-radviz.js"></script>
@@ -31,6 +32,12 @@
       var fitnessRange = [1,0];
       var costRange = [1,0];
       var selectedCategories = [];
+
+      /* Shared filters parameters */
+      var paramMissing = { N:0.25, A:0.25, R:0.25, C:0.25};
+      var paramRepetition = { N:0.2, A:0.2, W:0.2, R:0.2, C:0.2};
+      var paramMismatch = { N:0.2, A:0.2, W:0.2, R:0.2, C:0.2};
+      var paramWeights = { miss: 0.33, rep: 0.33, mism: 0.33};
 
       /* Shared data */
       var filteredAlignmentsData, filteredIncidentsData;
@@ -159,6 +166,8 @@
       }
 
       function initializeParameters(){
+        document.getElementById("containerState").style.height = "1300px"; /*todo */
+        
         loadData().then(data => {
           const alignmentsData = Object.entries(JSON.parse(data[0])).map(entry => {
             return {incident_id: entry[0],
@@ -166,6 +175,7 @@
             };
           });
           const incidentsData = JSON.parse(data[1]);
+
 
           renderParamSpace();
           renderParamAnalysis();
@@ -175,6 +185,9 @@
 
 
       function initializeExploration(){
+
+        document.getElementById("containerState").style.height = "200px"; /*todo */
+
         loadData().then(data => {
           const alignmentsData = Object.entries(JSON.parse(data[0])).map(entry => {
             return {incident_id: entry[0],
