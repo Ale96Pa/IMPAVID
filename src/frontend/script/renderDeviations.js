@@ -98,25 +98,20 @@ function renderActivityBars(alignments, error, selector){
     .text(sumTotal)
 
     svg.append("g")
-    // .selectAll("g")
-    // .data(dim).enter()
-    // .append("g")
-    // .attr("fill", function(d) {return color(d.k); })
-
     .selectAll("rect")
     .data(dim)
     .enter().append("rect")
         .attr("x", function(d) {
-            // const w = x(d[1]) - x(d[0]) < 20 && x(d[1]) - x(d[0])!=0 ? 20 : x(d[1]) - x(d[0]);
-            // if(d[1] == sumTotal) return x(d[0])
-            // return x(d[1])-w;
-            //console.log(x(d[0]));
-            //return x(d[0]);
+            /*const w = x(d[1]) - x(d[0]) < 20 && x(d[1]) - x(d[0])!=0 ? 20 : x(d[1]) - x(d[0]);
+            if(d[1] == sumTotal) return x(d[0])
+            return x(d[1])-w;
+            console.log(x(d[0]));
+            return x(d[0]);*/
             return d.x;
         })
         .attr("width", function(d) {
-            //return x(d[1]) - x(d[0]) < 20 && x(d[1]) - x(d[0])!=0 ? 20 : x(d[1]) - x(d[0]);
-            //return x(d[1]) - x(d[0]);
+            /*return x(d[1]) - x(d[0]) < 20 && x(d[1]) - x(d[0])!=0 ? 20 : x(d[1]) - x(d[0]);
+            return x(d[1]) - x(d[0]);*/
             return d.w;
         })
         .attr("y", function(d) {/*return y(d.data.error)+height;*/ return y(d.err)+height; })
@@ -192,39 +187,28 @@ function renderErrorsBars(objAlignment, selector){
     }, []);
 
     svg.append("g")
-    // .selectAll("g")
-    // .data(stackedData)
-    // .enter().append("g")
-    // .attr("fill", function(d) {return color(d.key); })
-
     .selectAll("rect")
     .data(dim)
     .enter().append("rect")
         .attr("x", function(d) {
+            /*
             // const w = x(d[1]) - x(d[0]) < 20 && x(d[1]) - x(d[0])!=0 ? 20 : x(d[1]) - x(d[0]);
             // if(d[1] == sumTotal) return x(d[0])
             // return x(d[1])-w;
-            /*return x(d[0]);*/return d.x;
+            return x(d[0]);*/
+            return d.x;
         })
         .attr("width", function(d) {
+            /*
             //return x(d[1]) - x(d[0]) < 20 && x(d[1]) - x(d[0])!=0 ? 20 : x(d[1]) - x(d[0]);
-            /*return x(d[1]) - x(d[0]);*/return d.w;
+            return x(d[1]) - x(d[0]);*/
+            return d.w;
         })
         .attr("y", function(d) {/*return y(d.data.error)+height;*/ return y(d.err)+height; })
         .attr("height", y.bandwidth())
         .attr("fill", function(d) {return color(d.k); })
         .style("stroke", "black")
         .style("stroke-width", 1);;
-
-    // svg.selectAll("text.error")
-    // .data(stackedData)
-    // .enter()
-    // .append("text")
-    //     .attr("text-anchor", "middle")
-    //     .attr("x", function(d) {return x(d[0][0]); })
-    //     .attr("y", y("tot")*4+height)
-    //     .attr("font-family", "Helvetica")
-    //     .text(function(d) {return d[0][1]-d[0][0] == 0 ? "" : d[0][1]-d[0][0]})
 
     svg.selectAll("text.error")
     .data(dim)
@@ -244,7 +228,6 @@ function renderState(alignments, selector) {
 }
 
 /* AUXILIARY FUNCTIONS */
-
 function sumErrorsDeviation(data, error){
     return data.reduce((accumulator, object) => {
         return {

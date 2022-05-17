@@ -10,7 +10,7 @@ fileLog = "data/dummy_log.csv"
 fileModel = "data/base_model.pnml"
 csv_file = "data/dummyTraces.csv"
 
-dictAlfaMiss = {"N":0.25,"A":0.25,"R":0.25,"C":0.25}
+dictAlfaMiss = {"N":0.25,"A":0.25, "W":0, "R":0.25,"C":0.25}
 Tmiss = 1
 dictAlfaMult = {"N":0.25,"A":0.25,"W":0.2,"R":0.2,"C":0.1}
 Tmult = 10

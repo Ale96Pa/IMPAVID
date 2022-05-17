@@ -72,7 +72,7 @@ def compute_deviations(traces, dictAlfaMiss, Tmiss, dictAlfaMult, Tmult, dictAlf
         resMismatch = dd.detectMismatch(trace)
 
         numEvents = upm.countEvents(trace)
-        costMissing = cm.calculateMissing(resMissing,dictAlfaMiss, Tmiss)
+        costMissing = cm.calculateMissing(upm.addAllActivities(resMissing),dictAlfaMiss, Tmiss)
         costRepetition = cm.calculateMultiple(upm.addAllActivities(resRepetition), numEvents, dictAlfaMult, Tmult)
         costMismatch = cm.calculateMismatch(upm.addAllActivities(resMismatch), numEvents, dictAlfaMismatch, Tmism)
         cost = cm.calculateCost(costMissing,costRepetition,costMismatch, dictAlfaCost)

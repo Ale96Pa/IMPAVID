@@ -71,8 +71,8 @@
       <img src="model_img.PNG" />
     </div>
     <div id="tab" class="tab">
-      <button id="tabExplore" onclick="changeView(event, 'exploration')">Exploration analysis</button>
-      <button id="tabParam" onclick="changeView(event, 'parameters')" >Parameters space analysis</button>
+      <button id="tabExplore">Exploration analysis</button>
+      <button id="tabParam">Parameters space analysis</button>
     </div>
   </div>
 
@@ -84,9 +84,7 @@
   <div id="container_middle">
 
     <div id="deviation"> 
-      
-      <!-- <div id="legend"></div> -->
-      
+
       <div id="containerDev">
         <div id="divMissing">
           <div id="barMissing"></div>
@@ -140,61 +138,56 @@
   </div>
     
     <script>
-      document.getElementById("tabExplore").style.backgroundColor = colorTab.checked;
-      //initializeExploration();
+      loadData().then(data => {
+        const alignmentsData = Object.entries(JSON.parse(data[0])).map(entry => {
+            return {incident_id: entry[0],
+              ...entry[1]
+            };
+          });
+        const incidentsData = JSON.parse(data[1]);
 
-      // Rimuovere sotto
-      removeAllFromExploration();
-      initializeParameters();
+        document.getElementById("tabExplore").style.backgroundColor = colorTab.checked;
+        //initializeExploration();
 
-      function changeView(evt, analysisType) {
-        if(analysisType === "parameters"){
-          document.getElementById("tabParam").style.backgroundColor = colorTab.checked;
-          document.getElementById("tabExplore").style.backgroundColor = colorTab.notChecked;
+        // Rimuovere sotto
+        removeAllFromExploration();
+        initializeParameters();
 
-          removeAllFromExploration();
-
-          initializeParameters();
-        } else {
+        /* LISTENER tab buttons */
+        document.getElementById("tabExplore").onclick = function () {
           document.getElementById("tabExplore").style.backgroundColor = colorTab.checked;
           document.getElementById("tabParam").style.backgroundColor = colorTab.notChecked;
 
           removeAllFromParameters();
-
           initializeExploration();
-        }
-      }
+        };
 
-      function initializeParameters(){
-        document.getElementById("containerState").style.height = "1300px"; /*todo */
-        
-        loadData().then(data => {
-          const alignmentsData = Object.entries(JSON.parse(data[0])).map(entry => {
-            return {incident_id: entry[0],
-              ...entry[1]
-            };
-          });
-          const incidentsData = JSON.parse(data[1]);
+        document.getElementById("tabParam").onclick = function () {
+          document.getElementById("tabParam").style.backgroundColor = colorTab.checked;
+          document.getElementById("tabExplore").style.backgroundColor = colorTab.notChecked;
 
+          removeAllFromExploration();
+          initializeParameters();
+        };
 
+        /* STATE PARAMETERS view */
+        function initializeParameters(){
+          document.getElementById("containerState").style.height = "1300px"; /*todo */
           renderParamSpace();
           renderParamAnalysis();
           renderTraces();
-        });
-      }
+        }
 
+        /* EXPLORATION view */
+        function initializeExploration(){
 
-      function initializeExploration(){
+          const devs = ["Missing", "Repetition", "Mismatch"];
+          d3.select("#paramDeviationWeights").remove();
+          devs.map(err => {
+              d3.select("#paramDeviation"+err).remove();
+          })
 
-        document.getElementById("containerState").style.height = "200px"; /*todo */
-
-        loadData().then(data => {
-          const alignmentsData = Object.entries(JSON.parse(data[0])).map(entry => {
-            return {incident_id: entry[0],
-              ...entry[1]
-            };
-          });
-          const incidentsData = JSON.parse(data[1]);
+          document.getElementById("containerState").style.height = "200px"; /*todo */
 
           selectedCategories = [...new Set(incidentsData.map(e => e.category))];
           filteredAlignmentsData = alignmentsData;
@@ -236,9 +229,6 @@
             }
             combineFilters(alignmentsData, incidentsData);
 
-            // filteredAlignmentsData = filterError(alignmentsData, selectedErrors);
-            // filteredIncidentsData = filterIncidentsByAlignments(filteredAlignmentsData, incidentsData);
-
             renderMetrics();
             renderOverviewBlock(alignmentsData, incidentsData);
 
@@ -247,7 +237,6 @@
             renderIncidentsBlock(alignmentsData, incidentsData);
 
             renderPattern();
-
           });
 
           d3.selectAll(".barAct").on("click", function(d,i) {
@@ -278,9 +267,6 @@
             }
             combineFilters(alignmentsData, incidentsData);
 
-            // filteredAlignmentsData = filterError(alignmentsData, selectedErrors);
-            // filteredIncidentsData = filterIncidentsByAlignments(filteredAlignmentsData, incidentsData);
-
             renderMetrics();
             renderOverviewBlock(alignmentsData, incidentsData);
 
@@ -290,8 +276,8 @@
 
             renderPattern();
           });    
-        });
-      }
+        }
+      });
 
     </script>
 

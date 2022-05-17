@@ -131,6 +131,7 @@ function renderParamSpace(){
     });
 
     d3.select("#paramDeviationWeights").remove();
+    d3.select("#btnParam").remove();
 
     var svgLast = d3.select("#containerState")
         .append("svg")
@@ -150,6 +151,7 @@ function renderParamSpace(){
     });
 
     var btn = document.createElement("button");
+    btn.id = "btnParam"
     btn.innerHTML = "Submit";
     btn.addEventListener("click", async function () {
         const pars = {
@@ -159,7 +161,7 @@ function renderParamSpace(){
             weights: paramWeights}
         const parData = await eel.calculateParamCosts(pars)();
 
-        /* TODO: riprendere da qui */
+        /* TODO: riprendere da qui (dati con i costi) */
         console.log(parData);
       });
     document.getElementById("containerState").appendChild(btn);
