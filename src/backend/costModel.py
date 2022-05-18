@@ -6,7 +6,7 @@ def calculateMissing(dfMiss, dictAlfaMiss, Tmiss):
     else:
         tot = dictAlfaMiss["N"]*dfMiss["N"]\
         +dictAlfaMiss["A"]*dfMiss["A"]\
-        +dictAlfaMiss["W"]*dfMiss["W"]\
+        # +dictAlfaMiss["W"]*dfMiss["W"]\
         +dictAlfaMiss["R"]*dfMiss["R"]\
         +dictAlfaMiss["C"]*dfMiss["C"]
     return tot
