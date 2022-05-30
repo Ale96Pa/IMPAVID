@@ -98,8 +98,8 @@ def compute_deviations(traces, dictAlfaMiss, Tmiss, dictAlfaMult, Tmult, dictAlf
             }
         else:
              deviationsDict[elem["incident_id"]] = {
-                 "alignment": elem["alignment"],
-                 "missing": resMissing,
+                "alignment": elem["alignment"],
+                "missing": resMissing,
                 "repetition": resRepetition,
                 "mismatch": resMismatch,
                 "totMissing": sum(resMissing.values()),

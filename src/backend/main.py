@@ -2,13 +2,14 @@ import procMining as pm
 import incidentData as id
 import json
 import csv
+import pandas as pd
 
 import eel
 eel.init("./frontend")
 
 fileLog = "data/dummy_log.csv"
 fileModel = "data/base_model.pnml"
-csv_file = "data/dummyTraces.csv"
+csv_file = "data/simpleTraces.csv"
 
 dictAlfaMiss = {"N":0.25,"A":0.25, "W":0, "R":0.25,"C":0.25}
 Tmiss = 1
@@ -66,27 +67,68 @@ def calculateParamCosts(params):
     for i in range(0,len(predicted)):
         labelPredicted.append(convertSeverityToLabel(predicted[i]["severity"]))
         labelActual.append(convertSeverityToLabel(actual[i]["severity"]))
-    print(labelPredicted, labelActual)
-    # print(actual)
-    # print(len(predicted), len(actual))
 
     # predicted = [0, 1, 1, 2, 3] 
     # y_test = [0, 3, 3, 0, 0]
-
     precision, recall, fscore, support = score(labelActual, labelPredicted)
-    print('precision: {}'.format(precision))
-    print('recall: {}'.format(recall))
-    print('fscore: {}'.format(fscore))
-    print('support: {}'.format(support))
+    # print('precision: {}'.format(precision))
+    # print('recall: {}'.format(recall))
+    # print('fscore: {}'.format(fscore))
+    # print('support: {}'.format(support))
+    return {"precision": list(precision), "recall": list(recall)}
 
 eel.paramsCosts()(calculateParamCosts)
 
 @eel.expose
+def rangeParams():
+    df = pd.read_csv('data/groundTruthWeights.csv')
+    ranges = df.agg(["mean", "std"])
+    return ranges.to_dict('dict')
+
+@eel.expose
 def processData():
-    aligns = pm.compute_trace_alignment(fileLog,fileModel)
-    alignments = pm.compute_deviations(aligns, dictAlfaMiss, Tmiss, dictAlfaMult, Tmult, dictAlfaMismatch, Tmism, dictAlfaCost, True)
+    # aligns = pm.compute_trace_alignment(fileLog,fileModel)
+    # alignments = pm.compute_deviations(aligns, dictAlfaMiss, Tmiss, dictAlfaMult, Tmult, dictAlfaMismatch, Tmism, dictAlfaCost, True)
 
-    incidents = id.formatIncidents(fileLog)
+    # incidents = id.formatIncidents(fileLog)
 
-    return [json.dumps(alignments), json.dumps(incidents)]
+    # return [json.dumps(alignments), json.dumps(incidents)]
+    print("Started")
 eel.start('index.html', mode='edge')
+
+# if __name__ == "__main__":
+#     aligns = pm.compute_trace_alignment(fileLog,fileModel)
+#     alignments = pm.compute_deviations(aligns, dictAlfaMiss, Tmiss, dictAlfaMult, Tmult, dictAlfaMismatch, Tmism, dictAlfaCost, True)
+
+#     res = []
+#     for incident in alignments.keys():
+#         res.append({"incident_id": incident,
+#         "alignment": alignments[incident]["alignment"],
+#         'fitness': alignments[incident]['fitness'],
+#         'missing': alignments[incident]['missing'],
+#         'repetition': alignments[incident]['repetition'],
+#         'mismatch': alignments[incident]['mismatch'],
+#         'totMissing': alignments[incident]['totMissing'],
+#         'totRepetition': alignments[incident]['totRepetition'],
+#         'totMismatch': alignments[incident]['totMismatch'],
+#         'costMissing': alignments[incident]['costMissing'],
+#         'costRepetition': alignments[incident]['costRepetition'],
+#         'costMismatch': alignments[incident]['costMismatch'],
+#         'costTotal': alignments[incident]['costTotal'],
+#         'severity': alignments[incident]['severity']
+#         })
+
+#     # keys = res[0].keys()
+#     # a_file = open("output.csv", "w", newline='')
+#     # dict_writer = csv.DictWriter(a_file, keys)
+#     # dict_writer.writeheader()
+#     # dict_writer.writerows(res)
+#     # a_file.close()
+
+#     # incidents = id.formatIncidents(fileLog)
+#     # keysInc = incidents[0].keys()
+#     # a_fileInc = open("outputInc.csv", "w", newline='')
+#     # dict_writerInc = csv.DictWriter(a_fileInc, keysInc)
+#     # dict_writerInc.writeheader()
+#     # dict_writerInc.writerows(incidents)
+#     # a_fileInc.close()

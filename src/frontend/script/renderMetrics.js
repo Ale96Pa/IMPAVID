@@ -10,10 +10,10 @@ function renderMetrics(){
     const numIncidents = filteredAlignmentsData.length;
 
     // Calculate average fitness
-    const avgF = (filteredAlignmentsData.reduce((acc,e) => {return acc + e.fitness},0)/numIncidents).toFixed(3);;
+    const avgF = (filteredAlignmentsData.reduce((acc,e) => {return acc + parseFloat(e.fitness)},0)/numIncidents).toFixed(3);;
 
     // Calculate average cost
-    const avgC = (filteredAlignmentsData.reduce((acc,e) => {return acc + e.costTotal},0)/numIncidents).toFixed(3);;
+    const avgC = (filteredAlignmentsData.reduce((acc,e) => {return acc + parseFloat(e.costTotal)},0)/numIncidents).toFixed(3);;
 
     var svg = d3.select("#metrics")
     .append("svg")

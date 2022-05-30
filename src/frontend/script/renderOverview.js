@@ -179,8 +179,6 @@ function renderLineLog(data, selector, fullAlignmentData, fullIncidentData){
 
     function brushDate({selection}) {
         dateRange = selection.map(x.invert, x);
-        // selectedIncidents = filterDate(dateRange, fullIncidentData);
-        // selectedAlignments = filterAlignmentsByIncidents(fullAlignmentData, selectedIncidents);
         combineFilters(fullAlignmentData, fullIncidentData);
         
         renderMetrics();

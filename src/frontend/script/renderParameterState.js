@@ -28,11 +28,10 @@ function convertEventToAbbr(ev){
         default:
             return "";
     }
-
 }
 
 
-function renderSingleSlider(svg, margin, width, p, i, err){
+async function renderSingleSlider(svg, margin, width, p, i, err){
 
     var def;
     switch(err){
@@ -68,7 +67,7 @@ function renderSingleSlider(svg, margin, width, p, i, err){
     .on('end', val => sliderChange(val));
 
     const yDim = 50*i+2*margin.top;
-    svg.append("g")
+    const g = svg.append("g")
     .attr("transform", "translate("+ 100 +"," + yDim + ")")
     .attr("height", 40)
     .call(sliderParam);
@@ -98,6 +97,47 @@ function renderSingleSlider(svg, margin, width, p, i, err){
         }
     }
 
+    const aa = d3.select(".slider");
+    const w = 386/*aa.node().getBoundingClientRect().width;*/
+
+    const x = d3.scaleLinear()
+    .domain([0,1]) 
+    .range([ 0, w ]);
+
+    const ranges = await eel.rangeParams()();
+    var greenRange, xPos;
+    if(p == "Detection" && err == "Missing") greenRange = ranges["Nmiss"]
+    if(p == "Activation" && err == "Missing") greenRange = ranges["Amiss"]
+    if(p == "Resolution" && err == "Missing") greenRange = ranges["Rmiss"]
+    if(p == "Closure" && err == "Missing") greenRange = ranges["Cmiss"]
+
+    if(p == "Detection" && err == "Repetition") greenRange = ranges["Nrep"]
+    if(p == "Activation" && err == "Repetition") greenRange = ranges["Arep"]
+    if(p == "Awaiting" && err == "Repetition") greenRange = ranges["Wrep"]
+    if(p == "Resolution" && err == "Repetition") greenRange = ranges["Rrep"]
+    if(p == "Closure" && err == "Repetition") greenRange = ranges["Crep"]
+
+    if(p == "Detection" && err == "Mismatch") greenRange = ranges["Nmism"]
+    if(p == "Activation" && err == "Mismatch") greenRange = ranges["Amism"]
+    if(p == "Awaiting" && err == "Mismatch") greenRange = ranges["Wmism"]
+    if(p == "Resolution" && err == "Mismatch") greenRange = ranges["Rmism"]
+    if(p == "Closure" && err == "Mismatch") greenRange = ranges["Cmism"]
+
+    /*TODO FARE MEGLIO*/
+    var xPos = greenRange ? greenRange.mean>1 ? w-margin.left : x(greenRange.mean) : null;
+    var xPosMin = xPos? x(greenRange.mean-greenRange.std) > x(1) ? x(1) : x(greenRange.mean-greenRange.std) : null;
+    var xPosMax = xPos ? x(greenRange.mean+greenRange.std) > x(1) ? x(1) : x(greenRange.mean+greenRange.std) : null;
+    console.log(greenRange)
+
+    xPos && g.append("rect")
+        .attr("width", xPosMin > xPos ? 10 : (xPosMax-xPosMin)-2*margin.left)
+        .attr("height", 8)
+        .attr("fill", "green")
+        .attr("opacity", 0.8)
+        .attr("x", xPos-margin.left)
+        .attr("y", -4)
+        .attr("rx", 20)
+        .attr("ry", 20);
 }
 
 function renderParamSpace(){
@@ -161,8 +201,27 @@ function renderParamSpace(){
             weights: paramWeights}
         const parData = await eel.calculateParamCosts(pars)();
 
-        /* TODO: riprendere da qui (dati con i costi) */
-        console.log(parData);
+        for(var i=0; i<parData.precision.length; i++){
+            var sev;
+            switch(i){
+                case 0:
+                    sev = "low";
+                    break;
+                case 1:
+                    sev = "medium";
+                    break;
+                case 2:
+                    sev = "high";
+                    break;
+                default:
+                    sev = "critical";
+                    break;
+            }
+            modelMetrics.push({severity:sev, precision:parData.precision[i], recall:parData.recall[i]})
+        }
+
+        renderParamAnalysis()
+
       });
     document.getElementById("containerState").appendChild(btn);
 
@@ -172,11 +231,11 @@ function renderParamAnalysis(){
 
     d3.select("#paramFitness").remove();
 
-    var margin = {top: 10, right: 10, bottom: 20, left: 10},
-    width = 300 - margin.left - margin.right,
-    height = 100 - margin.top - margin.bottom;
+    var margin = {top: 20, right: 30, bottom: 30, left: 50},
+    width = 600 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
 
-    var svg = d3.select("#fitness")
+    var svg = d3.select("#pattern")
     .append("svg")
     .attr("id", "paramFitness")
     .attr("width", width + margin.left + margin.right)
@@ -184,11 +243,73 @@ function renderParamAnalysis(){
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    // group the data: I want to draw one line per group
+    const sumstat = d3.group(modelMetrics, d => d.severity);
+
+    // Add X axis --> recall
+    var x = d3.scaleLinear()
+    .domain([0,1]/*d3.extent(modelMetrics, function(d) { return d.recall; })*/) //0,1
+    .range([ 0, width ]);
+    svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x));
     svg.append("text")
-    .attr("y", 70)
-    .attr("x", 0)
-    .attr("font-family", "Helvetica")
-    .text(" PRECISION and RECALL ");
+        .attr("text-anchor", "end")
+        .attr("x", width/2)
+        .attr("y", height + margin.top + 10)
+        .text("recall");
+
+    // Add Y axis --> precision
+    var y = d3.scaleLinear()
+    .domain([0, 1/*d3.max(modelMetrics, function(d) { return +d.precision; })*/]) //0,1
+    .range([ height, 0 ]);
+    svg.append("g")
+    .call(d3.axisLeft(y));
+    svg.append("text")
+        .attr("text-anchor", "end")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -margin.left+20)
+        .attr("x", -margin.top)
+        .text("precision");
+
+    // color palette
+    var color = d3.scaleOrdinal()
+    .range([colorSeverity.low,colorSeverity.medium,colorSeverity.high,colorSeverity.critical])
+
+    // Draw legend
+    var legend_keys = ["low", "medium", "high", "critical"]
+
+    var lineLegend = svg.selectAll(".lineLegend").data(legend_keys)
+        .enter().append("g")
+        .attr("class","lineLegend")
+        .attr("transform", function (d,i) {
+                return "translate(" + (width-50) + "," + (i*20)+")"; //todo aggiustare
+            });
+
+    lineLegend.append("text").text(function (d) {return d;})
+        .attr("transform", "translate(15,9)"); //align texts with boxes
+
+    lineLegend.append("rect")
+        .attr("fill", function (d, i) {return color(d); })
+        .attr("width", 10).attr("height", 10);
+
+    // Draw the line
+    var lines = svg.selectAll(".line")
+    .data(sumstat);
+
+    lines.exit().remove();
+
+    lines.enter().append("path")
+    .attr("fill", "none")
+    .attr("stroke", function(d){ return color(d[0]) })
+    .attr("stroke-width", 1.5)
+    .attr("d", function(d){
+        return d3.line()
+        .x(function(d) {return x(d.recall); })
+        .y(function(d) {return y(+d.precision); })
+        (d[1])
+    })
+
 }
 
 function renderTraces(){
@@ -199,7 +320,7 @@ function renderTraces(){
     width = 300 - margin.left - margin.right,
     height = 100 - margin.top - margin.bottom;
 
-    var svg = d3.select("#incident")
+    var svg = d3.select("#detail")
     .append("svg")
     .attr("id", "paramIncidents")
     .attr("width", width + margin.left + margin.right)

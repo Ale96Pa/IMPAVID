@@ -21,7 +21,7 @@
       const colorRectCat = {checked: "#e41a1c", notChecked: "#3182bd"}
       const fullDateRange = d3.timeDays(new Date(2016, 1, 19), new Date(2017, 2, 19));
       const formatTime = d3.timeFormat("%Y-%m-%d");
-      const colorSeverity = {none:"#1a9641",low:"#a6d96a",medium:"#ffffbf",high:"#fdae61",critical:"#d7191c"};
+      const colorSeverity = {none:"#1a9641",low:"#a6d96a",medium:"#3182bd",high:"#fdae61",critical:"#d7191c"};
       const threshold = {"low":0.37,"medium":0.69,"high":0.89}
 
       /* Shared filters */
@@ -39,10 +39,15 @@
       var paramMismatch = { N:0.2, A:0.2, W:0.2, R:0.2, C:0.2};
       var paramWeights = { miss: 0.33, rep: 0.33, mism: 0.33};
 
+      var modelMetrics = []
+
       /* Shared data */
-      var filteredAlignmentsData, filteredIncidentsData;
+      var filteredAlignmentsData, filteredIncidentsData, incidentsData;
       async function loadData(){
-        return await eel.processData()();
+        //return await eel.processData()();
+        eel.processData()();
+        incidentsData = await d3.csv("outputInc.csv");
+        return await d3.csv("fullOutput.csv"); 
       }
 
     </script>
@@ -139,19 +144,39 @@
     
     <script>
       loadData().then(data => {
-        const alignmentsData = Object.entries(JSON.parse(data[0])).map(entry => {
-            return {incident_id: entry[0],
-              ...entry[1]
-            };
-          });
-        const incidentsData = JSON.parse(data[1]);
+        // const alignmentsData = Object.entries(JSON.parse(data[0])).map(entry => {
+        //     return {incident_id: entry[0],
+        //       ...entry[1]
+        //     };
+        //   });
+        // const incidentsData = JSON.parse(data[1]);
+        const alignmentsData = data.map(elem => {
+          var b = elem.mismatch.replace(/"/g, "'");
+          // TODO: FORMATTARE OBJ !! per essere parsati con json.parse
+          return {
+            ...elem,
+            fitness: parseFloat(elem.fitness),
+            costMismatch: parseFloat(elem.costMismatch),
+            costMissing: parseFloat(elem.costMissing),
+            costRepetition: parseFloat(elem.costRepetition),
+            costTotal: parseFloat(elem.costTotal),
+            //mismatch: elem.mismatch.replace(/"/g, "'"),
+            // missing: JSON.parse(elem.missing),
+            // repetition: JSON.parse(elem.repetition),
+            totMismatch: parseFloat(elem.totMismatch),
+            totMissing: parseFloat(elem.totMissing),
+            totRepetition: parseFloat(elem.totRepetition)
+          }
+        });
+        console.log(alignmentsData)
 
         document.getElementById("tabExplore").style.backgroundColor = colorTab.checked;
         //initializeExploration();
 
         // Rimuovere sotto
-        removeAllFromExploration();
-        initializeParameters();
+        // removeAllFromExploration();
+        // initializeParameters();
+        initializeExploration()
 
         /* LISTENER tab buttons */
         document.getElementById("tabExplore").onclick = function () {
@@ -172,7 +197,7 @@
 
         /* STATE PARAMETERS view */
         function initializeParameters(){
-          document.getElementById("containerState").style.height = "1300px"; /*todo */
+          
           renderParamSpace();
           renderParamAnalysis();
           renderTraces();
@@ -199,13 +224,13 @@
           renderLegendError("legend");
           renderOverviewBlock(alignmentsData, incidentsData);
 
-          // Render middle part
+          // // Render middle part
           renderDeviationsBlock(alignmentsData);
-          renderFitnessBlock(alignmentsData, incidentsData);
-          renderIncidentsBlock(alignmentsData, incidentsData);
+          // renderFitnessBlock(alignmentsData, incidentsData);
+          // renderIncidentsBlock(alignmentsData, incidentsData);
 
-          // Render bottom part
-          renderPattern();
+          // // Render bottom part
+          // renderPattern();
 
 
           /* LISTENER LEGEND */        
@@ -233,10 +258,10 @@
             renderOverviewBlock(alignmentsData, incidentsData);
 
             renderDeviationsBlock(alignmentsData);
-            renderFitnessBlock(alignmentsData, incidentsData);
-            renderIncidentsBlock(alignmentsData, incidentsData);
+            // renderFitnessBlock(alignmentsData, incidentsData);
+            // renderIncidentsBlock(alignmentsData, incidentsData);
 
-            renderPattern();
+            // renderPattern();
           });
 
           d3.selectAll(".barAct").on("click", function(d,i) {
@@ -271,10 +296,10 @@
             renderOverviewBlock(alignmentsData, incidentsData);
 
             renderDeviationsBlock(alignmentsData);
-            renderFitnessBlock(alignmentsData, incidentsData);
-            renderIncidentsBlock(alignmentsData, incidentsData);
+            // renderFitnessBlock(alignmentsData, incidentsData);
+            // renderIncidentsBlock(alignmentsData, incidentsData);
 
-            renderPattern();
+            // renderPattern();
           });    
         }
       });

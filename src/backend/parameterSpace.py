@@ -1,6 +1,7 @@
 import csv
 import itertools
 
+import pandas as pd
 from numpy import Inf
 import costModel as cm
 import procMining as pm
@@ -15,7 +16,7 @@ Tmism = 5000
 Write in a csv file incident processes to parametrize
 """
 fileLog = "data/simple_log.csv"
-fileModel = "data/simple_model.pnml"
+fileModel = "data/base_model.pnml"
 csv_columns = ["incident_id", "alignment", "numEvent"]
 csv_columns2 = ["incidents", "alignment", "count", "numEvents"]
 csv_file = "data/simpleTraces.csv"
@@ -222,6 +223,173 @@ def permutation2():
             # print(comb)
             csv_out.writerow(comb)
 
+
+def writeAlignmentTruth():
+    aligns = pm.compute_trace_alignment(fileLog,fileModel)
+    listData = []
+    computedInc = []
+
+    with open("data/simple_log.csv", "r") as f:
+        reader = csv.DictReader(f, delimiter=";")
+        for row in reader:
+            inc = row["incident_id"]
+            priority = row["priority"]
+            for elem in aligns:
+                if(elem["incident_id"] == inc and inc not in computedInc):
+                    computedInc.append(inc)
+                    listData.append({"incident_id": inc, "trace": elem["alignment"], "priority":priority})
+    
+    with open("data/groundTruth.csv", "w", newline='') as fw:
+        keys = listData[0].keys()
+        dict_writer = csv.DictWriter(fw, keys)
+        dict_writer.writeheader()
+        dict_writer.writerows(listData)
+
+
+
+def computeTruthWeights():
+    c=0
+    listTrueWeights = []
+    dictAlfaMiss = {"N":0.25,"A":0.25, "W":0, "R":0.25,"C":0.25}
+    Tmiss = 1000
+    dictAlfaMult = {"N":0.25,"A":0.25,"W":0.2,"R":0.2,"C":0.1}
+    Tmult = 10000
+    dictAlfaMismatch = {"N":0.35,"A":0.35,"W":0.1,"R":0.1,"C":0.1}
+    Tmism = 4000
+    dictAlfaCost = {"miss":0.33,"rep":0.34,"mism":0.33}
+    with open("data/groundTruth.csv", "r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            trace = upm.convertTraceList(row["trace"])
+            severityTrue = row["priority"]
+
+            resMissing = dd.detectMissing(trace)
+            resRepetition = dd.detectMutliple(trace)
+            resMismatch = dd.detectMismatch(trace)
+
+            numEvents = upm.countEvents(trace)
+            costMissing = cm.calculateMissing(upm.addAllActivities(resMissing),dictAlfaMiss, Tmiss)
+            costRepetition = cm.calculateMultiple(upm.addAllActivities(resRepetition), numEvents, dictAlfaMult, Tmult)
+            costMismatch = cm.calculateMismatch(upm.addAllActivities(resMismatch), numEvents, dictAlfaMismatch, Tmism)
+            cost = cm.calculateCost(costMissing,costRepetition,costMismatch, dictAlfaCost)
+            severity = cm.calculateSeverity(cost)
+            if convertSeverityToLabel(severityTrue) == convertSeverityToLabel(severity):
+                listTrueWeights.append({"priority": row["priority"], 
+                "Nmiss":dictAlfaMiss["N"], "Amiss":dictAlfaMiss["A"], "Wmiss":dictAlfaMiss["W"], "Rmiss":dictAlfaMiss["R"], "Cmiss":dictAlfaMiss["C"],
+                "Nrep":dictAlfaMult["N"], "Arep":dictAlfaMult["A"], "Wrep":dictAlfaMult["W"], "Rrep":dictAlfaMult["R"], "Crep":dictAlfaMult["C"],
+                "Nmism":dictAlfaMismatch["N"], "Amism":dictAlfaMismatch["A"], "Wmism":dictAlfaMismatch["W"], "Rmism":dictAlfaMismatch["R"], "Cmism":dictAlfaMismatch["C"],
+                 })
+                c+=1
+            else:
+                foundW = True
+                dictAlfaMiss = {"N":0.25,"A":0.25, "W":0, "R":0.25,"C":0.25}
+                dictAlfaMult = {"N":0.25,"A":0.25,"W":0.2,"R":0.2,"C":0.1}
+                dictAlfaMismatch = {"N":0.35,"A":0.35,"W":0.1,"R":0.1,"C":0.1}
+                counter = 0
+                costMissing = cm.calculateMissing(upm.addAllActivities(resMissing),dictAlfaMiss, Tmiss)
+                costRepetition = cm.calculateMultiple(upm.addAllActivities(resRepetition), numEvents, dictAlfaMult, Tmult)
+                costMismatch = cm.calculateMismatch(upm.addAllActivities(resMismatch), numEvents, dictAlfaMismatch, Tmism)
+                cost = cm.calculateCost(costMissing,costRepetition,costMismatch, dictAlfaCost)
+                severity = cm.calculateSeverity(cost)
+                while(foundW):
+                    for elem in ["N","A","W","R","C"]:
+                        if convertSeverityToLabel(severityTrue) < convertSeverityToLabel(severity):
+                            dictAlfaMiss[elem] = dictAlfaMiss[elem]/2
+                            dictAlfaMult[elem] = dictAlfaMult[elem]/2
+                            dictAlfaMismatch[elem] = dictAlfaMismatch[elem]/2
+                        else:
+                            dictAlfaMiss[elem] = dictAlfaMiss[elem]*2
+                            dictAlfaMult[elem] = dictAlfaMult[elem]*3
+                            dictAlfaMismatch[elem] = dictAlfaMismatch[elem]*3
+                            
+                        costMissing = cm.calculateMissing(upm.addAllActivities(resMissing),dictAlfaMiss, Tmiss)
+                        costRepetition = cm.calculateMultiple(upm.addAllActivities(resRepetition), numEvents, dictAlfaMult, Tmult)
+                        costMismatch = cm.calculateMismatch(upm.addAllActivities(resMismatch), numEvents, dictAlfaMismatch, Tmism)
+                        cost = cm.calculateCost(costMissing,costRepetition,costMismatch, dictAlfaCost)
+                        severity = cm.calculateSeverity(cost)
+
+                        if counter == 5:
+                            foundW = False
+                        if convertSeverityToLabel(severityTrue) == convertSeverityToLabel(severity):
+                                c += 1
+                                listTrueWeights.append({"priority": row["priority"], 
+                                "Nmiss":dictAlfaMiss["N"], "Amiss":dictAlfaMiss["A"], "Wmiss":dictAlfaMiss["W"], "Rmiss":dictAlfaMiss["R"], "Cmiss":dictAlfaMiss["C"],
+                                "Nrep":dictAlfaMult["N"], "Arep":dictAlfaMult["A"], "Wrep":dictAlfaMult["W"], "Rrep":dictAlfaMult["R"], "Crep":dictAlfaMult["C"],
+                                "Nmism":dictAlfaMismatch["N"], "Amism":dictAlfaMismatch["A"], "Wmism":dictAlfaMismatch["W"], "Rmism":dictAlfaMismatch["R"], "Cmism":dictAlfaMismatch["C"],
+                                })
+                                foundW = False
+                        counter +=1
+    print(c/24918*100)
+
+    with open("data/groundTruthWeights.csv", "w", newline='') as fw:
+        keys = listTrueWeights[0].keys()
+        dict_writer = csv.DictWriter(fw, keys)
+        dict_writer.writeheader()
+        dict_writer.writerows(listTrueWeights)
+    
+def paramanalysis():
+    df = pd.read_csv('data/groundTruthWeights.csv')
+    ranges = df.agg(["mean", "std"])
+    el = ranges.to_dict('dict')
+
+
+def convertSeverityToLabel(sev):
+    if sev == '1 - Critical' or sev == "critical":
+        return 4
+    elif sev == '2 - High' or sev == "high":
+        return 3
+    elif sev == '3 - Moderate' or sev == "medium":
+        return 2
+    elif sev == '4 - Low' or sev == "low" or sev == "none":
+        return 1
+    else:
+        return 1
+
+
+dictAlfaMiss = {"N":0.25,"A":0.25, "W":0, "R":0.25,"C":0.25}
+Tmiss = 1
+dictAlfaMult = {"N":0.25,"A":0.25,"W":0.2,"R":0.2,"C":0.1}
+Tmult = 10
+dictAlfaMismatch = {"N":0.35,"A":0.35,"W":0.1,"R":0.1,"C":0.1}
+Tmism = 4
+dictAlfaCost = {"miss":0.33,"rep":0.34,"mism":0.33}
+def writeDataOnFile():
+    aligns = pm.compute_trace_alignment(fileLog,fileModel)
+    alignments = pm.compute_deviations(aligns, dictAlfaMiss, Tmiss, dictAlfaMult, Tmult, dictAlfaMismatch, Tmism, dictAlfaCost, True)
+
+    res = []
+    for incident in alignments.keys():
+        res.append({"incident_id": incident,
+        "alignment": alignments[incident]["alignment"],
+        'fitness': alignments[incident]['fitness'],
+        'missing': alignments[incident]['missing'],
+        'repetition': alignments[incident]['repetition'],
+        'mismatch': alignments[incident]['mismatch'],
+        'totMissing': alignments[incident]['totMissing'],
+        'totRepetition': alignments[incident]['totRepetition'],
+        'totMismatch': alignments[incident]['totMismatch'],
+        'costMissing': alignments[incident]['costMissing'],
+        'costRepetition': alignments[incident]['costRepetition'],
+        'costMismatch': alignments[incident]['costMismatch'],
+        'costTotal': alignments[incident]['costTotal'],
+        'severity': alignments[incident]['severity']
+        })
+
+    keys = res[0].keys()
+    a_file = open("data/fullOutput.csv", "w", newline='')
+    dict_writer = csv.DictWriter(a_file, keys)
+    dict_writer.writeheader()
+    dict_writer.writerows(res)
+    a_file.close()
+
+    # incidents = id.formatIncidents(fileLog)
+    # keysInc = incidents[0].keys()
+    # a_fileInc = open("outputInc.csv", "w", newline='')
+    # dict_writerInc = csv.DictWriter(a_fileInc, keysInc)
+    # dict_writerInc.writeheader()
+    # dict_writerInc.writerows(incidents)
+    # a_fileInc.close()
+
 if __name__ == "__main__":
     # permutation()
     # writeAlignmentsOnFile()
@@ -229,5 +397,10 @@ if __name__ == "__main__":
     # computeParamCosts()
     # calculateMetrics()
     # permutation2()
-    computeParamCosts()
+    # computeParamCosts()
     # calculateMetrics()
+    # writeAlignmentTruth()
+    # computeTruthWeights()
+
+    paramanalysis()
+    # writeDataOnFile()

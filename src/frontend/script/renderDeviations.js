@@ -4,10 +4,10 @@
 const minW = 20;
 
 function renderDeviationsBlock(fullAlignmentData) {
-    const sorter = (a, b) => a.totMissing+a.totRepetition+a.totMismatch < b.totMissing+b.totRepetition+b.totMismatch ? 1 : -1;
-    const sortedErrors = fullAlignmentData.filter(inc => inc.totMissing+inc.totRepetition+inc.totMismatch>0).sort(sorter);
+    const sorter = (a, b) => parseInt(a.totMissing)+parseInt(a.totRepetition)+parseInt(a.totMismatch) < parseInt(b.totMissing)+parseInt(b.totRepetition)+parseInt(b.totMismatch) ? 1 : -1;
+    const sortedErrors = fullAlignmentData.filter(inc => parseInt(inc.totMissing)+parseInt(inc.totRepetition)+parseInt(inc.totMismatch)>0).sort(sorter);
     const sortedFilteredErrors = filteredAlignmentsData.sort(sorter);
-
+    
     d3.select("#barMissing").selectAll("*").remove();
     d3.select("#barRepetition").selectAll("*").remove();
     d3.select("#barMismatch").selectAll("*").remove();
@@ -36,7 +36,7 @@ function renderDeviationsBlock(fullAlignmentData) {
 function renderActivityBars(alignments, error, selector){
 
     const objDeviations = sumErrorsDeviation(alignments, error);
-    const sumTotal = Object.values(objDeviations).reduce((a, b) => a + b, 0);
+    const sumTotal = Object.values(objDeviations).reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
     const data = [{error:error, ...objDeviations}]
     const subgroups = ["N","A","W","R","C"];
 
@@ -230,12 +230,13 @@ function renderState(alignments, selector) {
 /* AUXILIARY FUNCTIONS */
 function sumErrorsDeviation(data, error){
     return data.reduce((accumulator, object) => {
+        obj = object[error]
         return {
-            N: accumulator.N + object[error].N,
-            A: accumulator.A + object[error].A,
-            W: accumulator.W + (object[error].W || 0),
-            R: accumulator.R + object[error].R,
-            C: accumulator.C + object[error].C,
+            N: accumulator.N + obj.N,
+            A: accumulator.A + obj.A,
+            W: accumulator.W + obj.W || 0,
+            R: accumulator.R + obj.R,
+            C: accumulator.C + obj.C,
         }
     }, {N:0, A:0, W:0, R:0, C:0});
 }
