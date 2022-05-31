@@ -138,3 +138,95 @@ function renderLegendError(selector){
         .attr("text-anchor", "left")
         .style("alignment-baseline", "middle");
 }
+
+function renderDatasetAnalysis(fullAlignmentData){
+
+    d3.select("#detail").selectAll("*").remove();
+
+    var margin = {top: 10, right: 10, bottom: 20, left: 10},
+    width = 1800 - margin.left - margin.right,
+    height = 100 - margin.top - margin.bottom;
+
+    // Calculate number of incidents
+    const totIncidents = fullAlignmentData.length;
+    const numIncidents = filteredAlignmentsData.length;
+
+    var svg = d3.select("#detail")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height*2 + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+    const x = d3.scaleLinear()
+    .domain([0, totIncidents])
+    .range([0, width])
+
+    svg.append("rect")
+    .attr("y", 0)
+    .attr("x",0)
+    .attr("width", x(totIncidents))
+    .attr("height", height/2)
+    .attr("style", "fill:none")
+    .style("stroke", "black")
+    .style("stroke-width", 2);
+
+    svg.append("rect")
+    .attr("y", 0)
+    .attr("x",0)
+    .attr("width", x(numIncidents))
+    .attr("height", height/2)
+    .attr("style", "fill:"+colorRectCat.notChecked);
+
+    svg.append("text")
+    .attr("y", height/2-5)
+    .attr("x",width/2)
+    .attr("font-family", "Helvetica")
+    .text((numIncidents/totIncidents*100).toFixed(2) + " %")
+        // .append("tspan")
+        .attr("font-weight", "bold");
+
+
+    const data = filteredAlignmentsData.reduce((acc, elem)=> {
+        var structures = acc.map(e => e.structure);
+        if(structures.includes(elem.alignment)){
+            const currentInc = acc.find(e => e.structure == elem.alignment);
+            tmp = acc.filter(e => e.structure != elem.alignment);
+            acc = [...tmp, {structure:elem.alignment, count:currentInc.count+1}]
+        } else {
+            acc = [...acc, {structure:elem.alignment, count:1}]
+        }
+        return acc;
+    }, []).sort((a,b) => b.count - a.count);
+
+    const xScaleVariants = d3.scaleLinear()
+    .domain([0, numIncidents])
+    .range([0, width])
+
+    const colors = ["#4e79a7","#f28e2c","#e15759","#76b7b2","#59a14f","#edc949","#af7aa1","#ff9da7","#9c755f","#bab0ab"];
+
+    var sum = 0;
+    data.map((elem,i) => {
+
+        svg.append("rect")
+        .attr("y", height)
+        .attr("x", sum)
+        .attr("width", xScaleVariants(elem.count))
+        .attr("height", height/2)
+        .attr("style", "fill:"+colors[i%colors.length])
+        .style("stroke", "black")
+        .style("stroke-width", 1);
+
+        i<5 && svg.append("text")
+        .attr("y", height+15)
+        .attr("x", sum)
+        .attr("font-family", "Helvetica")
+        .text(elem.count)
+            // .append("tspan")
+            .attr("font-weight", "bold");
+
+        sum += xScaleVariants(elem.count);
+    })
+
+}

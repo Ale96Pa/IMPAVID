@@ -90,7 +90,7 @@ function renderActivityBars(alignments, error, selector){
     .attr("height", height)
     .attr("style", "fill:"+colorTop)
     .style("stroke", "black")
-    .style("stroke-width", 1);;
+    .style("stroke-width", 1);
     sumTotal>0 && svg.append("text")
     .attr("y", height/2+5)
     .attr("x",width/2)

@@ -145,6 +145,7 @@ function renderBarCategory(data, fullDataAlignment, fullIncidentData, selector){
         renderParallelIncidents(fullIncidentData, "parallelIncidents");
 
         renderPattern();
+        renderDatasetAnalysis(fullAlignmentData);
 
     });
 }

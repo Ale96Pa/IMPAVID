@@ -189,6 +189,7 @@ function renderLineLog(data, selector, fullAlignmentData, fullIncidentData){
         renderIncidentsBlock(fullAlignmentData, fullIncidentData);
 
         renderPattern();
+        renderDatasetAnalysis(fullAlignmentData);
     }
 }
 

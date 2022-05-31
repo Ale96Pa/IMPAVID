@@ -156,6 +156,7 @@ function renderViolinChart(data, fullAlignmentData, fullIncidentData, selector, 
         renderIncidentsBlock(fullAlignmentData, fullIncidentData);
 
         renderPattern();
+        renderDatasetAnalysis(fullAlignmentData);
     }
 }
 
