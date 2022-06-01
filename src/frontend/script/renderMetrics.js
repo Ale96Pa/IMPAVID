@@ -7,13 +7,13 @@ function renderMetrics(){
     height = 100 - margin.top - margin.bottom;
 
     // Calculate number of incidents
-    const numIncidents = filteredAlignmentsData.length;
+    const numIncidents = filteredData.length;
 
     // Calculate average fitness
-    const avgF = (filteredAlignmentsData.reduce((acc,e) => {return acc + parseFloat(e.fitness)},0)/numIncidents).toFixed(3);;
+    const avgF = (filteredData.reduce((acc,e) => {return acc + parseFloat(e.fitness)},0)/numIncidents).toFixed(3);;
 
     // Calculate average cost
-    const avgC = (filteredAlignmentsData.reduce((acc,e) => {return acc + parseFloat(e.costTotal)},0)/numIncidents).toFixed(3);;
+    const avgC = (filteredData.reduce((acc,e) => {return acc + parseFloat(e.costTotal)},0)/numIncidents).toFixed(3);;
 
     var svg = d3.select("#metrics")
     .append("svg")
@@ -139,7 +139,7 @@ function renderLegendError(selector){
         .style("alignment-baseline", "middle");
 }
 
-function renderDatasetAnalysis(fullAlignmentData){
+function renderDatasetAnalysis(fullData){
 
     d3.select("#detail").selectAll("*").remove();
 
@@ -148,8 +148,8 @@ function renderDatasetAnalysis(fullAlignmentData){
     height = 100 - margin.top - margin.bottom;
 
     // Calculate number of incidents
-    const totIncidents = fullAlignmentData.length;
-    const numIncidents = filteredAlignmentsData.length;
+    const totIncidents = fullData.length;
+    const numIncidents = filteredData.length;
 
     var svg = d3.select("#detail")
     .append("svg")
@@ -188,7 +188,7 @@ function renderDatasetAnalysis(fullAlignmentData){
         .attr("font-weight", "bold");
 
 
-    const data = filteredAlignmentsData.reduce((acc, elem)=> {
+    const data = filteredData.reduce((acc, elem)=> {
         var structures = acc.map(e => e.structure);
         if(structures.includes(elem.alignment)){
             const currentInc = acc.find(e => e.structure == elem.alignment);

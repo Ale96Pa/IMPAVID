@@ -1,12 +1,12 @@
-function renderIncidentsBlock(fullDataAlignment, fullIncidentData) {
+function renderIncidentsBlock(fullData) {
 
     d3.select("#parallelIncidents").selectAll("*").remove();
     d3.select("#barIncidents").selectAll("*").remove();
 
-    renderParallelIncidents(fullIncidentData, "parallelIncidents");
+    renderParallelIncidents(fullData, "parallelIncidents");
 
-    const countCategories = fullIncidentData.reduce((accumulator, object) => {
-        if(filteredIncidentsData.map(e => e.incident_id).includes(object.incident_id)){
+    const countCategories = fullData.reduce((accumulator, object) => {
+        if(filteredData.map(e => e.incident_id).includes(object.incident_id)){
             if(Object.keys(accumulator).includes(object.category)){
                 accumulator[object.category] +=1;
             } else {
@@ -20,10 +20,10 @@ function renderIncidentsBlock(fullDataAlignment, fullIncidentData) {
     const countCategoriesArr = Object.keys(countCategories).map(elem => {
         return {category: elem, value: countCategories[elem]}
     });
-    renderBarCategory(countCategoriesArr, fullDataAlignment, fullIncidentData, "barIncidents");
+    renderBarCategory(countCategoriesArr, fullData, "barIncidents");
 }
 
-function renderParallelIncidents(fullDataIncidents, selector) {
+function renderParallelIncidents(fullData, selector) {
 
     d3.select("#parallelIncidents").selectAll("*").remove();
 
@@ -38,13 +38,13 @@ function renderParallelIncidents(fullDataIncidents, selector) {
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    dimensions = Object.keys(fullDataIncidents[0]).filter(function(d) { return d == "impact" || d=="urgency" || d=="priority" || d=="category" });
+    dimensions = Object.keys(fullData[0]).filter(function(d) { return d == "impact" || d=="urgency" || d=="priority" || d=="category" });
 
     var y = {}
     for (i in dimensions) {
         name = dimensions[i]
         y[name] = d3.scalePoint()
-        .domain( fullDataIncidents.map(function(p) {return p[name]; }).sort() )
+        .domain( fullData.map(function(p) {return p[name]; }).sort() )
         .range([height, 0])
     }
 
@@ -58,12 +58,12 @@ function renderParallelIncidents(fullDataIncidents, selector) {
     }
 
     svg.selectAll("myPath")
-        .data(fullDataIncidents)
+        .data(fullData)
         .enter().append("path")
         .attr("d",  path)
         .style("fill", "none")
-        .style("stroke", function(d) {return filteredIncidentsData.map(e => e.incident_id).includes(d.incident_id) ? colorRectCat.checked : colorRectCat.notChecked; })
-        .style("opacity", function(d) {return filteredIncidentsData.map(e => e.incident_id).includes(d.incident_id) ? 1 : 0.3; })
+        .style("stroke", function(d) {return filteredData.map(e => e.incident_id).includes(d.incident_id) ? colorRectCat.checked : colorRectCat.notChecked; })
+        .style("opacity", function(d) {return filteredData.map(e => e.incident_id).includes(d.incident_id) ? 1 : 0.3; })
 
     svg.selectAll("myAxis")
         .data(dimensions).enter()
@@ -77,7 +77,7 @@ function renderParallelIncidents(fullDataIncidents, selector) {
         .style("fill", "black")
 }
 
-function renderBarCategory(data, fullDataAlignment, fullIncidentData, selector){
+function renderBarCategory(data, fullData, selector){
     const maxVal = d3.max(data, d => d.value);
 
     var margin = {top: 20, right: 0, bottom: 30, left: 0},
@@ -133,19 +133,19 @@ function renderBarCategory(data, fullDataAlignment, fullIncidentData, selector){
             d3.select(this).attr("fill", colorRectCat.checked)
         }
         
-        combineFilters(fullDataAlignment, fullIncidentData);
-        // selectedAlignments = filterAlignmentsByCategory(fullDataAlignment, fullIncidentData, selectedCategories);
-        // selectedIncidents = filterIncidentsByAlignments(selectedAlignments, fullIncidentData);
+        // combineFilters(fullDataAlignment, fullIncidentData);
+        filterAll(fullData);
+
 
         renderMetrics();
-        renderOverviewBlock(fullDataAlignment, fullIncidentData);
+        renderOverviewBlock(fullData);
 
-        renderDeviationsBlock(fullDataAlignment);
-        renderFitnessBlock(fullDataAlignment, fullIncidentData);
-        renderParallelIncidents(fullIncidentData, "parallelIncidents");
+        renderDeviationsBlock(fullData);
+        renderFitnessBlock(fullData);
+        renderParallelIncidents(fullData, "parallelIncidents");
 
         renderPattern();
-        renderDatasetAnalysis(fullAlignmentData);
+        renderDatasetAnalysis(fullData);
 
     });
 }

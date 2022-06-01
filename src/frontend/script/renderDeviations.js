@@ -3,10 +3,10 @@
 */
 const minW = 20;
 
-function renderDeviationsBlock(fullAlignmentData) {
+function renderDeviationsBlock(fullData) {
     const sorter = (a, b) => parseInt(a.totMissing)+parseInt(a.totRepetition)+parseInt(a.totMismatch) < parseInt(b.totMissing)+parseInt(b.totRepetition)+parseInt(b.totMismatch) ? 1 : -1;
-    const sortedErrors = fullAlignmentData.filter(inc => parseInt(inc.totMissing)+parseInt(inc.totRepetition)+parseInt(inc.totMismatch)>0).sort(sorter);
-    const sortedFilteredErrors = filteredAlignmentsData.sort(sorter);
+    const sortedErrors = fullData.filter(inc => parseInt(inc.totMissing)+parseInt(inc.totRepetition)+parseInt(inc.totMismatch)>0).sort(sorter);
+    const sortedFilteredErrors = filteredData.sort(sorter);
     
     d3.select("#barMissing").selectAll("*").remove();
     d3.select("#barRepetition").selectAll("*").remove();

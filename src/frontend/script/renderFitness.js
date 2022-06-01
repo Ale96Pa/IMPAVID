@@ -1,11 +1,10 @@
 /* TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 - OTTENERE width in modo dinamico
-- MANTENERE IL BRUSH NELLA SELEZIOE CON brush.move causa problemi nelle altre visualizzazioni
 */
 
 const maxTracesBarchart = 100;
 
-function renderFitnessBlock(fullAlignmentData, fullIncidentData) {
+function renderFitnessBlock(fullData) {
 
     d3.select("#fitnessViolin").selectAll("*").remove();
     d3.select("#fitnessBar").selectAll("*").remove();
@@ -13,20 +12,32 @@ function renderFitnessBlock(fullAlignmentData, fullIncidentData) {
     d3.select("#costBar").selectAll("*").remove();
 
     // Render fitness analysis
-    var violinDataFitness = filteredAlignmentsData.map(elem => {
-        return {metric: "fitness", value: elem.fitness};
-    });
-    var filterFitness = filteredAlignmentsData.map(elem => {
+    // var violinDataFitness = filteredData.map(elem => {
+    //     return {metric: "fitness", value: elem.fitness};
+    // });
+    // var violinDataCost = filteredData.map(elem => {
+    //     return {metric: "cost", value: elem.costTotal};
+    // });
+    const violinData = filteredData.reduce((acc, elem)=> {
+        if(acc[0].includes(elem.alignment)){
+        } else {
+            acc[0].push(elem.alignment);
+            acc[1].push({metric: "fitness", value: elem.fitness});
+            acc[2].push({metric: "cost", value: elem.costTotal});
+        }
+        return acc;
+    }, [[],[],[]]);
+
+
+    var filterFitness = filteredData.map(elem => {
         return {incident_id: elem.incident_id, value: elem.fitness};
     }).sort((a, b) => a.value < b.value ? 1 : -1).slice(0, maxTracesBarchart);
-    renderViolinChart(violinDataFitness, fullAlignmentData, fullIncidentData, "fitnessViolin", "fitness");
+    // renderViolinChart(violinDataFitness, fullData, "fitnessViolin", "fitness");
+    renderViolinChart(violinData[1], fullData, "fitnessViolin", "fitness");
     renderFitnessBar(filterFitness, "fitnessBar")
 
     // Render cost analysis
-    var violinDataCost = filteredAlignmentsData.map(elem => {
-        return {metric: "cost", value: elem.costTotal};
-    });
-    var filterCostsInPercentage = filteredAlignmentsData.map(elem => {
+    var filterCostsInPercentage = filteredData.map(elem => {
         const tot = elem.costMissing+elem.costMismatch+elem.costRepetition;
         const percMiss = elem.costMissing*100/tot;
         const percRep = elem.costRepetition*100/tot;
@@ -42,11 +53,12 @@ function renderFitnessBlock(fullAlignmentData, fullIncidentData) {
     const keyFit = filterFitness.map(elem => elem.incident_id);
     filterCostsInPercentage = filterCostsInPercentage.sort((a, b) => keyFit.indexOf(a.incident_id) - keyFit.indexOf(b.incident_id));
 
-    renderViolinChart(violinDataCost, fullAlignmentData, fullIncidentData, "costViolin", "cost");
+    // renderViolinChart(violinDataCost, fullData, "costViolin", "cost");
+    renderViolinChart(violinData[2], fullData, "costViolin", "cost");
     renderCostStackedBar(filterCostsInPercentage, "costBar")
 }
 
-function renderViolinChart(data, fullAlignmentData, fullIncidentData, selector, metric){
+function renderViolinChart(data, fullData, selector, metric){
     const jitterWidth = 30;
 
     var margin = {top: 10, right: 30, bottom: 30, left: 40},
@@ -145,18 +157,18 @@ function renderViolinChart(data, fullAlignmentData, fullIncidentData, selector, 
         metricRange = selection.map(y.invert, y);
         if(metric == "fitness") fitnessRange = metricRange
         else costRange = metricRange
-        // selectedAlignments = filterBrushes(fullAlignmentData, metricRange, metric == "fitness" ? "fitness" : "costTotal");
-        // selectedIncidents = filterIncidentsByAlignments(selectedAlignments, fullIncidentData);
-        combineFilters(fullAlignmentData, fullIncidentData);
+        // combineFilters(fullAlignmentData, fullIncidentData);
+        // console.log(filteredData);
+        filterAll(fullData);
 
         renderMetrics();
-        renderOverviewBlock(fullAlignmentData, fullIncidentData);
+        renderOverviewBlock(fullData);
         
-        renderDeviationsBlock(fullAlignmentData);
-        renderIncidentsBlock(fullAlignmentData, fullIncidentData);
+        renderDeviationsBlock(fullData);
+        renderIncidentsBlock(fullData);
 
         renderPattern();
-        renderDatasetAnalysis(fullAlignmentData);
+        renderDatasetAnalysis(fullData);
     }
 }
 

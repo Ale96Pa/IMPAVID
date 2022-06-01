@@ -2,7 +2,7 @@
 TODO: aggiustare width dinamica delle sequenze
 */
 
-function renderOverviewBlock(fullAlignmentData, fullIncidentData){
+function renderOverviewBlock(fullData){
 
     d3.select("#focus").selectAll("*").remove();
     d3.select("#context").selectAll("*").remove();
@@ -10,7 +10,7 @@ function renderOverviewBlock(fullAlignmentData, fullIncidentData){
     renderSequences("focus");
     
     const allDates = fullDateRange.map(elem => {return {date: new Date(elem), value: 0}});
-    var dataIncTime = filteredIncidentsData.reduce((accumulator, elem) => {
+    var dataIncTime = filteredData.reduce((accumulator, elem) => {
         const start = buildDate(elem.openTs);
         const end = buildDate(elem.closeTs);
         const numDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 3600 * 24));
@@ -29,7 +29,7 @@ function renderOverviewBlock(fullAlignmentData, fullIncidentData){
 
     dataIncTime = dataIncTime.sort((a,b) => Date.parse(a.date) - Date.parse(b.date))
 
-    renderLineLog(dataIncTime, "context", fullAlignmentData, fullIncidentData)
+    renderLineLog(dataIncTime, "context", fullData)
 }
 
 function renderSequences(selector){
@@ -44,7 +44,7 @@ function renderSequences(selector){
     width = 450 - margin.left - margin.right,
     height = 50 - margin.top - margin.bottom;
 
-    const data = filteredAlignmentsData.reduce((acc, elem)=> {
+    const data = filteredData.reduce((acc, elem)=> {
         var structures = acc.map(e => e.structure);
         if(structures.includes(elem.alignment)){
             const currentInc = acc.find(e => e.structure == elem.alignment);
@@ -121,7 +121,7 @@ function renderSequences(selector){
     });
 }
 
-function renderLineLog(data, selector, fullAlignmentData, fullIncidentData){
+function renderLineLog(data, selector, fullData){
 
     var margin = {top: 10, right: 30, bottom: 30, left: 60},
     width = 1900 - margin.left - margin.right,
@@ -179,17 +179,17 @@ function renderLineLog(data, selector, fullAlignmentData, fullIncidentData){
 
     function brushDate({selection}) {
         dateRange = selection.map(x.invert, x);
-        combineFilters(fullAlignmentData, fullIncidentData);
+        filterAll(fullData);
         
         renderMetrics();
         renderSequences("focus");
 
-        renderDeviationsBlock(fullAlignmentData);
-        renderFitnessBlock(fullAlignmentData, fullIncidentData)
-        renderIncidentsBlock(fullAlignmentData, fullIncidentData);
+        renderDeviationsBlock(fullData);
+        renderFitnessBlock(fullData)
+        renderIncidentsBlock(fullData);
 
         renderPattern();
-        renderDatasetAnalysis(fullAlignmentData);
+        renderDatasetAnalysis(fullData);
     }
 }
 

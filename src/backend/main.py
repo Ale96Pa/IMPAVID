@@ -71,10 +71,6 @@ def calculateParamCosts(params):
     # predicted = [0, 1, 1, 2, 3] 
     # y_test = [0, 3, 3, 0, 0]
     precision, recall, fscore, support = score(labelActual, labelPredicted)
-    # print('precision: {}'.format(precision))
-    # print('recall: {}'.format(recall))
-    # print('fscore: {}'.format(fscore))
-    # print('support: {}'.format(support))
     return {"precision": list(precision), "recall": list(recall)}
 
 eel.paramsCosts()(calculateParamCosts)

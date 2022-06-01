@@ -61,7 +61,7 @@ function renderRadviz(data,selector){
 function renderPattern() {
     d3.select("#patternChart").selectAll("*").remove();
 
-    const data = filteredIncidentsData.map(elem => {
+    const data = filteredData.map(elem => {
         return {
             ...elem,
             impact: parseInt(elem.impact.split(" ")[0]),

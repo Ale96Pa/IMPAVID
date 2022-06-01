@@ -356,41 +356,55 @@ dictAlfaMismatch = {"N":0.35,"A":0.35,"W":0.1,"R":0.1,"C":0.1}
 Tmism = 4
 dictAlfaCost = {"miss":0.33,"rep":0.34,"mism":0.33}
 def writeDataOnFile():
-    # aligns = pm.compute_trace_alignment(fileLog,fileModel)
-    # alignments = pm.compute_deviations(aligns, dictAlfaMiss, Tmiss, dictAlfaMult, Tmult, dictAlfaMismatch, Tmism, dictAlfaCost, True)
+    aligns = pm.compute_trace_alignment(fileLog,fileModel)
+    alignments = pm.compute_deviations(aligns, dictAlfaMiss, Tmiss, dictAlfaMult, Tmult, dictAlfaMismatch, Tmism, dictAlfaCost, True)
+    # incidents = id.formatIncidents(fileLog)
+    # print(alignments, incidents)
+    incidents = sorted(id.formatIncidents(fileLog), key=lambda d: d['incident_id']) 
 
-    # res = []
-    # for incident in alignments.keys():
-    #     res.append({"incident_id": incident,
-    #     "alignment": alignments[incident]["alignment"],
-    #     'fitness': alignments[incident]['fitness'],
-    #     'missing': alignments[incident]['missing'],
-    #     'repetition': alignments[incident]['repetition'],
-    #     'mismatch': alignments[incident]['mismatch'],
-    #     'totMissing': alignments[incident]['totMissing'],
-    #     'totRepetition': alignments[incident]['totRepetition'],
-    #     'totMismatch': alignments[incident]['totMismatch'],
-    #     'costMissing': alignments[incident]['costMissing'],
-    #     'costRepetition': alignments[incident]['costRepetition'],
-    #     'costMismatch': alignments[incident]['costMismatch'],
-    #     'costTotal': alignments[incident]['costTotal'],
-    #     'severity': alignments[incident]['severity']
-    #     })
+    res = []
+    i=0
+    for incident in alignments.keys():
+        res.append({"incident_id": incident,
+        "alignment": alignments[incident]["alignment"],
+        'fitness': alignments[incident]['fitness'],
+        'missing': alignments[incident]['missing'],
+        'repetition': alignments[incident]['repetition'],
+        'mismatch': alignments[incident]['mismatch'],
+        'totMissing': alignments[incident]['totMissing'],
+        'totRepetition': alignments[incident]['totRepetition'],
+        'totMismatch': alignments[incident]['totMismatch'],
+        'costMissing': alignments[incident]['costMissing'],
+        'costRepetition': alignments[incident]['costRepetition'],
+        'costMismatch': alignments[incident]['costMismatch'],
+        'costTotal': alignments[incident]['costTotal'],
+        'severity': alignments[incident]['severity'],
 
-    # keys = res[0].keys()
-    # a_file = open("data/fullOutput.csv", "w", newline='')
-    # dict_writer = csv.DictWriter(a_file, keys)
-    # dict_writer.writeheader()
-    # dict_writer.writerows(res)
-    # a_file.close()
+        "impact": incidents[i]["impact"],
+        "urgency": incidents[i]["urgency"],
+        "priority": incidents[i]["priority"],
+        "category": incidents[i]["category"],
+        "openTs": incidents[i]["openTs"],
+        "closeTs": incidents[i]["closeTs"],
+        "reassignment": incidents[i]["reassignment"],
+        "reopen": incidents[i]["reopen"],
+        "updates": incidents[i]["updates"]
+        })
+        i+=1
 
-    incidents = id.formatIncidents(fileLog)
-    keysInc = incidents[0].keys()
-    a_fileInc = open("outputInc.csv", "w", newline='')
-    dict_writerInc = csv.DictWriter(a_fileInc, keysInc)
-    dict_writerInc.writeheader()
-    dict_writerInc.writerows(incidents)
-    a_fileInc.close()
+    keys = res[0].keys()
+    a_file = open("data/fullOutputFull.csv", "w", newline='')
+    dict_writer = csv.DictWriter(a_file, keys)
+    dict_writer.writeheader()
+    dict_writer.writerows(res)
+    a_file.close()
+
+    # keysInc = incidents[0].keys()
+    # a_fileInc = open("outputInc.csv", "w", newline='')
+    # dict_writerInc = csv.DictWriter(a_fileInc, keysInc)
+    # dict_writerInc.writeheader()
+    # dict_writerInc.writerows(incidents)
+    # a_fileInc.close()
 
 if __name__ == "__main__":
     # permutation()
@@ -404,5 +418,5 @@ if __name__ == "__main__":
     # writeAlignmentTruth()
     # computeTruthWeights()
 
-    paramanalysis()
-    # writeDataOnFile()
+    # paramanalysis()
+    writeDataOnFile()

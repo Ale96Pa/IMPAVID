@@ -42,12 +42,14 @@
       var modelMetrics = []
 
       /* Shared data */
-      var filteredAlignmentsData, filteredIncidentsData, incidentsData;
+      var filteredData;
       async function loadData(){
         //return await eel.processData()();
         eel.processData()();
-        incidentsData = await d3.csv("outputInc.csv");
-        return await d3.csv("output.csv"); 
+        // // incidentsData = await d3.csv("outputInc.csv");
+        // // alignmentsData = await d3.csv("output.csv"); 
+        // return await d3.csv("simpleFull.csv");
+        return await d3.csv("fullOutputFull.csv");
       }
 
     </script>
@@ -149,7 +151,7 @@
         //     };
         //   });
         // const incidentsData = JSON.parse(data[1]);
-        const alignmentsData = data.map(elem => {
+        const fullData = data.map(elem => {
           var a = elem.missing.split(",");
           var b = elem.repetition.split(",");
           var c = elem.mismatch.split(",");
@@ -177,7 +179,10 @@
             repetition: objRep,
             totMismatch: parseFloat(elem.totMismatch),
             totMissing: parseFloat(elem.totMissing),
-            totRepetition: parseFloat(elem.totRepetition)
+            totRepetition: parseFloat(elem.totRepetition),
+            reassignment: parseInt(elem.reassignment),
+            reopen: parseInt(elem.reopen),
+            updates: parseInt(elem.updates)
           }
         });
 
@@ -225,24 +230,27 @@
 
           document.getElementById("containerState").style.height = "200px"; /*todo */
 
-          selectedCategories = [...new Set(incidentsData.map(e => e.category))];
-          filteredAlignmentsData = alignmentsData;
-          filteredIncidentsData = incidentsData;
+          // selectedCategories = [...new Set(incidentsData.map(e => e.category))];
+          // filteredAlignmentsData = alignmentsData;
+          // filteredIncidentsData = incidentsData;
+          selectedCategories = [...new Set(fullData.map(e => e.category))];
+          filteredData = fullData;
+          // filteredIncidentsData = alignmentsData;
 
           /* FIRST RENDER: default viz*/
           // Render top part
           renderMetrics();
           renderLegendError("legend");
-          renderOverviewBlock(alignmentsData, incidentsData);
+          renderOverviewBlock(fullData);
 
           // // Render middle part
-          renderDeviationsBlock(alignmentsData);
-          // renderFitnessBlock(alignmentsData, incidentsData);
-          // renderIncidentsBlock(alignmentsData, incidentsData);
+          renderDeviationsBlock(fullData);
+          renderFitnessBlock(fullData);
+          // renderIncidentsBlock(fullData);
 
           // // Render bottom part
           // renderPattern();
-          renderDatasetAnalysis(alignmentsData);
+          renderDatasetAnalysis(fullData);
 
 
           /* LISTENER LEGEND */        
@@ -264,17 +272,19 @@
                 selectedErrors;
                 break;
             }
-            combineFilters(alignmentsData, incidentsData);
+            // combineFilters(alignmentsData, incidentsData);
+            // console.log(filteredAlignmentsData);
+            filterAll(fullData);
 
             renderMetrics();
-            renderOverviewBlock(alignmentsData, incidentsData);
+            renderOverviewBlock(fullData);
 
-            renderDeviationsBlock(alignmentsData);
-            // renderFitnessBlock(alignmentsData, incidentsData);
+            renderDeviationsBlock(fullData);
+            renderFitnessBlock(fullData);
             // renderIncidentsBlock(alignmentsData, incidentsData);
 
             // renderPattern();
-            renderDatasetAnalysis(alignmentsData);
+            renderDatasetAnalysis(fullData);
           });
 
           d3.selectAll(".barAct").on("click", function(d,i) {
@@ -303,17 +313,17 @@
                 selectedActivities;
                 break;
             }
-            combineFilters(alignmentsData, incidentsData);
+            filterAll(fullData);
 
             renderMetrics();
-            renderOverviewBlock(alignmentsData, incidentsData);
+            renderOverviewBlock(fullData);
 
-            renderDeviationsBlock(alignmentsData);
-            // renderFitnessBlock(alignmentsData, incidentsData);
-            // renderIncidentsBlock(alignmentsData, incidentsData);
+            renderDeviationsBlock(fullData);
+            renderFitnessBlock(fullData);
+            renderIncidentsBlock(fullData);
 
-            // renderPattern();
-            renderDatasetAnalysis(alignmentsData);
+            renderPattern();
+            renderDatasetAnalysis(fullData);
           });    
         }
       });
