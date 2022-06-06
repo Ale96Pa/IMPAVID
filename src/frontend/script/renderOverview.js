@@ -121,68 +121,108 @@ function renderSequences(selector){
     });
 }
 
+/*
+Separare focus più context: in context mettere fullData, in focus filteredData e
+renderizzare focus al cambiare di context
+*/
 function renderLineLog(data, selector, fullData){
 
-    var margin = {top: 10, right: 30, bottom: 30, left: 60},
-    width = 1900 - margin.left - margin.right,
-    height = 200 - margin.top - margin.bottom;
+    const w =  d3.select("#context").node().offsetWidth;
+    console.log(w);
 
-    var svg = d3.select("#"+selector)
+    var margin = {top: 10, right: 30, bottom: 30, left: 60};
+    width = /*1900*/1100 - margin.left - margin.right;
+    heightF = 250 - margin.top - margin.bottom;
+    heightC = 60 - margin.top - margin.bottom;
+
+    var svgF = d3.select("#"+selector)
     .append("svg")
     .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+    .attr("height", heightF + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var svgC = d3.select("#"+selector)
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", heightC + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // Add X axis --> it is a date format
-    var x = d3.scaleTime()
+    var xF = d3.scaleTime()
+        .domain(dateRange)
+        .range([ 0, width ]);
+    var xC = d3.scaleTime()
         .domain(d3.extent(data, function(d) {return d.date; }))
         .range([ 0, width ]);
 
-    var brushO = d3.brushX()
-    .on("end", brushDate)
-    .extent([[0, 0], [width, width]]);
-
-    const initialBrush = [x(dateRange[0]), x(dateRange[1])];
-    svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x)
+    svgF.append("g")
+        .attr("transform", "translate(0," + heightF + ")")
+        .call(d3.axisBottom(xF)
             .ticks(d3.timeWeek.every(2))
             .tickFormat(d3.timeFormat('%-m/%-d/%y'))
         )
-        .call(brushO)
-        .call(d3.brushX().move, initialBrush);
+    svgC.append("g")
+        .attr("transform", "translate(0," + heightC + ")")
+        .call(d3.axisBottom(xC)
+            .ticks(d3.timeWeek.every(2))
+            .tickFormat(d3.timeFormat('%-m/%-d/%y'))
+        )
 
     // Add Y axis
-    var y = d3.scaleLinear()
+    var yF = d3.scaleLinear()
         .domain([0, d3.max(data, function(d) { return +d.value; })])
-        .range([ height, 0 ]);
-    svg.append("g")
-        .call(d3.axisLeft(y))
-    svg.append("text")
+        .range([ heightF, 0 ]);
+    var yC = d3.scaleLinear()
+        .domain([0, d3.max(data, function(d) { return +d.value; })])
+        .range([ heightC, 0 ]);
+    svgF.append("g")
+        .call(d3.axisLeft(yF))
+    svgF.append("text")
         .attr("text-anchor", "end")
         .attr("transform", "rotate(-90)")
         .attr("y", -margin.left+20)
         .attr("x", -margin.top)
-        .text("Active incidents");;
+        .text("Active incidents");
 
     // Add the line
-    svg.append("path")
+
+    svgF.append("path")
         .datum(data)
         .attr("fill", "none")
         .attr("stroke", "steelblue")
         .attr("stroke-width", 1.5)
         .attr("d", d3.line()
-            .x(function(d) {return x(d.date) })
-            .y(function(d) {return y(d.value) })
+            .x(function(d) {return xF(d.date) })
+            .y(function(d) {return yF(d.value) })
+        )
+
+    var brushO = d3.brushX()
+    .on("end", brushDate)
+    .extent([[0, 0], [width, width]]);
+
+    const initialBrush = [xC(dateRange[0]), xC(dateRange[1])];
+
+    const gP = svgC.append("g").call(brushO)
+    .call(d3.brushX().move, initialBrush);
+    gP.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 1.5)
+        .attr("d", d3.line()
+            .x(function(d) {return xC(d.date) })
+            .y(function(d) {return yC(d.value) })
         )
 
     function brushDate({selection}) {
-        dateRange = selection.map(x.invert, x);
+        dateRange = selection.map(xC.invert, xC);
         filterAll(fullData);
         
         renderMetrics();
         renderSequences("focus");
+        //renderFocus --> TODO
 
         renderDeviationsBlock(fullData);
         renderFitnessBlock(fullData)
