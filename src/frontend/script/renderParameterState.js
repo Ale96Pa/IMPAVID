@@ -6,6 +6,14 @@ function paramsCosts() {
         mismatch: paramMismatch,
         weights: paramWeights};
 }
+eel.expose(recalculateDate);
+function recalculateDate(){
+    return {
+        missing: paramMissing,
+        repetition: paramRepetition,
+        mismatch: paramMismatch,
+        weights: paramWeights};
+}
 
 function convertEventToAbbr(ev){
     switch(ev){
@@ -31,7 +39,7 @@ function convertEventToAbbr(ev){
 }
 
 
-async function renderSingleSlider(svg, margin, width, p, i, err){
+async function renderSingleSlider(svg, margin, width, p, i, err, ranges){
 
     var def;
     switch(err){
@@ -104,47 +112,75 @@ async function renderSingleSlider(svg, margin, width, p, i, err){
     .domain([0,1]) 
     .range([ 0, w ]);
 
-    const ranges = await eel.rangeParams()();
 
-    console.log(ranges);
+    var rCrit;
+    var rMed;
+    var rLow;
+    if(p == "Detection" && err == "Missing"){ rCrit = ranges["critical"]["Nmiss"]; rMed=ranges["medium"]["Nmiss"]; rLow =ranges["low"]["Nmiss"];}
+    if(p == "Activation" && err == "Missing"){ rCrit = ranges["critical"]["Amiss"]; rMed=ranges["medium"]["Amiss"]; rLow =ranges["low"]["Amiss"];}
+    if(p == "Resolution" && err == "Missing"){ rCrit = ranges["critical"]["Rmiss"]; rMed=ranges["medium"]["Rmiss"]; rLow =ranges["low"]["Rmiss"];}
+    if(p == "Closure" && err == "Missing"){ rCrit = ranges["critical"]["Cmiss"]; rMed=ranges["medium"]["Cmiss"]; rLow =ranges["low"]["Cmiss"];}
 
-    var rCrit,rMed,rLow, xPos;
-    if(p == "Detection" && err == "Missing") rCrit = ranges["critical"]["Nmiss"]; rMed=ranges["medium"]["Nmiss"]; rLow =ranges["low"]["Nmiss"];
-    if(p == "Activation" && err == "Missing") greenRange = ranges["Amiss"]
-    if(p == "Resolution" && err == "Missing") greenRange = ranges["Rmiss"]
-    if(p == "Closure" && err == "Missing") greenRange = ranges["Cmiss"]
+    if(p == "Detection" && err == "Repetition"){ rCrit = ranges["critical"]["Nrep"]; rMed=ranges["medium"]["Nrep"]; rLow =ranges["low"]["Nrep"];}
+    if(p == "Activation" && err == "Repetition"){ rCrit = ranges["critical"]["Arep"]; rMed=ranges["medium"]["Arep"]; rLow =ranges["low"]["Arep"];}
+    if(p == "Awaiting" && err == "Repetition"){ rCrit = ranges["critical"]["Wrep"]; rMed=ranges["medium"]["Wrep"]; rLow =ranges["low"]["Wrep"];}
+    if(p == "Resolution" && err == "Repetition"){ rCrit = ranges["critical"]["Rrep"]; rMed=ranges["medium"]["Rrep"]; rLow =ranges["low"]["Rrep"];}
+    if(p == "Closure" && err == "Repetition"){ rCrit = ranges["critical"]["Crep"]; rMed=ranges["medium"]["Crep"]; rLow =ranges["low"]["Crep"];}
 
-    if(p == "Detection" && err == "Repetition") greenRange = ranges["Nrep"]
-    if(p == "Activation" && err == "Repetition") greenRange = ranges["Arep"]
-    if(p == "Awaiting" && err == "Repetition") greenRange = ranges["Wrep"]
-    if(p == "Resolution" && err == "Repetition") greenRange = ranges["Rrep"]
-    if(p == "Closure" && err == "Repetition") greenRange = ranges["Crep"]
+    if(p == "Detection" && err == "Mismatch"){ rCrit = ranges["critical"]["Nmism"]; rMed=ranges["medium"]["Nmism"]; rLow =ranges["low"]["Nmism"];}
+    if(p == "Activation" && err == "Mismatch"){ rCrit = ranges["critical"]["Amism"]; rMed=ranges["medium"]["Amism"]; rLow =ranges["low"]["Amism"];}
+    if(p == "Awaiting" && err == "Mismatch"){ rCrit = ranges["critical"]["Wmism"]; rMed=ranges["medium"]["Wmism"]; rLow =ranges["low"]["Wmism"];}
+    if(p == "Resolution" && err == "Mismatch"){ rCrit = ranges["critical"]["Rmism"]; rMed=ranges["medium"]["Rmism"]; rLow =ranges["low"]["Rmism"];}
+    if(p == "Closure" && err == "Mismatch"){ rCrit = ranges["critical"]["Cmism"]; rMed=ranges["medium"]["Cmism"]; rLow =ranges["low"]["Cmism"];}
 
-    if(p == "Detection" && err == "Mismatch") greenRange = ranges["Nmism"]
-    if(p == "Activation" && err == "Mismatch") greenRange = ranges["Amism"]
-    if(p == "Awaiting" && err == "Mismatch") greenRange = ranges["Wmism"]
-    if(p == "Resolution" && err == "Mismatch") greenRange = ranges["Rmism"]
-    if(p == "Closure" && err == "Mismatch") greenRange = ranges["Cmism"]
-    console.log(rCrit, rMed, rLow);
 
     /*TODO FARE MEGLIO*/
-    var xPos = greenRange ? greenRange.mean>1 ? w-margin.left : x(greenRange.mean) : null;
-    var xPosMin = xPos? x(greenRange.mean-greenRange.std) > x(1) ? x(1) : x(greenRange.mean-greenRange.std) : null;
-    var xPosMax = xPos ? x(greenRange.mean+greenRange.std) > x(1) ? x(1) : x(greenRange.mean+greenRange.std) : null;
-    console.log(greenRange)
+    var xPosM = rMed ? rMed.mean>1 ? w-margin.left : x(rMed.mean) : null;
+    var xPosMinM = xPosM? x(rMed.mean-rMed.std) > x(1) ? x(1) : x(rMed.mean-rMed.std) : null;
+    var xPosMaxM = xPosM ? x(rMed.mean+rMed.std) > x(1) ? x(1) : x(rMed.mean+rMed.std) : null;
 
-    xPos && g.append("rect")
-        .attr("width", xPosMin > xPos ? 10 : (xPosMax-xPosMin)-2*margin.left)
+    xPosM && g.append("rect")
+        .attr("width", xPosMinM > xPosM ? 10 : (xPosMaxM-xPosMinM)-2*margin.left)
+        .attr("height", 8)
+        .attr("fill", "yellow")
+        .attr("opacity", 0.8)
+        .attr("x", xPosM-margin.left)
+        .attr("y", -4)
+        .attr("rx", 20)
+        .attr("ry", 20);
+
+    /*TODO FARE MEGLIO*/
+    var xPosL = rLow ? rLow.mean>1 ? w-margin.left : x(rLow.mean) : null;
+    var xPosMinL = xPosL? x(rLow.mean-rLow.std) > x(1) ? x(1) : x(rLow.mean-rLow.std) : null;
+    var xPosMaxL = xPosL ? x(rLow.mean+rLow.std) > x(1) ? x(1) : x(rLow.mean+rLow.std) : null;
+
+    xPosL && g.append("rect")
+        .attr("width", xPosMinL > xPosL ? 10 : (xPosMaxL-xPosMinL)-2*margin.left)
         .attr("height", 8)
         .attr("fill", "green")
         .attr("opacity", 0.8)
-        .attr("x", xPos-margin.left)
+        .attr("x", xPosL-margin.left)
+        .attr("y", -4)
+        .attr("rx", 20)
+        .attr("ry", 20);
+
+    /*TODO FARE MEGLIO*/
+    var xPosC = rCrit ? rCrit.mean>1 ? w-margin.left : x(rCrit.mean) : null;
+    var xPosMinC = xPosC? x(rCrit.mean-rCrit.std) > x(1) ? x(1) : x(rCrit.mean-rCrit.std) : null;
+    var xPosMaxC = xPosC ? x(rCrit.mean+rCrit.std) > x(1) ? x(1) : x(rCrit.mean+rCrit.std) : null;
+
+    xPosC && g.append("rect")
+        .attr("width", xPosMinC > xPosC ? 10 : (xPosMaxC-xPosMinC)-2*margin.left)
+        .attr("height", 8)
+        .attr("fill", "red")
+        .attr("opacity", 0.8)
+        .attr("x", xPosC-margin.left)
         .attr("y", -4)
         .attr("rx", 20)
         .attr("ry", 20);
 }
 
-function renderParamSpace(){
+function renderParamSpace(fullData, ranges){
 
     var margin = {top: 15, right: 10, bottom: 20, left: 10},
     width = 500 - margin.left - margin.right,
@@ -170,7 +206,7 @@ function renderParamSpace(){
 
         const params = err == "Missing" ? ["Detection", "Activation", "Resolution", "Closure"] : ["Detection", "Activation", "Awaiting", "Resolution", "Closure"];
         params.map((p,i) => {
-            renderSingleSlider(svg, margin, width, p, i, err);
+            renderSingleSlider(svg, margin, width, p, i, err, ranges);
         });
     });
 
@@ -191,7 +227,7 @@ function renderParamSpace(){
     .text("Error weights");
 
     devs.map((p,i) => {
-        renderSingleSlider(svgLast, margin, width, p, i, "Weigths");
+        renderSingleSlider(svgLast, margin, width, p, i, "Weigths", ranges);
     });
 
     var btn = document.createElement("button");
@@ -204,6 +240,17 @@ function renderParamSpace(){
             mismatch: paramMismatch,
             weights: paramWeights}
         const parData = await eel.calculateParamCosts(pars)();
+        const newCosts = await eel.calculateNewCost(pars)();
+        filteredData = fullData.map(elem => {
+            newEl = newCosts.find(e => e.incident_id === elem.incident_id)
+            return newEl ? {
+                ...elem,
+                costMismatch: parseFloat(newEl.costMismatch),
+                costMissing: parseFloat(newEl.costMissing),
+                costRepetition: parseFloat(newEl.costRepetition),
+                costTotal: parseFloat(newEl.costTotal),
+            } : {...elem}
+        })
 
         for(var i=0; i<parData.precision.length; i++){
             var sev;
@@ -224,7 +271,8 @@ function renderParamSpace(){
             modelMetrics.push({severity:sev, precision:parData.precision[i], recall:parData.recall[i]})
         }
 
-        renderParamAnalysis()
+        // renderParamAnalysis()
+        writePrecRecall()
 
       });
     document.getElementById("containerState").appendChild(btn);
@@ -316,6 +364,55 @@ function renderParamAnalysis(){
 
 }
 
+function writePrecRecall(){
+
+    d3.select("#paramFitness").remove();
+
+    var margin = {top: 20, right: 30, bottom: 30, left: 50},
+    width = 600 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+
+    var svg = d3.select("#pattern")
+    .append("svg")
+    .attr("id", "paramFitness")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // group the data: I want to draw one line per group
+    const sumstat = d3.group(modelMetrics, d => d.severity);
+
+    // color palette
+    var color = d3.scaleOrdinal()
+    .range([colorSeverity.low,colorSeverity.medium,colorSeverity.high,colorSeverity.critical])
+
+    // // Draw legend
+    // var legend_keys = ["low", "medium", "high", "critical"]
+
+    // var lineLegend = svg.selectAll(".lineLegend").data(legend_keys)
+    //     .enter().append("g")
+    //     .attr("class","lineLegend")
+    //     .attr("transform", function (d,i) {
+    //             return "translate(" + (width-50) + "," + (i*20)+")"; //todo aggiustare
+    //         });
+
+    // lineLegend.append("text").text(function (d) {return d;})
+    //     .attr("transform", "translate(15,9)"); //align texts with boxes
+
+    // lineLegend.append("rect")
+    //     .attr("fill", function (d, i) {return color(d); })
+    //     .attr("width", 10).attr("height", 10);
+
+    modelMetrics.map((elem,i) => {
+        svg.append("text")
+            .attr("y", i*20)
+            .attr("x", 0)
+            .text(modelMetrics[i].severity+": "+modelMetrics[i].precision.toFixed(3)+", "+modelMetrics[i].recall.toFixed(3))
+    });
+
+}
+
 function renderTraces(){
 
     d3.select("#paramIncidents").remove();
@@ -332,9 +429,9 @@ function renderTraces(){
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    svg.append("text")
-    .attr("y", 70)
-    .attr("x", 0)
-    .attr("font-family", "Helvetica")
-    .text(" TRACCE ORDINATE IN BASE AL COSTO ");
+    // svg.append("text")
+    // .attr("y", 70)
+    // .attr("x", 0)
+    // .attr("font-family", "Helvetica")
+    // .text(" TRACCE ORDINATE IN BASE AL COSTO ");
 }

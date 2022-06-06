@@ -10,10 +10,10 @@ function renderMetrics(){
     const numIncidents = filteredData.length;
 
     // Calculate average fitness
-    const avgF = (filteredData.reduce((acc,e) => {return acc + parseFloat(e.fitness)},0)/numIncidents).toFixed(3);;
+    const avgF = (filteredData.reduce((acc,e) => {return acc + parseFloat(e.fitness)},0)/numIncidents).toFixed(3);
 
     // Calculate average cost
-    const avgC = (filteredData.reduce((acc,e) => {return acc + parseFloat(e.costTotal)},0)/numIncidents).toFixed(3);;
+    const avgC = (filteredData.reduce((acc,e) => {return acc + parseFloat(e.costTotal)},0)/numIncidents).toFixed(3);
 
     var svg = d3.select("#metrics")
     .append("svg")
@@ -177,7 +177,7 @@ function renderDatasetAnalysis(fullData){
     .attr("x",0)
     .attr("width", x(numIncidents))
     .attr("height", height/2)
-    .attr("style", "fill:"+colorRectCat.notChecked);
+    .attr("style", "fill:"+colorRectCat.checked);
 
     svg.append("text")
     .attr("y", height/2-5)

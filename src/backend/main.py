@@ -76,6 +76,53 @@ def calculateParamCosts(params):
 eel.paramsCosts()(calculateParamCosts)
 
 @eel.expose
+def calculateNewCost(params):
+    missDict = params["missing"]
+    repDict = params["repetition"]
+    mismDict = params["mismatch"]
+    wDict = params["weights"]
+    with open(csv_file, "r") as f:
+        reader = csv.DictReader(f)
+        traces = list(reader)
+        devs = pm.compute_deviations(traces, missDict, Tmiss, repDict, Tmult, mismDict, Tmism, wDict, False)
+        incidents = sorted(id.formatIncidents(fileLog), key=lambda d: d['incident_id'])
+
+        res = []
+        for inc in devs.keys():
+            i=0
+            for incident in inc.split(";"):
+                res.append({"incident_id": incident,
+                # "alignment": devs[inc]["alignment"],
+                # 'fitness': devs[inc]['fitness'],
+                'missing': devs[inc]['missing'],
+                'repetition': devs[inc]['repetition'],
+                'mismatch': devs[inc]['mismatch'],
+                'totMissing': devs[inc]['totMissing'],
+                'totRepetition': devs[inc]['totRepetition'],
+                'totMismatch': devs[inc]['totMismatch'],
+                'costMissing': devs[inc]['costMissing'],
+                'costRepetition': devs[inc]['costRepetition'],
+                'costMismatch': devs[inc]['costMismatch'],
+                'costTotal': devs[inc]['costTotal'],
+                'severity': devs[inc]['severity'],
+
+                # "impact": incidents[i]["impact"],
+                # "urgency": incidents[i]["urgency"],
+                # "priority": incidents[i]["priority"],
+                # "category": incidents[i]["category"],
+                # "openTs": incidents[i]["openTs"],
+                # "closeTs": incidents[i]["closeTs"],
+                # "reassignment": incidents[i]["reassignment"],
+                # "reopen": incidents[i]["reopen"],
+                # "updates": incidents[i]["updates"]
+                })
+                i+=1
+    return res
+
+
+eel.recalculateDate()(calculateNewCost)
+
+@eel.expose
 def rangeParams():
     # df = pd.read_csv('data/groundTruthWeights.csv')
     # ranges = df.agg(["mean", "std"])

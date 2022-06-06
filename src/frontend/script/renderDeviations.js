@@ -222,7 +222,7 @@ function renderErrorsBars(objAlignment, selector){
 }
 
 function renderState(alignments, selector) {
-    for(var i=0;i<alignments.length;i++){
+    for(var i=0;i</*alignments.length*/50;i++){
         renderErrorsBars(alignments[i],selector)
     }
 }

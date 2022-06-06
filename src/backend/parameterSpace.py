@@ -341,9 +341,6 @@ def paramanalysis():
     rCrit = critical.agg(["mean", "std"])
     rMed = medium.agg(["mean", "std"])
     rLow = low.agg(["mean", "std"])
-    # print(rCrit)
-    # print(rMed)
-    # print(rLow)
 
 
 def convertSeverityToLabel(sev):

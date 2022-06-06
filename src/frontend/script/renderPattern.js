@@ -59,7 +59,7 @@ function renderRadviz(data,selector){
 }
 
 function renderPattern() {
-    d3.select("#patternChart").selectAll("*").remove();
+    d3.select("#pattern").selectAll("*").remove(); //patternChart
 
     const data = filteredData.map(elem => {
         return {
@@ -70,5 +70,5 @@ function renderPattern() {
         }
     })
 
-    renderRadviz(data, "patternChart");
+    renderRadviz(data, "pattern"); //patternChart
 }

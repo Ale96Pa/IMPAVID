@@ -18,7 +18,7 @@
       const colorTab = {checked: "#ccc", notChecked:"#ddd"};
       const colorDev = { tot:"grey", miss: "#bebada", rep: "#fdb462", mism: "#8dd3c7",
                         N:"#80b1d3", A:"#b3de69", W:"#fb8072",R:"#fccde5",C:"#ffffb3"};
-      const colorRectCat = {checked: "#e41a1c", notChecked: "#3182bd"}
+      const colorRectCat = {notChecked: "#e41a1c", checked: "#3182bd"}
       const fullDateRange = d3.timeDays(new Date(2016, 1, 19), new Date(2017, 2, 19));
       const formatTime = d3.timeFormat("%Y-%m-%d");
       const colorSeverity = {none:"#1a9641",low:"#a6d96a",medium:"#3182bd",high:"#fdae61",critical:"#d7191c"};
@@ -136,7 +136,7 @@
 
   <div id="container_bottom">
     <div id="pattern">
-      <div id="patternChart"></div>
+      <!-- <div id="patternChart"></div> -->
     </div>
 
     <div id="detail">
@@ -187,7 +187,6 @@
         });
 
         document.getElementById("tabExplore").style.backgroundColor = colorTab.checked;
-        //initializeExploration();
 
         // Rimuovere sotto
         // removeAllFromExploration();
@@ -212,10 +211,12 @@
         };
 
         /* STATE PARAMETERS view */
-        function initializeParameters(){
+        async function initializeParameters(){
+          const ranges = await eel.rangeParams()();
           
-          renderParamSpace();
-          renderParamAnalysis();
+          renderParamSpace(fullData, ranges);
+          // renderParamAnalysis();
+          writePrecRecall();
           renderTraces();
         }
 
@@ -281,9 +282,9 @@
 
             renderDeviationsBlock(fullData);
             renderFitnessBlock(fullData);
-            // renderIncidentsBlock(alignmentsData, incidentsData);
+            renderIncidentsBlock(alignmentsData, incidentsData);
 
-            // renderPattern();
+            renderPattern();
             renderDatasetAnalysis(fullData);
           });
 
