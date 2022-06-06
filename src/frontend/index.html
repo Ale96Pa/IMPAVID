@@ -49,7 +49,7 @@
         // // incidentsData = await d3.csv("outputInc.csv");
         // // alignmentsData = await d3.csv("output.csv"); 
         // return await d3.csv("simpleFull.csv");
-        return await d3.csv("fullOutputFull.csv");
+        return await d3.csv("simpleFull.csv");
       }
 
     </script>
@@ -246,10 +246,10 @@
           // // Render middle part
           renderDeviationsBlock(fullData);
           renderFitnessBlock(fullData);
-          // renderIncidentsBlock(fullData);
+          renderIncidentsBlock(fullData);
 
           // // Render bottom part
-          // renderPattern();
+          renderPattern();
           renderDatasetAnalysis(fullData);
 
 

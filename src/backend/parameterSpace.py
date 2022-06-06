@@ -334,6 +334,17 @@ def paramanalysis():
     ranges = df.agg(["mean", "std"])
     el = ranges.to_dict('dict')
 
+    critical = pd.concat([df.loc[df['priority'] == "1 - Critical"], df.loc[df['priority'] == "2 - High"]])
+    medium = df.loc[df['priority'] == "3 - Moderate"]
+    low = df.loc[df['priority'] == "4 - Low"]
+
+    rCrit = critical.agg(["mean", "std"])
+    rMed = medium.agg(["mean", "std"])
+    rLow = low.agg(["mean", "std"])
+    # print(rCrit)
+    # print(rMed)
+    # print(rLow)
+
 
 def convertSeverityToLabel(sev):
     if sev == '1 - Critical' or sev == "critical":
@@ -418,5 +429,5 @@ if __name__ == "__main__":
     # writeAlignmentTruth()
     # computeTruthWeights()
 
-    # paramanalysis()
-    writeDataOnFile()
+    # writeDataOnFile()
+    paramanalysis()

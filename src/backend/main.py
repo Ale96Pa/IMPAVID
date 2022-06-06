@@ -77,9 +77,20 @@ eel.paramsCosts()(calculateParamCosts)
 
 @eel.expose
 def rangeParams():
+    # df = pd.read_csv('data/groundTruthWeights.csv')
+    # ranges = df.agg(["mean", "std"])
+    # return ranges.to_dict('dict')
     df = pd.read_csv('data/groundTruthWeights.csv')
-    ranges = df.agg(["mean", "std"])
-    return ranges.to_dict('dict')
+
+    critical = pd.concat([df.loc[df['priority'] == "1 - Critical"], df.loc[df['priority'] == "2 - High"]])
+    medium = df.loc[df['priority'] == "3 - Moderate"]
+    low = df.loc[df['priority'] == "4 - Low"]
+
+    rCrit = critical.agg(["mean", "std"])
+    rMed = medium.agg(["mean", "std"])
+    rLow = low.agg(["mean", "std"])
+
+    return {"critical":rCrit.to_dict("dict"), "medium": rMed.to_dict("dict"), "low":rLow.to_dict("dict")}
 
 @eel.expose
 def processData():

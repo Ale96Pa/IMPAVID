@@ -105,8 +105,11 @@ async function renderSingleSlider(svg, margin, width, p, i, err){
     .range([ 0, w ]);
 
     const ranges = await eel.rangeParams()();
-    var greenRange, xPos;
-    if(p == "Detection" && err == "Missing") greenRange = ranges["Nmiss"]
+
+    console.log(ranges);
+
+    var rCrit,rMed,rLow, xPos;
+    if(p == "Detection" && err == "Missing") rCrit = ranges["critical"]["Nmiss"]; rMed=ranges["medium"]["Nmiss"]; rLow =ranges["low"]["Nmiss"];
     if(p == "Activation" && err == "Missing") greenRange = ranges["Amiss"]
     if(p == "Resolution" && err == "Missing") greenRange = ranges["Rmiss"]
     if(p == "Closure" && err == "Missing") greenRange = ranges["Cmiss"]
@@ -122,6 +125,7 @@ async function renderSingleSlider(svg, margin, width, p, i, err){
     if(p == "Awaiting" && err == "Mismatch") greenRange = ranges["Wmism"]
     if(p == "Resolution" && err == "Mismatch") greenRange = ranges["Rmism"]
     if(p == "Closure" && err == "Mismatch") greenRange = ranges["Cmism"]
+    console.log(rCrit, rMed, rLow);
 
     /*TODO FARE MEGLIO*/
     var xPos = greenRange ? greenRange.mean>1 ? w-margin.left : x(greenRange.mean) : null;
