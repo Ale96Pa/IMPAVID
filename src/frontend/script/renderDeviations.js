@@ -41,13 +41,13 @@ function renderActivityBars(alignments, error, selector){
     const subgroups = ["N","A","W","R","C"];
 
     var margin = {top: 10, right: 10, bottom: 20, left: 40},
-    width = 400 - margin.left - margin.right,
-    height = 60 - margin.top - margin.bottom;
+    width = 500 - margin.left - margin.right,
+    height = 55 - margin.top - margin.bottom;
 
     var svg = d3.select("#"+selector)
     .append("svg")
     .attr("width", width + margin.left + margin.right)
-    .attr("height", height*2 + margin.top + margin.bottom)
+    .attr("height", height*2 + margin.top /*+ margin.bottom*/)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -136,16 +136,16 @@ function renderErrorsBars(objAlignment, selector){
     const sumTotal = objAlignment.totMissing+objAlignment.totRepetition+objAlignment.totMismatch;
     const data = [{error: "tot", missing: objAlignment.totMissing, repetition:objAlignment.totRepetition, mismatch:objAlignment.totMismatch}]
     const subgroups = ["missing","repetition","mismatch"];
-    const fullW = selector == "stateDeviations" ? 800 : 400;
+    const fullW = 800;//selector == "stateDeviations" ? 800 : 400;
 
-    var margin = {top: 10, right: 10, bottom: 20, left: 40},
+    var margin = {top: 5, right: 10, bottom: 20, left: 40},
     width = fullW - margin.left - margin.right,
-    height = 60 - margin.top - margin.bottom;
+    height = 50 - margin.top - margin.bottom;
 
     var svg = d3.select("#"+selector)
     .append("svg")
     .attr("width", width + margin.left + margin.right)
-    .attr("height", height*2 + margin.top + margin.bottom)
+    .attr("height", height*2 + margin.top /*+ margin.bottom*/)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 

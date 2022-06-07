@@ -5,7 +5,8 @@ TODO: aggiustare width dinamica delle sequenze
 function renderOverviewBlock(fullData){
 
     d3.select("#focus").selectAll("*").remove();
-    d3.select("#context").selectAll("*").remove();
+    d3.select("#focusLine").selectAll("*").remove();
+    d3.select("#contextLine").selectAll("*").remove();
 
     renderSequences("focus");
     
@@ -29,10 +30,13 @@ function renderOverviewBlock(fullData){
 
     dataIncTime = dataIncTime.sort((a,b) => Date.parse(a.date) - Date.parse(b.date))
 
-    renderLineLog(dataIncTime, "context", fullData)
+    renderLineLog(dataIncTime, "contextLine", fullData)
 }
 
 function renderSequences(selector){
+
+    const w = d3.select("#focus").node().offsetWidth;
+    console.log(w)
 
     d3.select("#focus").selectAll("*").remove();
 
@@ -41,7 +45,7 @@ function renderSequences(selector){
     const dBlock = 20;
 
     var margin = {top: 0, right: 5, bottom: 0, left: 10},
-    width = 450 - margin.left - margin.right,
+    width = 850 - margin.left - margin.right,
     height = 50 - margin.top - margin.bottom;
 
     const data = filteredData.reduce((acc, elem)=> {
@@ -59,6 +63,10 @@ function renderSequences(selector){
     // const sumTotal =data.reduce((a, elem) => a+elem.count, 0);
     // console.log(sumTotal);
 
+    const x = d3.scaleLinear()
+    .domain(d3.extent(data, function(d) {return d.count; }))
+    .range([ 4*dBlock, width/2]);
+
     const colorActivity = d3.scaleOrdinal()
     .domain(["N","A","W","R","C"])
     .range([colorDev.N,colorDev.A,colorDev.W,colorDev.R,colorDev.C]);
@@ -71,6 +79,12 @@ function renderSequences(selector){
     // const maxVal = Math.max(...counters)*dBlock;
 
     //data = data.sort((a,b) => b.count - a.count);
+
+    d3.select("#focus").append("text")
+    .attr("x", width/2)
+    .attr("y", 5)
+    .attr("font-family", "Helvetica")
+    .text("Sequence Analysis");
 
     // TODO: vedi se aggiustare width
     data.map((elem,i) => {
@@ -96,8 +110,23 @@ function renderSequences(selector){
             }
         });
 
+        const wBar = x(elem.count) > 0 ? x(elem.count)+dBlock : dBlock
+
+        svg.append("rect")
+        .attr("x", 0)
+        .attr("y", dBlock)
+        .attr("width", wBar-dBlock)
+        .attr("height", dBlock)
+        .style("fill", colorRectCat.checked)
+        .style("opacity", 0.7);
+        svg.append("text")
+        .attr("y", dBlock+(dBlock/2)+(dBlock/4))
+        .attr("x", 0)
+        .attr("font-family", "Helvetica")
+        .text(elem.count + '('+(elem.count/filteredData.length*100).toFixed(1)+'%)');
+
         container.append("rect")
-        .attr("x", function(d,i){return i*dBlock})
+        .attr("x", function(d,i){return (i*dBlock)+wBar})
         .attr("y", dBlock)
         .attr("width", dBlock)
         .attr("height", dBlock)
@@ -106,56 +135,45 @@ function renderSequences(selector){
         .style("stroke-width", 1); 
         container.append("text")
         .attr("y", dBlock+(dBlock/2)+(dBlock/4))
-        .attr("x", function(d,i){return (i*dBlock)+2})
+        .attr("x", function(d,i){return (i*dBlock)+2+wBar})
         .text(function(d){return d});
 
-        svg.selectAll("text.count")
-        .data(eventList)
-        .enter()
-        .append("text")
-            .attr("text-anchor", "middle")
-            .attr("x", width-margin.left-margin.right) 
-            .attr("y",dBlock+(dBlock/2)+(dBlock/4))
-            .attr("font-family", "Helvetica")
-            .text(function(d,i) {return eventList.length-1 == i ? elem.count : ""})
+        // svg.selectAll("text.count")
+        // .data(eventList)
+        // .enter()
+        // .append("text")
+        //     .attr("text-anchor", "middle")
+        //     .attr("x", (eventList.length)*dBlock+2*dBlock+wBar/*width-margin.left-margin.right*/) 
+        //     .attr("y", dBlock+(dBlock/2)+(dBlock/4))
+        //     .attr("font-family", "Helvetica")
+        //     .text(function(d,i) {return eventList.length-1 == i ? elem.count : ""})
     });
 }
 
-/*
-Separare focus più context: in context mettere fullData, in focus filteredData e
-renderizzare focus al cambiare di context
-*/
-function renderLineLog(data, selector, fullData){
+function renderFocus(data, selector){
 
-    const w =  d3.select("#context").node().offsetWidth;
-    console.log(w);
+    const filteredDate = data.filter(e => e.date >= dateRange[0] && e.date <= dateRange[1]);
 
     var margin = {top: 10, right: 30, bottom: 30, left: 60};
-    width = /*1900*/1100 - margin.left - margin.right;
-    heightF = 250 - margin.top - margin.bottom;
-    heightC = 60 - margin.top - margin.bottom;
+    width = 1600/*1100*/ - margin.left - margin.right;
+    heightF = 150 - margin.top - margin.bottom;
 
     var svgF = d3.select("#"+selector)
     .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", heightF + margin.top + margin.bottom)
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", heightF + margin.top + margin.bottom)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var svgC = d3.select("#"+selector)
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", heightC + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    // svgF.append("text")
+    //     .attr("x", width/2)
+    //     .attr("y", 20)
+    //     .attr("font-family", "Helvetica")
+    //     .text("Temporal Analysis")
 
-    // Add X axis --> it is a date format
     var xF = d3.scaleTime()
-        .domain(dateRange)
-        .range([ 0, width ]);
-    var xC = d3.scaleTime()
-        .domain(d3.extent(data, function(d) {return d.date; }))
-        .range([ 0, width ]);
+    .domain(dateRange)
+    .range([ 0, width ]);
 
     svgF.append("g")
         .attr("transform", "translate(0," + heightF + ")")
@@ -163,22 +181,14 @@ function renderLineLog(data, selector, fullData){
             .ticks(d3.timeWeek.every(2))
             .tickFormat(d3.timeFormat('%-m/%-d/%y'))
         )
-    svgC.append("g")
-        .attr("transform", "translate(0," + heightC + ")")
-        .call(d3.axisBottom(xC)
-            .ticks(d3.timeWeek.every(2))
-            .tickFormat(d3.timeFormat('%-m/%-d/%y'))
-        )
 
-    // Add Y axis
     var yF = d3.scaleLinear()
-        .domain([0, d3.max(data, function(d) { return +d.value; })])
+        .domain([0, d3.max(filteredDate, function(d) { return +d.value; })])
         .range([ heightF, 0 ]);
-    var yC = d3.scaleLinear()
-        .domain([0, d3.max(data, function(d) { return +d.value; })])
-        .range([ heightC, 0 ]);
+
     svgF.append("g")
         .call(d3.axisLeft(yF))
+
     svgF.append("text")
         .attr("text-anchor", "end")
         .attr("transform", "rotate(-90)")
@@ -189,7 +199,7 @@ function renderLineLog(data, selector, fullData){
     // Add the line
 
     svgF.append("path")
-        .datum(data)
+        .datum(filteredDate)
         .attr("fill", "none")
         .attr("stroke", "steelblue")
         .attr("stroke-width", 1.5)
@@ -197,6 +207,43 @@ function renderLineLog(data, selector, fullData){
             .x(function(d) {return xF(d.date) })
             .y(function(d) {return yF(d.value) })
         )
+}
+
+
+function renderLineLog(data, selector, fullData){
+
+    renderFocus(data, "focusLine");
+
+    var margin = {top: 10, right: 30, bottom: 30, left: 60};
+    width = 1600/*1100*/ - margin.left - margin.right;
+    heightC = 60 - margin.top - margin.bottom;
+
+    var svgC = d3.select("#"+selector)
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", heightC + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // Add X axis --> it is a date format
+   
+    var xC = d3.scaleTime()
+        .domain(d3.extent(data, function(d) {return d.date; }))
+        .range([ 0, width ]);
+
+    
+    svgC.append("g")
+        .attr("transform", "translate(0," + heightC + ")")
+        .call(d3.axisBottom(xC)
+            .ticks(d3.timeWeek.every(2))
+            .tickFormat(d3.timeFormat('%-m/%-d/%y'))
+        )
+
+    // Add Y axis
+
+    var yC = d3.scaleLinear()
+        .domain([0, d3.max(data, function(d) { return +d.value; })])
+        .range([ heightC, 0 ]);
 
     var brushO = d3.brushX()
     .on("end", brushDate)
@@ -220,9 +267,10 @@ function renderLineLog(data, selector, fullData){
         dateRange = selection.map(xC.invert, xC);
         filterAll(fullData);
         
-        renderMetrics();
+        renderMetrics(fullData);
         renderSequences("focus");
-        //renderFocus --> TODO
+        d3.select("#focusLine").selectAll("*").remove();
+        renderFocus(data, "focusLine")
 
         renderDeviationsBlock(fullData);
         renderFitnessBlock(fullData)

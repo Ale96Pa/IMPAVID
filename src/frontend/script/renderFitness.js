@@ -81,12 +81,12 @@ function renderViolinChart(data, fullData, selector, metric){
     .domain([0,1])
     .range([height, 0]);
     
-    const initialBrush = metric === "fitness" ? [y(fitnessRange[0]), y(fitnessRange[1])] : [y(costRange[0]), y(costRange[1])]
+    //const initialBrush = metric === "fitness" ? [y(fitnessRange[0]), y(fitnessRange[1])] : [y(costRange[0]), y(costRange[1])]
     svg.append("g")
     .attr("class", metric == "fitness" ? "brushFitness" : "brushCost")
     .call(d3.axisLeft(y))
     .call(brushV)
-    .call(d3.brushY().move, initialBrush);
+    .call(d3.brushY().move, brushViolinSelection[metric]);
 
     // X scale
     var x = d3.scaleBand()
@@ -154,14 +154,44 @@ function renderViolinChart(data, fullData, selector, metric){
         .attr("stroke", "white")
 
     function brushAxis({selection}) {
-        metricRange = selection.map(y.invert, y);
-        if(metric == "fitness") fitnessRange = metricRange
-        else costRange = metricRange
-        // combineFilters(fullAlignmentData, fullIncidentData);
-        // console.log(filteredData);
+        if(selection){
+            brushViolinSelection[metric] = selection;
+            metricRange = selection.map(y.invert, y);
+            if(metric == "fitness") fitnessRange = metricRange
+            else costRange = metricRange
+    
+        } else {
+            brushViolinSelection[metric] = [];
+            if(metric == "fitness") fitnessRange = [1,0];
+            else costRange = [1,0];
+        }
         filterAll(fullData);
 
-        renderMetrics();
+        var filterFitness = filteredData.map(elem => {
+            return {incident_id: elem.incident_id, value: elem.fitness};
+        }).sort((a, b) => a.value < b.value ? 1 : -1).slice(0, maxTracesBarchart);
+        var filterCostsInPercentage = filteredData.map(elem => {
+            const tot = elem.costMissing+elem.costMismatch+elem.costRepetition;
+            const percMiss = elem.costMissing*100/tot;
+            const percRep = elem.costRepetition*100/tot;
+            const percMism = elem.costMismatch*100/tot;
+            
+            return {incident_id: elem.incident_id, 
+                costTot: elem.costTotal, 
+                missing: percMiss*elem.costTotal/100, 
+                repetition: percRep*elem.costTotal/100, 
+                mismatch: percMism*elem.costTotal/100
+            };
+        });
+        const keyFit = filterFitness.map(elem => elem.incident_id);
+        filterCostsInPercentage = filterCostsInPercentage.sort((a, b) => keyFit.indexOf(a.incident_id) - keyFit.indexOf(b.incident_id));
+
+        d3.select("#fitnessBar").selectAll("*").remove();
+        d3.select("#costBar").selectAll("*").remove();
+        renderFitnessBar(filterFitness, "fitnessBar");
+        renderCostStackedBar(filterCostsInPercentage, "costBar")
+
+        renderMetrics(fullData);
         renderOverviewBlock(fullData);
         
         renderDeviationsBlock(fullData);
@@ -169,6 +199,7 @@ function renderViolinChart(data, fullData, selector, metric){
 
         renderPattern();
         renderDatasetAnalysis(fullData);
+        
     }
 }
 

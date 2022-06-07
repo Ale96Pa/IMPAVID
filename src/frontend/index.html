@@ -32,6 +32,10 @@
       var fitnessRange = [1,0];
       var costRange = [1,0];
       var selectedCategories = [];
+      var selectedAssessment = {priority:[], impact:[], urgency:[]};
+
+      var brushViolinSelection = {fitness:[], cost:[]}
+      var brushParallelSelection = {priority:[], impact:[], urgency:[]};
 
       /* Shared filters parameters */
       var paramMissing = { N:0.25, A:0.25, R:0.25, C:0.25};
@@ -73,9 +77,9 @@
 
   <div id="container_header">
     <div id="metrics"></div>
-    <div id="legend"></div>
     <div id="image">
-      <img src="model_img.PNG" />
+      <p class="titleDev">Reference Incident Management Model</p>
+      <img src="reference_model.svg" />
     </div>
     <div id="tab" class="tab">
       <button id="tabExplore">Exploration analysis</button>
@@ -84,15 +88,24 @@
   </div>
 
   <div id="container_top">
-    <div id="focus"></div>
-    <div id="context"></div>
+    <div id="focus">
+      <p class="titleDev">Sequence Analysis</p>
+    </div>
+    <div id="context">
+      <p class="titleDev">Temporal Analysis</p>
+      <div id="focusLine"></div>
+      <div id="contextLine"></div>
+    </div>
   </div>
 
   <div id="container_middle">
-
+    
     <div id="deviation"> 
 
-      <div id="containerDev">
+      <div id="legend">
+      </div>
+
+      <div id="containerDev"><p class="titleDev">Deviations analysis</p>
         <div id="divMissing">
           <div id="barMissing"></div>
         </div>
@@ -107,7 +120,7 @@
       </div>
 
       <div id="containerTop">
-        <p style="text-align: center; margin: 0;"><b>INCIDENTS WITH MOST ERRORS</b></p>
+        <p class="titleDev" style="margin: 0;">Incidents with most errors</p>
         <div id="divTopOne"></div>
         <div id="divTopTwo"></div>
         <div id="divTopThree"></div>
@@ -121,6 +134,7 @@
 
 
     <div id="fitness">
+      <p class="titleDev">Fitness and Cost Analysis</p>
       <div id="fitnessViolin"></div>
       <div id="fitnessBar"></div>
 
@@ -129,6 +143,7 @@
     </div>
     
     <div id="incident">
+      <p class="titleDev">Incidents priority analysis</p>
       <div id="parallelIncidents"></div>
       <div id="barIncidents"></div>
     </div>
@@ -229,8 +244,6 @@
               d3.select("#paramDeviation"+err).remove();
           })
 
-          document.getElementById("containerState").style.height = "200px"; /*todo */
-
           // selectedCategories = [...new Set(incidentsData.map(e => e.category))];
           // filteredAlignmentsData = alignmentsData;
           // filteredIncidentsData = incidentsData;
@@ -240,7 +253,7 @@
 
           /* FIRST RENDER: default viz*/
           // Render top part
-          renderMetrics();
+          renderMetrics(fullData);
           renderLegendError("legend");
           renderOverviewBlock(fullData);
 
@@ -259,15 +272,15 @@
             switch(i){
               case "Missing":
                 selectedErrors.missing = !selectedErrors.missing;
-                d3.select(this).style("opacity", selectedErrors.missing ? "1" : "0.5");
+                d3.select(this).style("stroke", selectedErrors.missing ? "black" : "grey");
                 break;
               case "Repetition":
                 selectedErrors.repetition = !selectedErrors.repetition;
-                d3.select(this).style("opacity", selectedErrors.repetition ? "1" : "0.5");
+                d3.select(this).style("stroke", selectedErrors.repetition ? "black" : "grey");
                 break;
               case "Mismatch":
                 selectedErrors.mismatch = !selectedErrors.mismatch
-                d3.select(this).style("opacity", selectedErrors.mismatch ? "1" : "0.5");
+                d3.select(this).style("stroke", selectedErrors.mismatch ? "black" : "grey");
                 break;
               default:
                 selectedErrors;
@@ -277,7 +290,7 @@
             // console.log(filteredAlignmentsData);
             filterAll(fullData);
 
-            renderMetrics();
+            renderMetrics(fullData);
             renderOverviewBlock(fullData);
 
             renderDeviationsBlock(fullData);
@@ -292,23 +305,23 @@
             switch(i){
               case "Detection":
                 selectedActivities.n = !selectedActivities.n
-                d3.select(this).style("opacity", selectedActivities.n ? "1" : "0.5");
+                d3.select(this).style("stroke", selectedActivities.n ? "black" : "grey");
                 break;
               case "Activation":
                 selectedActivities.a = !selectedActivities.a
-                d3.select(this).style("opacity", selectedActivities.a ? "1" : "0.5");
+                d3.select(this).style("stroke", selectedActivities.a ? "black" : "grey");
                 break;
               case "Awaiting":
                 selectedActivities.w = !selectedActivities.w
-                d3.select(this).style("opacity", selectedActivities.w ? "1" : "0.5");
+                d3.select(this).style("stroke", selectedActivities.w ? "black" : "grey");
                 break;
               case "Resolution":
                 selectedActivities.r = !selectedActivities.r
-                d3.select(this).style("opacity", selectedActivities.r ? "1" : "0.5");
+                d3.select(this).style("stroke", selectedActivities.r ? "black" : "grey");
                 break;
               case "Closure":
                 selectedActivities.c = !selectedActivities.c
-                d3.select(this).style("opacity", selectedActivities.c ? "1" : "0.5");
+                d3.select(this).style("stroke", selectedActivities.c ? "black" : "grey");
                 break;
               default:
                 selectedActivities;
@@ -316,7 +329,7 @@
             }
             filterAll(fullData);
 
-            renderMetrics();
+            renderMetrics(fullData);
             renderOverviewBlock(fullData);
 
             renderDeviationsBlock(fullData);

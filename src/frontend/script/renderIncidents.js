@@ -29,7 +29,7 @@ function renderParallelIncidents(fullData, selector) {
 
     var margin = {top: 30, right: 0, bottom: 10, left: 10},
     width = 400 - margin.left - margin.right,
-    height = 450 - margin.top - margin.bottom;
+    height = 520 - margin.top - margin.bottom;
 
     var svg = d3.select("#"+selector)
     .append("svg")
@@ -57,6 +57,10 @@ function renderParallelIncidents(fullData, selector) {
         return d3.line()(dimensions.map(function(p) { return [x(p), y[p](d[p])]; }));
     }
 
+    var brushP = d3.brushY()
+    .on("end", brushParallel)
+    .extent([[-20, 0], [20, height]])
+
     svg.selectAll("myPath")
         .data(fullData)
         .enter().append("path")
@@ -69,12 +73,48 @@ function renderParallelIncidents(fullData, selector) {
         .data(dimensions).enter()
         .append("g")
         .attr("transform", function(d) {return "translate(" + x(d) + ")"; })
-        .each(function(d) {d == "category" ? d3.select(this).call(d3.axisRight().scale(y[d])) : d3.select(this).call(d3.axisLeft().scale(y[d])); })
+        .each(function(d) {d == "category" ? 
+            d3.select(this).call(d3.axisRight().scale(y[d])) 
+            : d3.select(this).call(d3.axisLeft().scale(y[d]))
+            .call(brushP)
+            .call(d3.brushY().move, brushParallelSelection[d]);; 
+        })
         .append("text")
         .style("text-anchor", "middle")
         .attr("y", -9)
         .text(function(d) {return d; })
         .style("fill", "black")
+
+    function brushParallel({selection}, key){
+        if(selection){
+            selectedAssessment[key] = [];
+            if(key === "priority"){
+                if(selection[0] <= 0) selectedAssessment[key].push("4 - Low"); //low
+                if(selection[0] <= 160 && selection[1] >= 160) selectedAssessment[key].push("3 - Moderate"); //medium
+                if(selection[0] <= 320 && selection[1] >= 320) selectedAssessment[key].push("2 - High"); //high
+                if(selection[1] >= 480) selectedAssessment[key].push("1 - Critical"); //critical
+            } else {
+                if(selection[0] <= 0) selectedAssessment[key].push("3 - Low"); //low
+                if(selection[0] <= 240 && selection[1] >= 240) selectedAssessment[key].push("2 - Medium"); //medium
+                if(selection[1] >= 480) selectedAssessment[key].push("1 - High"); //high
+            }
+    
+        } else {
+            selectedAssessment[key] = [];
+        }
+        brushParallelSelection[key] = selection;
+        filterAll(fullData);
+
+        renderMetrics(fullData);
+        renderOverviewBlock(fullData);
+
+        renderDeviationsBlock(fullData);
+        renderFitnessBlock(fullData);
+        renderParallelIncidents(fullData, "parallelIncidents");
+
+        renderPattern();
+        renderDatasetAnalysis(fullData);
+    }
 }
 
 function renderBarCategory(data, fullData, selector){
@@ -82,7 +122,7 @@ function renderBarCategory(data, fullData, selector){
 
     var margin = {top: 20, right: 0, bottom: 30, left: 0},
     width = 350 - margin.left - margin.right,
-    height = 480 - margin.top - margin.bottom;
+    height = 550 - margin.top - margin.bottom;
 
     var svg = d3.select("#"+selector)
     .append("svg")
@@ -137,7 +177,7 @@ function renderBarCategory(data, fullData, selector){
         filterAll(fullData);
 
 
-        renderMetrics();
+        renderMetrics(fullData);
         renderOverviewBlock(fullData);
 
         renderDeviationsBlock(fullData);

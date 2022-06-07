@@ -14,6 +14,7 @@ function removeAllFromParameters(){
     document.getElementById("containerTop").style.display = "";
     document.getElementById("containerState").style.overflowY = "scroll";
     document.getElementById("containerState").style.width = "100%";
+    document.getElementById("containerState").style.height = "150px"; /*todo */
     document.getElementById("container_bottom").style.display = "flex";
     
     document.getElementById("fitness").style.display = "inline-block";
@@ -83,7 +84,20 @@ function filterAll(fullData){
                 if(elem["costTotal"]<=costRange[0] && elem["costTotal"]>=costRange[1] && !acc.includes(elem))
                     if(((start <= endRange && start >= startRange) || (end <= endRange && end >= startRange)) && !acc.includes(elem))
                         if((selectedCategories.includes(elem.category) || selectedCategories.length === 0) && !acc.includes(elem)){
-                            acc.push(elem);
+                            if(selectedAssessment.priority.length == 0 || selectedAssessment.priority.includes(elem.priority)){
+                                if(selectedAssessment.impact.length == 0 || selectedAssessment.impact.includes(elem.impact)){
+                                    if(selectedAssessment.urgency.length == 0 || selectedAssessment.urgency.includes(elem.urgency)){
+                                        if(selectedErrors.missing == false || (selectedErrors.missing && elem.totMissing>0)){
+                                            if(selectedErrors.repetition == false || (selectedErrors.repetition && elem.totRepetition>0)){
+                                                if(selectedErrors.mismatch == false || (selectedErrors.mismatch && elem.totMismatch>0)){
+                                                    acc.push(elem);
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
                             // if(selectedErrors.missing && selectedErrors.repetition && selectedErrors.mismatch){
                             //     if(elem.totMissing>0 && elem.totRepetition>0 && elem.totMismatch>0) acc.push(elem);
                             // }

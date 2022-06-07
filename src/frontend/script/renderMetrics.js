@@ -1,10 +1,10 @@
-function renderMetrics(){
+function renderMetrics(fullData){
 
     d3.select("#metrics").selectAll("*").remove();
 
     var margin = {top: 10, right: 10, bottom: 20, left: 10},
     width = 300 - margin.left - margin.right,
-    height = 100 - margin.top - margin.bottom;
+    height = 120 - margin.top - margin.bottom;
 
     // Calculate number of incidents
     const numIncidents = filteredData.length;
@@ -26,25 +26,35 @@ function renderMetrics(){
     .attr("y", 10)
     .attr("x", 0)
     .attr("font-family", "Helvetica")
-    .text("Number of selected incidents: ")
-        .append("tspan")
-        .attr("font-weight", "bold")
-        .text(numIncidents);
+    .attr("font-size", "20px")
+    .text("Summary");
 
     svg.append("text")
     .attr("y", 40)
     .attr("x", 0)
     .attr("font-family", "Helvetica")
-    .text("Average fitness: ")
+    .attr("font-size", "20px")
+    .text("N. incidents: ")
         .append("tspan")
         .attr("font-weight", "bold")
-        .text(avgF);
+        .text(numIncidents+" ("+(numIncidents/fullData.length*100).toFixed(2)+"%)");
 
     svg.append("text")
     .attr("y", 70)
     .attr("x", 0)
     .attr("font-family", "Helvetica")
-    .text("Average cost: ")
+    .attr("font-size", "20px")
+    .text("Avg fitness: ")
+        .append("tspan")
+        .attr("font-weight", "bold")
+        .text(avgF);
+
+    svg.append("text")
+    .attr("y", 100)
+    .attr("x", 0)
+    .attr("font-family", "Helvetica")
+    .attr("font-size", "20px")
+    .text("Avg cost: ")
         .append("tspan")
         .attr("font-weight", "bold")
         .text(avgC);
@@ -59,7 +69,7 @@ function renderLegendError(selector){
     const dBlock = 20;
     var margin = {top: 10, right: 10, bottom: 20, left: 40},
     width = 550 - margin.left - margin.right,
-    height = 120 - margin.top - margin.bottom;
+    height = 200 - margin.top - margin.bottom;
 
     const keysError = ["Missing", "Repetition", "Mismatch"]
     const keysActivity = ["Detection", "Activation", "Awaiting", "Resolution", "Closure"]
@@ -77,6 +87,17 @@ function renderLegendError(selector){
     .style("display", "block")
     .style("margin", "auto");
 
+    svg.append("text")
+    .attr("x", 20)
+    .attr("y", 20)
+    .attr("font-family", "Helvetica")
+    .text("Errors");
+    svg.append("text")
+    .attr("x", 180)
+    .attr("y", 20)
+    .attr("font-family", "Helvetica")
+    .text("Activities");
+
     var legContainerError = svg.selectAll(selector+".itemE")
         .data(keysError)
         .enter().append('g')
@@ -84,11 +105,13 @@ function renderLegendError(selector){
         .attr("transform", function (d, i) {
             if (i === 0) {
                 len = d.length + offset 
-                return "translate(0,0)"
+                return "translate(0,20)"
             } else { 
                 var prevLen = len
                 len +=  d.length + offset
-                return "translate(" + (prevLen) + ",0)"
+                // return "translate(" + (prevLen) + ",0)"
+                var l = (40*i)+20;
+                return "translate(0,"+ l +")";
             }
         });
     legContainerError.append("rect")
@@ -98,9 +121,9 @@ function renderLegendError(selector){
     .attr("width", dBlock)
     .attr("height", dBlock)
     .style("fill", function(d){ return colorError(d)})
-    .style("stroke", "black")
+    .style("stroke", "grey")
     .style("stroke-width", 2)
-    .style("opacity", "0.5");
+    //.style("opacity", "0.5");
     legContainerError.append("text")
     .attr("x", dBlock + dBlock*1.2)
     .attr("y", dBlock+ (dBlock/2))
@@ -114,11 +137,10 @@ function renderLegendError(selector){
         .attr("transform", function (d, i) {
             if (i === 0) {
                 len = d.length + offset 
-                return "translate(0,0)"
-            } else { 
-                var prevLen = len
-                len +=  d.length + offset
-                return "translate(" + (prevLen) + ",0)"
+                return "translate(150,-20)"
+            } else {
+                var l = -20+(30*i)
+                return "translate(150,"+ l +")";
             }
         })
     legContainerActivity.append("rect")
@@ -128,9 +150,9 @@ function renderLegendError(selector){
         .attr("width", dBlock)
         .attr("height", dBlock)
         .style("fill", function(d){ return colorActivity(d)})
-        .style("stroke", "black")
+        .style("stroke", "grey")
         .style("stroke-width", 2)
-        .style("opacity", "0.5");;        
+        //.style("opacity", "0.5");
     legContainerActivity.append("text")
         .attr("x", dBlock + dBlock*1.2)
         .attr("y", 3*dBlock + (dBlock/2))
