@@ -3,8 +3,6 @@ function renderIncidentsBlock(fullData) {
     d3.select("#parallelIncidents").selectAll("*").remove();
     d3.select("#barIncidents").selectAll("*").remove();
 
-    renderParallelIncidents(fullData, "parallelIncidents");
-
     const countCategories = fullData.reduce((accumulator, object) => {
         if(filteredData.map(e => e.incident_id).includes(object.incident_id)){
             if(Object.keys(accumulator).includes(object.category)){
@@ -20,6 +18,8 @@ function renderIncidentsBlock(fullData) {
     const countCategoriesArr = Object.keys(countCategories).map(elem => {
         return {category: elem, value: countCategories[elem]}
     });
+
+    renderParallelIncidents(fullData, "parallelIncidents");
     renderBarCategory(countCategoriesArr, fullData, "barIncidents");
 }
 
@@ -29,7 +29,7 @@ function renderParallelIncidents(fullData, selector) {
 
     var margin = {top: 30, right: 0, bottom: 10, left: 10},
     width = 400 - margin.left - margin.right,
-    height = 520 - margin.top - margin.bottom;
+    height = 490 - margin.top - margin.bottom;
 
     var svg = d3.select("#"+selector)
     .append("svg")
@@ -122,7 +122,7 @@ function renderBarCategory(data, fullData, selector){
 
     var margin = {top: 20, right: 0, bottom: 30, left: 0},
     width = 350 - margin.left - margin.right,
-    height = 550 - margin.top - margin.bottom;
+    height = 520 - margin.top - margin.bottom;
 
     var svg = d3.select("#"+selector)
     .append("svg")

@@ -138,9 +138,9 @@ function renderErrorsBars(objAlignment, selector){
     const subgroups = ["missing","repetition","mismatch"];
     const fullW = 800;//selector == "stateDeviations" ? 800 : 400;
 
-    var margin = {top: 5, right: 10, bottom: 20, left: 40},
+    var margin = {top: 0, right: 10, bottom: 20, left: 40},
     width = fullW - margin.left - margin.right,
-    height = 50 - margin.top - margin.bottom;
+    height = 40 - margin.top - margin.bottom;
 
     var svg = d3.select("#"+selector)
     .append("svg")
@@ -149,35 +149,30 @@ function renderErrorsBars(objAlignment, selector){
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    sumTotal>0 && svg.append("text")
-    .attr("y", height/2+margin.top)
-    .attr("x", 0)
-    .attr("font-family", "Helvetica")
-    .text(objAlignment.incident_id)
-
+    
     var x = d3.scaleLinear()
     .domain([0, sumTotal])
-    .range([0, width])
-
+    .range([0, width-100])
+    
     var y = d3.scaleBand()
     .domain(data.map(d => d.error))
     .range([ height, 0 ])
     .padding([0.2]);
-
+    
     var color = d3.scaleOrdinal()
     .domain(subgroups)
     .range([colorDev.miss,colorDev.rep,colorDev.mism]);
-
+    
     var stackedData = d3.stack()
     .keys(subgroups)(data)
-
+    
     var count=0;
     const dim = stackedData.reduce((acc, elem, i) => {
         const d = elem[0];
         const wCurr = x(d[1]) - x(d[0]) < minW && x(d[1]) - x(d[0])!=0 ? minW : x(d[1]) - x(d[0]);
         x(d[1]) - x(d[0]) < minW && x(d[1]) - x(d[0])!=0 && count++;
         var xCurr;
-
+        
         if(wCurr>0 && i!=0){
             xCurr = acc[i-1].x+acc[i-1].w;
         } else {
@@ -186,6 +181,12 @@ function renderErrorsBars(objAlignment, selector){
         return [...acc, {err:d.data.error, k: elem.key, w: wCurr, x:xCurr, val:d[1]-d[0]}]
     }, []);
 
+    sumTotal>0 && svg.append("text")
+    .attr("y", y("tot")+height+15)
+    .attr("x", 0)
+    .attr("font-family", "Helvetica")
+    .text(objAlignment.incident_id)
+    
     svg.append("g")
     .selectAll("rect")
     .data(dim)
@@ -196,7 +197,7 @@ function renderErrorsBars(objAlignment, selector){
             // if(d[1] == sumTotal) return x(d[0])
             // return x(d[1])-w;
             return x(d[0]);*/
-            return d.x;
+            return d.x+100;
         })
         .attr("width", function(d) {
             /*
@@ -204,7 +205,7 @@ function renderErrorsBars(objAlignment, selector){
             return x(d[1]) - x(d[0]);*/
             return d.w;
         })
-        .attr("y", function(d) {/*return y(d.data.error)+height;*/ return y(d.err)+height; })
+        .attr("y", function(d) {/*return y(d.data.error)+height;*/return y(d.err)+height; })
         .attr("height", y.bandwidth())
         .attr("fill", function(d) {return color(d.k); })
         .style("stroke", "black")
@@ -215,14 +216,15 @@ function renderErrorsBars(objAlignment, selector){
     .enter()
     .append("text")
         .attr("text-anchor", "middle")
-        .attr("x", function(d) {/*return x(d[0][0]);*/return d.x+(d.w/2) })
-        .attr("y",  function(d) {return y(d.err)*4+height})
+        .attr("x", function(d) {/*return x(d[0][0]);*/return d.x+(d.w/2)+100 })
+        .attr("y",  function(d) {return y("tot")+height+15/*y(d.err)*4+height+100*/})
         .attr("font-family", "Helvetica")
         .text(function(d) {/*return d[0][1]-d[0][0] == 0 ? "" : d[0][1]-d[0][0]*/return d.val == 0 ? "" : d.val})
+
 }
 
 function renderState(alignments, selector) {
-    for(var i=0;i</*alignments.length*/50;i++){
+    for(var i=3;i</*alignments.length*/50;i++){
         renderErrorsBars(alignments[i],selector)
     }
 }

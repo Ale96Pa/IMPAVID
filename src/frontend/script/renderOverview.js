@@ -46,7 +46,7 @@ function renderSequences(selector){
 
     var margin = {top: 0, right: 5, bottom: 0, left: 10},
     width = 850 - margin.left - margin.right,
-    height = 50 - margin.top - margin.bottom;
+    height = 40 - margin.top - margin.bottom;
 
     const data = filteredData.reduce((acc, elem)=> {
         var structures = acc.map(e => e.structure);
@@ -80,19 +80,30 @@ function renderSequences(selector){
 
     //data = data.sort((a,b) => b.count - a.count);
 
-    d3.select("#focus").append("text")
+    // d3.select("#"+selector).append("text")
+    // .attr("x", width/2)
+    // .attr("y", 5)
+    // .attr("font-family", "Helvetica")
+    // .text("Sequence Analysis");
+
+    var svgContainer = d3.select("#"+selector);
+
+    /*todo: controllare */
+    svgContainer.append("text")
     .attr("x", width/2)
     .attr("y", 5)
+    .attr("text-align", "center")
     .attr("font-family", "Helvetica")
-    .text("Sequence Analysis");
+    .text("Sequence Analysis  ("+data.length+" variants)");
+
 
     // TODO: vedi se aggiustare width
     data.map((elem,i) => {
         const eventList = elem.structure.split(";").filter(e => !e.includes("M")).map(el => el.split("]")[1]).slice(0, -1);
         //width = eventList.length*dBlock+ margin.left + margin.right + 2*dBlock;
 
-        var svg = d3.select("#"+selector)
-        .append("svg")
+        //var svg = d3.select("#"+selector)
+        var svg = svgContainer.append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
 
@@ -118,12 +129,12 @@ function renderSequences(selector){
         .attr("width", wBar-dBlock)
         .attr("height", dBlock)
         .style("fill", colorRectCat.checked)
-        .style("opacity", 0.7);
+        .style("opacity", 0.5);
         svg.append("text")
         .attr("y", dBlock+(dBlock/2)+(dBlock/4))
         .attr("x", 0)
         .attr("font-family", "Helvetica")
-        .text(elem.count + '('+(elem.count/filteredData.length*100).toFixed(1)+'%)');
+        .text(elem.count + ' ('+(elem.count/filteredData.length*100).toFixed(1)+'%)');
 
         container.append("rect")
         .attr("x", function(d,i){return (i*dBlock)+wBar})

@@ -43,14 +43,14 @@ background-color: #ccc;
 #metrics {
     border-style: solid; /*todo: eliminare*/
     border-width: 2px; /*todo: eliminare*/
-    width: 20%;
+    width: 55%;
     float: left;
 }
 
 #image {
     border-style: solid; /*todo: eliminare*/
     border-width: 2px; /*todo: eliminare*/
-    width: 50%;
+    width: 40%;
     float: right;
     text-align: center;
 }
@@ -147,6 +147,7 @@ background-color: #ccc;
     border-width: 2px; /*todo: eliminare*/
     width: 33%;
     display: inline-block;
+    height: 530px; /*todo*/
 }
 
 #fitnessViolin, #costViolin {
@@ -166,6 +167,7 @@ background-color: #ccc;
     border-width: 2px; /*todo: eliminare*/
     width: 32%;
     display: inline-block;
+    height: 530px; /*todo*/
 }
 
 #parallelIncidents{
@@ -183,7 +185,7 @@ background-color: #ccc;
 #pattern {
     border-style: solid; /*todo: eliminare*/
     border-width: 2px; /*todo: eliminare*/
-    width: 500px;
+    width: 350px;
     display: inline-block;
 }
 
@@ -192,5 +194,10 @@ background-color: #ccc;
     border-width: 2px; /*todo: eliminare*/
     width: 75%;
     display: inline-block;
+}
+
+#containerTraces {
+    overflow-y: scroll;
+    height: 150px;
 }
 

@@ -3,11 +3,12 @@ function renderMetrics(fullData){
     d3.select("#metrics").selectAll("*").remove();
 
     var margin = {top: 10, right: 10, bottom: 20, left: 10},
-    width = 300 - margin.left - margin.right,
-    height = 120 - margin.top - margin.bottom;
+    width = 400 - margin.left - margin.right,
+    height = 110 - margin.top - margin.bottom;
 
     // Calculate number of incidents
     const numIncidents = filteredData.length;
+    const totIncidents = fullData.length;
 
     // Calculate average fitness
     const avgF = (filteredData.reduce((acc,e) => {return acc + parseFloat(e.fitness)},0)/numIncidents).toFixed(3);
@@ -15,45 +16,93 @@ function renderMetrics(fullData){
     // Calculate average cost
     const avgC = (filteredData.reduce((acc,e) => {return acc + parseFloat(e.costTotal)},0)/numIncidents).toFixed(3);
 
-    var svg = d3.select("#metrics")
+    var svgContainer = d3.select("#metrics")
+    // .append("svg")
+    // .attr("width", width*3 + margin.left + margin.right)
+    // .attr("height", height + margin.top + margin.bottom)
+    // // .append("g")
+    // // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // svgContainer.append("text")
+    // .attr("y", 0)
+    // .attr("x", 0)
+    // .attr("font-family", "Helvetica")
+    // .attr("font-size", "14px")
+    // .text("Summary");
+    const x = d3.scaleLinear()
+    .domain([0, totIncidents])
+    .range([0, width])
+
+    var svgCount = svgContainer
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    svg.append("text")
-    .attr("y", 10)
-    .attr("x", 0)
-    .attr("font-family", "Helvetica")
-    .attr("font-size", "20px")
-    .text("Summary");
-
-    svg.append("text")
+    svgCount.append("rect")
+    .attr("y", 50)
+    .attr("x",0)
+    .attr("width", x(totIncidents))
+    .attr("height", /*height/2*/20)
+    .attr("style", "fill:none")
+    .style("stroke", "black")
+    .style("stroke-width", 2);
+    svgCount.append("rect")
+    .attr("y", 50)
+    .attr("x",0)
+    .attr("width", x(numIncidents))
+    .attr("height", /*height/2*/20)
+    .attr("style", "fill:"+colorRectCat.checked);
+    svgCount.append("text")
     .attr("y", 40)
-    .attr("x", 0)
+    .attr("x", "10%")
     .attr("font-family", "Helvetica")
-    .attr("font-size", "20px")
+    .attr("font-size", "25px")
     .text("N. incidents: ")
         .append("tspan")
         .attr("font-weight", "bold")
         .text(numIncidents+" ("+(numIncidents/fullData.length*100).toFixed(2)+"%)");
 
-    svg.append("text")
-    .attr("y", 70)
+    var svgFitness = svgContainer
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    svgFitness.append("rect")
     .attr("x", 0)
+    .attr("y", 50)
+    .attr("width", width-margin.left-margin.right)
+    .attr("height", 20)
+    .style("fill", avgF < 0.4 ? colorSeverity.critical : avgF > 0.7 ? colorSeverity.none : colorSeverity.high)
+    svgFitness.append("text")
+    .attr("y", 40)
+    .attr("x", "20%")
     .attr("font-family", "Helvetica")
-    .attr("font-size", "20px")
+    .attr("font-size", "25px")
     .text("Avg fitness: ")
         .append("tspan")
         .attr("font-weight", "bold")
         .text(avgF);
 
-    svg.append("text")
-    .attr("y", 100)
+    var svgCost = svgContainer
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
+    svgCost.append("rect")
     .attr("x", 0)
+    .attr("y", 50)
+    .attr("width", width-margin.left-margin.right)
+    .attr("height", 20)
+    .style("fill", avgC < 0.4 ? colorSeverity.none : avgC > 0.7 ? colorSeverity.critical : colorSeverity.high)
+    svgCost.append("text")
+    .attr("y", 40)
+    .attr("x", "20%")
     .attr("font-family", "Helvetica")
-    .attr("font-size", "20px")
+    .attr("font-size", "25px")
     .text("Avg cost: ")
         .append("tspan")
         .attr("font-weight", "bold")
@@ -159,96 +208,4 @@ function renderLegendError(selector){
         .text(function(d){ return d})
         .attr("text-anchor", "left")
         .style("alignment-baseline", "middle");
-}
-
-function renderDatasetAnalysis(fullData){
-
-    d3.select("#detail").selectAll("*").remove();
-
-    var margin = {top: 10, right: 10, bottom: 20, left: 10},
-    width = 1800 - margin.left - margin.right,
-    height = 100 - margin.top - margin.bottom;
-
-    // Calculate number of incidents
-    const totIncidents = fullData.length;
-    const numIncidents = filteredData.length;
-
-    var svg = d3.select("#detail")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height*2 + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-
-    const x = d3.scaleLinear()
-    .domain([0, totIncidents])
-    .range([0, width])
-
-    svg.append("rect")
-    .attr("y", 0)
-    .attr("x",0)
-    .attr("width", x(totIncidents))
-    .attr("height", height/2)
-    .attr("style", "fill:none")
-    .style("stroke", "black")
-    .style("stroke-width", 2);
-
-    svg.append("rect")
-    .attr("y", 0)
-    .attr("x",0)
-    .attr("width", x(numIncidents))
-    .attr("height", height/2)
-    .attr("style", "fill:"+colorRectCat.checked);
-
-    svg.append("text")
-    .attr("y", height/2-5)
-    .attr("x",width/2)
-    .attr("font-family", "Helvetica")
-    .text((numIncidents/totIncidents*100).toFixed(2) + " %")
-        // .append("tspan")
-        .attr("font-weight", "bold");
-
-
-    const data = filteredData.reduce((acc, elem)=> {
-        var structures = acc.map(e => e.structure);
-        if(structures.includes(elem.alignment)){
-            const currentInc = acc.find(e => e.structure == elem.alignment);
-            tmp = acc.filter(e => e.structure != elem.alignment);
-            acc = [...tmp, {structure:elem.alignment, count:currentInc.count+1}]
-        } else {
-            acc = [...acc, {structure:elem.alignment, count:1}]
-        }
-        return acc;
-    }, []).sort((a,b) => b.count - a.count);
-
-    const xScaleVariants = d3.scaleLinear()
-    .domain([0, numIncidents])
-    .range([0, width])
-
-    const colors = ["#4e79a7","#f28e2c","#e15759","#76b7b2","#59a14f","#edc949","#af7aa1","#ff9da7","#9c755f","#bab0ab"];
-
-    var sum = 0;
-    data.map((elem,i) => {
-
-        svg.append("rect")
-        .attr("y", height)
-        .attr("x", sum)
-        .attr("width", xScaleVariants(elem.count))
-        .attr("height", height/2)
-        .attr("style", "fill:"+colors[i%colors.length])
-        .style("stroke", "black")
-        .style("stroke-width", 1);
-
-        i<5 && svg.append("text")
-        .attr("y", height+15)
-        .attr("x", sum)
-        .attr("font-family", "Helvetica")
-        .text(elem.count)
-            // .append("tspan")
-            .attr("font-weight", "bold");
-
-        sum += xScaleVariants(elem.count);
-    })
-
 }

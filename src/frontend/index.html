@@ -21,7 +21,7 @@
       const colorRectCat = {notChecked: "#e41a1c", checked: "#3182bd"}
       const fullDateRange = d3.timeDays(new Date(2016, 1, 19), new Date(2017, 2, 19));
       const formatTime = d3.timeFormat("%Y-%m-%d");
-      const colorSeverity = {none:"#1a9641",low:"#a6d96a",medium:"#3182bd",high:"#fdae61",critical:"#d7191c"};
+      const colorSeverity = {none:"#1a9641",low:"#a6d96a",medium:"#3182bd",high:"#feb24c",critical:"#d7191c"};
       const threshold = {"low":0.37,"medium":0.69,"high":0.89}
 
       /* Shared filters */
@@ -62,13 +62,13 @@
 
     <script type="text/javascript" src="script/renderMetrics.js"></script>
     <script type="text/javascript" src="script/renderOverview.js"></script>
-    <script type="text/javascript" src="script/renderHeader.js"></script>
-
+    
     <script type="text/javascript" src="script/renderDeviations.js"></script>
     <script type="text/javascript" src="script/renderFitness.js"></script>
     <script type="text/javascript" src="script/renderIncidents.js"></script>
-
+    
     <script type="text/javascript" src="script/renderPattern.js"></script>
+    <script type="text/javascript" src="script/renderDetails.js"></script>
 
     <script type="text/javascript" src="script/renderParameterState.js"></script>
 </head>
@@ -155,6 +155,8 @@
     </div>
 
     <div id="detail">
+      <div id="overviewBar"></div>
+      <div id="containerTraces"></div>
     </div>
   </div>
     
