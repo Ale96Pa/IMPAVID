@@ -3,7 +3,7 @@ function renderMetrics(fullData){
     d3.select("#metrics").selectAll("*").remove();
 
     var margin = {top: 10, right: 10, bottom: 20, left: 10},
-    width = 400 - margin.left - margin.right,
+    width = 300 - margin.left - margin.right,
     height = 110 - margin.top - margin.bottom;
 
     // Calculate number of incidents
@@ -56,9 +56,9 @@ function renderMetrics(fullData){
     .attr("style", "fill:"+colorRectCat.checked);
     svgCount.append("text")
     .attr("y", 40)
-    .attr("x", "10%")
+    .attr("x", "0")
     .attr("font-family", "Helvetica")
-    .attr("font-size", "25px")
+    .attr("font-size", "22px")
     .text("N. incidents: ")
         .append("tspan")
         .attr("font-weight", "bold")
@@ -78,9 +78,9 @@ function renderMetrics(fullData){
     .style("fill", avgF < 0.4 ? colorSeverity.critical : avgF > 0.7 ? colorSeverity.none : colorSeverity.high)
     svgFitness.append("text")
     .attr("y", 40)
-    .attr("x", "20%")
+    .attr("x", "10%")
     .attr("font-family", "Helvetica")
-    .attr("font-size", "25px")
+    .attr("font-size", "22px")
     .text("Avg fitness: ")
         .append("tspan")
         .attr("font-weight", "bold")
@@ -100,9 +100,9 @@ function renderMetrics(fullData){
     .style("fill", avgC < 0.4 ? colorSeverity.none : avgC > 0.7 ? colorSeverity.critical : colorSeverity.high)
     svgCost.append("text")
     .attr("y", 40)
-    .attr("x", "20%")
+    .attr("x", "10%")
     .attr("font-family", "Helvetica")
-    .attr("font-size", "25px")
+    .attr("font-size", "22px")
     .text("Avg cost: ")
         .append("tspan")
         .attr("font-weight", "bold")
