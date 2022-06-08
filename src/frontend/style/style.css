@@ -35,8 +35,12 @@ background-color: #ccc;
 
 
 #container_header, #container_top, #container_middle, #container_bottom {
-    padding: 1px;
+    padding: 5px;
     display: flex;
+}
+
+#container_bottom {
+    position: absolute
 }
 
 /* HEADER BLOCK */
@@ -83,14 +87,14 @@ background-color: #ccc;
 
 /* DEVIATION BLOCK */
 #deviation {
-    width: 33%;
+    width: 35%;
     display: inline-block;
 }
 
 #legend {
     border-style: solid; /*todo: eliminare*/
     border-width: 2px; /*todo: eliminare*/
-    width: 35%;
+    width: 39%;
     float: left;
     height: 215px;
 }
@@ -130,8 +134,9 @@ background-color: #ccc;
 #containerState {
     border-style: solid; /*todo: eliminare*/
     border-width: 2px; /*todo: eliminare*/
-    width: 100%;
-    height: 150px; /*todo: eliminare*/
+    /* width: 100%; */
+    width: 380px;
+    height: 566px; /*todo: eliminare*/
     clear: both;
     overflow-y: scroll;
 }
@@ -147,7 +152,7 @@ background-color: #ccc;
     border-width: 2px; /*todo: eliminare*/
     width: 33%;
     display: inline-block;
-    height: 530px; /*todo*/
+    /* height: 530px; todo */
 }
 
 #fitnessViolin, #costViolin {
@@ -167,7 +172,7 @@ background-color: #ccc;
     border-width: 2px; /*todo: eliminare*/
     width: 32%;
     display: inline-block;
-    height: 530px; /*todo*/
+    /* height: 530px; todo */
 }
 
 #parallelIncidents{
@@ -185,20 +190,23 @@ background-color: #ccc;
 #pattern {
     border-style: solid; /*todo: eliminare*/
     border-width: 2px; /*todo: eliminare*/
-    width: 350px;
+    width: 500px;
     display: inline-block;
+    position: relative;
 }
 
 #detail {
     border-style: solid; /*todo: eliminare*/
     border-width: 2px; /*todo: eliminare*/
-    width: 75%;
+    width: 65%;
+    height: 220px;
     display: inline-block;
 }
 
 #containerTraces {
     overflow-x: scroll;
-    height: 150px;
-    width: 1800px;
+    /* height: 70px; */
+    width: 1500px;
+    margin-left: 60px;
 }
 

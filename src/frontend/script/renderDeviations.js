@@ -23,10 +23,10 @@ function renderDeviationsBlock(fullData) {
     renderActivityBars(sortedFilteredErrors, "repetition", "barRepetition");
     renderActivityBars(sortedFilteredErrors, "mismatch","barMismatch");
     
-    // Render bars for the top 3 wrong traces
-    renderErrorsBars(sortedErrors[0], "divTopOne");
-    renderErrorsBars(sortedErrors[1], "divTopTwo");
-    renderErrorsBars(sortedErrors[2], "divTopThree");
+    // // Render bars for the top 3 wrong traces
+    // renderErrorsBars(sortedErrors[0], "divTopOne");
+    // renderErrorsBars(sortedErrors[1], "divTopTwo");
+    // renderErrorsBars(sortedErrors[2], "divTopThree");
     
     // Render state block
     renderState(sortedFilteredErrors, "stateDeviations");
@@ -136,11 +136,11 @@ function renderErrorsBars(objAlignment, selector){
     const sumTotal = objAlignment.totMissing+objAlignment.totRepetition+objAlignment.totMismatch;
     const data = [{error: "tot", missing: objAlignment.totMissing, repetition:objAlignment.totRepetition, mismatch:objAlignment.totMismatch}]
     const subgroups = ["missing","repetition","mismatch"];
-    const fullW = 800;//selector == "stateDeviations" ? 800 : 400;
+    const fullW = 350;//selector == "stateDeviations" ? 800 : 400;
 
     var margin = {top: 0, right: 10, bottom: 20, left: 40},
     width = fullW - margin.left - margin.right,
-    height = 40 - margin.top - margin.bottom;
+    height = 50 - margin.top - margin.bottom;
 
     var svg = d3.select("#"+selector)
     .append("svg")
@@ -182,7 +182,7 @@ function renderErrorsBars(objAlignment, selector){
     }, []);
 
     sumTotal>0 && svg.append("text")
-    .attr("y", y("tot")+height+15)
+    .attr("y", 25/*y("tot")+height+15*/)
     .attr("x", 0)
     .attr("font-family", "Helvetica")
     .text(objAlignment.incident_id)
@@ -197,7 +197,7 @@ function renderErrorsBars(objAlignment, selector){
             // if(d[1] == sumTotal) return x(d[0])
             // return x(d[1])-w;
             return x(d[0]);*/
-            return d.x+100;
+            return d.x/*+100*/;
         })
         .attr("width", function(d) {
             /*
@@ -209,22 +209,23 @@ function renderErrorsBars(objAlignment, selector){
         .attr("height", y.bandwidth())
         .attr("fill", function(d) {return color(d.k); })
         .style("stroke", "black")
-        .style("stroke-width", 1);;
+        .style("stroke-width", 1);
 
     svg.selectAll("text.error")
     .data(dim)
     .enter()
     .append("text")
         .attr("text-anchor", "middle")
-        .attr("x", function(d) {/*return x(d[0][0]);*/return d.x+(d.w/2)+100 })
+        .attr("x", function(d) {/*return x(d[0][0]);*/return d.x+(d.w/2)/*+100*/ })
         .attr("y",  function(d) {return y("tot")+height+15/*y(d.err)*4+height+100*/})
         .attr("font-family", "Helvetica")
+        //.attr("font-size", "15px")
         .text(function(d) {/*return d[0][1]-d[0][0] == 0 ? "" : d[0][1]-d[0][0]*/return d.val == 0 ? "" : d.val})
 
 }
 
 function renderState(alignments, selector) {
-    for(var i=3;i</*alignments.length*/50;i++){
+    for(var i=0;i</*alignments.length*/50;i++){
         renderErrorsBars(alignments[i],selector)
     }
 }

@@ -3,9 +3,9 @@ function renderDatasetAnalysis(fullData){
     d3.select("#overviewBar").selectAll("*").remove();
     d3.select("#containerTraces").selectAll("*").remove();
 
-    var margin = {top: 10, right: 10, bottom: 20, left: 10},
-    width = 1800 - margin.left - margin.right,
-    height = 50 - margin.top - margin.bottom;
+    var margin = {top: 10, right: 10, bottom: 20, left: 60},
+    width = 1600 - margin.left - margin.right,
+    height = 70 - margin.top - margin.bottom;
 
     const allDates = fullDateRange.map(elem => {return {date: new Date(elem), value: 0, ids:[]}});
     var dataIncTime = filteredData.reduce((accumulator, elem) => {
@@ -51,7 +51,7 @@ function renderDatasetAnalysis(fullData){
 
     const x = d3.scaleLinear()
     .domain([0, sum])
-    .range([0, width-200])
+    .range([0, width-70])
 
     svg.append("rect")
     .attr("y", 0)
@@ -156,6 +156,9 @@ function renderDatasetAnalysis(fullData){
         var svg = contDiv.append("svg")
         .attr("width", 6000 + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
+        // .append("g")
+        // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
         formatData.map((elem,i) => {
             const eventList = elem.structure.split(";").filter(e => !e.includes("M")).map(el => el.split("]")[1]).slice(0, -1);
             //width = eventList.length*dBlock+ margin.left + margin.right + 2*dBlock;
