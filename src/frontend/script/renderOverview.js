@@ -36,7 +36,7 @@ function renderOverviewBlock(fullData){
 function renderSequences(selector){
 
     const w = d3.select("#focus").node().offsetWidth;
-    console.log(w)
+    // console.log(w)
 
     d3.select("#focus").selectAll("*").remove();
 

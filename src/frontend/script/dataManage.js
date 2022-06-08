@@ -1,4 +1,13 @@
 function removeAllFromParameters(){
+
+    d3.select(".paramDeviation").remove();
+    d3.select("#btnParam").remove();
+    d3.select("#paramFitness").remove();
+    d3.select("#paramIncidents").remove();
+    document.getElementById("deviation").style.display = "inline-block";
+    document.getElementById("detail").style.display = "inline-block";
+
+ /*   
     // Remove parameters elements
     d3.select("#paramDeviation").remove();
     d3.select("#paramFitness").remove();
@@ -14,22 +23,30 @@ function removeAllFromParameters(){
     document.getElementById("containerTop").style.display = "";
     document.getElementById("containerState").style.overflowY = "scroll";
     document.getElementById("containerState").style.width = "100%";
-    document.getElementById("containerState").style.height = "150px"; /*todo */
+    document.getElementById("containerState").style.height = "150px"; //todo
     document.getElementById("container_bottom").style.display = "flex";
     
     document.getElementById("fitness").style.display = "inline-block";
     document.getElementById("incident").style.display = "inline-block";
     document.getElementById("pattern").style.width = "500px";
+    */
 }
 
 function removeAllFromExploration(){
+
+    document.getElementById("deviation").style.display = "none";
+    document.getElementById("detail").style.display = "none";
+
+
+/*
+
     // Remove deviation
     d3.select("#barMissing").selectAll("*").remove();
     d3.select("#barRepetition").selectAll("*").remove();
     d3.select("#barMismatch").selectAll("*").remove();
-    d3.select("#divTopOne").selectAll("*").remove();
-    d3.select("#divTopTwo").selectAll("*").remove();
-    d3.select("#divTopThree").selectAll("*").remove();
+    // d3.select("#divTopOne").selectAll("*").remove();
+    // d3.select("#divTopTwo").selectAll("*").remove();
+    // d3.select("#divTopThree").selectAll("*").remove();
     d3.select("#stateDeviations").selectAll("*").remove();
 
     // Remove fitness
@@ -47,19 +64,27 @@ function removeAllFromExploration(){
     d3.select("#detail").selectAll("*").remove();
 
     // Adjust display styles
-    document.getElementById("containerDev").style.display = "none";
-    document.getElementById("containerTop").style.display = "none";
+    document.getElementById("deviation").style.display = "none";
+    document.getElementById("detail").style.display = "none";
+    document.getElementById("containerState").style.display = "none";
+    document.getElementById("pattern").style.display = "none";
+    document.getElementById("detail").style.display = "none";
+    document.getElementById("detail").style.display = "none";
     document.getElementById("fitness").style.display = "none";
     document.getElementById("incident").style.display = "none";
 
-    document.getElementById("containerState").style.overflow = "hidden";
-    document.getElementById("containerState").style.width = "300%";
-    document.getElementById("containerState").style.height = "400px"; /*todo */
+    document.getElementById("containerDev").style.display = "none";
+    // document.getElementById("containerTop").style.display = "none";
+
+    // document.getElementById("containerState").style.overflow = "hidden";
+    // document.getElementById("containerState").style.width = "300%";
+    // document.getElementById("containerState").style.height = "400px"; //todo
 
     // document.getElementById("container_bottom").style.display = "none";
-    document.getElementById("pattern").style.width = "60%";
-    document.getElementById("detail").style.width = "75%";
-    document.getElementById("legend").style.display = "none";
+    // document.getElementById("pattern").style.width = "60%";
+    // document.getElementById("detail").style.width = "75%";
+    // document.getElementById("legend").style.display = "none";
+*/
 }
 
 

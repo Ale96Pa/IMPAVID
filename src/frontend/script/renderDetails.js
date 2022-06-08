@@ -85,9 +85,6 @@ function renderDatasetAnalysis(fullData){
     .domain(dateRange)
     .range([ 0, width-200 ]);
 
-    console.log(part1[0].date, part2[0].date, part3[0].date, part4[0].date, part5[0].date)
-    console.log(allW)
-
     var x1 = d3.scaleOrdinal()
     .domain([part1[0].date, part2[0].date, part3[0].date, part4[0].date, part5[0].date])
     .range(allW);

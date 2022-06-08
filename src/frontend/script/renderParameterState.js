@@ -133,70 +133,111 @@ async function renderSingleSlider(svg, margin, width, p, i, err, ranges){
     if(p == "Resolution" && err == "Mismatch"){ rCrit = ranges["critical"]["Rmism"]; rMed=ranges["medium"]["Rmism"]; rLow =ranges["low"]["Rmism"];}
     if(p == "Closure" && err == "Mismatch"){ rCrit = ranges["critical"]["Cmism"]; rMed=ranges["medium"]["Cmism"]; rLow =ranges["low"]["Cmism"];}
 
-
-    /*TODO FARE MEGLIO*/
-    var xPosM = rMed ? rMed.mean>1 ? w-margin.left : x(rMed.mean) : null;
-    var xPosMinM = xPosM? x(rMed.mean-rMed.std) > x(1) ? x(1) : x(rMed.mean-rMed.std) : null;
-    var xPosMaxM = xPosM ? x(rMed.mean+rMed.std) > x(1) ? x(1) : x(rMed.mean+rMed.std) : null;
-
+    
+    var xPosM = rMed ? rMed.mean>=1 ? x(1)-25 : x(rMed.mean-rMed.std) : null;
+    var wPosM = xPosM ? rMed.mean>=1 ? 25 : 2*x(rMed.std) : 0;
     xPosM && g.append("rect")
-        .attr("width", xPosMinM > xPosM ? 10 : (xPosMaxM-xPosMinM)-2*margin.left)
-        .attr("height", 8)
-        .attr("fill", "yellow")
-        .attr("opacity", 0.8)
-        .attr("x", xPosM-margin.left)
-        .attr("y", -4)
-        .attr("rx", 20)
-        .attr("ry", 20);
+    .attr("width", /*wPosM*/xPosM + wPosM > x(1) ? x(1) - xPosM : wPosM)
+    .attr("height", 8)
+    .attr("fill", "yellow")
+    .attr("opacity", 0.8)
+    .attr("x", xPosM)
+    .attr("y", -4)
+    .attr("rx", 10)
+    .attr("ry", 10);
 
-    /*TODO FARE MEGLIO*/
-    var xPosL = rLow ? rLow.mean>1 ? w-margin.left : x(rLow.mean) : null;
-    var xPosMinL = xPosL? x(rLow.mean-rLow.std) > x(1) ? x(1) : x(rLow.mean-rLow.std) : null;
-    var xPosMaxL = xPosL ? x(rLow.mean+rLow.std) > x(1) ? x(1) : x(rLow.mean+rLow.std) : null;
-
+    var xPosL = rLow ? rLow.mean>=1 ? x(1)-25 : x(rLow.mean-rLow.std) : null;
+    var wPosL = xPosL ? rLow.mean>=1 ? 25 : 2*x(rLow.std) : 0;
     xPosL && g.append("rect")
-        .attr("width", xPosMinL > xPosL ? 10 : (xPosMaxL-xPosMinL)-2*margin.left)
+        .attr("width", /*wPosL*/xPosL + wPosL > x(1) ? x(1) - xPosL : wPosL)
         .attr("height", 8)
         .attr("fill", "green")
         .attr("opacity", 0.8)
-        .attr("x", xPosL-margin.left)
+        .attr("x", xPosL)
         .attr("y", -4)
-        .attr("rx", 20)
-        .attr("ry", 20);
-
-    /*TODO FARE MEGLIO*/
-    var xPosC = rCrit ? rCrit.mean>1 ? w-margin.left : x(rCrit.mean) : null;
-    var xPosMinC = xPosC? x(rCrit.mean-rCrit.std) > x(1) ? x(1) : x(rCrit.mean-rCrit.std) : null;
-    var xPosMaxC = xPosC ? x(rCrit.mean+rCrit.std) > x(1) ? x(1) : x(rCrit.mean+rCrit.std) : null;
-
+        .attr("rx", 10)
+        .attr("ry", 10);
+    
+    var xPosC = rCrit ? rCrit.mean>=1 ? x(1)-25 : x(rCrit.mean-rCrit.std) : null;
+    var wPosC = xPosC ? rCrit.mean>=1 ? 25 : 2*x(rCrit.std) : 0;
     xPosC && g.append("rect")
-        .attr("width", xPosMinC > xPosC ? 10 : (xPosMaxC-xPosMinC)-2*margin.left)
+        .attr("width", /*wPosC*/xPosC + wPosC > x(1) ? x(1) - xPosC : wPosC)
         .attr("height", 8)
         .attr("fill", "red")
         .attr("opacity", 0.8)
-        .attr("x", xPosC-margin.left)
+        .attr("x", xPosC)
         .attr("y", -4)
-        .attr("rx", 20)
-        .attr("ry", 20);
+        .attr("rx", 10)
+        .attr("ry", 10);
+
+
+    // /*TODO FARE MEGLIO*/
+    // var xPosM = rMed ? rMed.mean>1 ? w-margin.left : x(rMed.mean) : null;
+    // var xPosMinM = xPosM? x(rMed.mean-rMed.std) > x(1) ? x(1) : x(rMed.mean-rMed.std) : null;
+    // var xPosMaxM = xPosM ? x(rMed.mean+rMed.std) > x(1) ? x(1) : x(rMed.mean+rMed.std) : null;
+
+    // xPosM && g.append("rect")
+    //     .attr("width", xPosMinM > xPosM ? 10 : (xPosMaxM-xPosMinM)-2*margin.left)
+    //     .attr("height", 8)
+    //     .attr("fill", "yellow")
+    //     .attr("opacity", 0.8)
+    //     .attr("x", xPosM-margin.left)
+    //     .attr("y", -4)
+    //     .attr("rx", 10)
+    //     .attr("ry", 10);
+
+    // /*TODO FARE MEGLIO*/
+    // var xPosL = rLow ? rLow.mean>1 ? w-margin.left : x(rLow.mean) : null;
+    // var xPosMinL = xPosL? x(rLow.mean-rLow.std) > x(1) ? x(1) : x(rLow.mean-rLow.std) : null;
+    // var xPosMaxL = xPosL ? x(rLow.mean+rLow.std) > x(1) ? x(1) : x(rLow.mean+rLow.std) : null;
+
+    // xPosL && g.append("rect")
+    //     .attr("width", xPosMinL > xPosL ? 10 : (xPosMaxL-xPosMinL)-2*margin.left)
+    //     .attr("height", 8)
+    //     .attr("fill", "green")
+    //     .attr("opacity", 0.8)
+    //     .attr("x", xPosL-margin.left)
+    //     .attr("y", -4)
+    //     .attr("rx", 10)
+    //     .attr("ry", 10);
+
+    // /*TODO FARE MEGLIO*/
+    // var xPosC = rCrit ? rCrit.mean>1 ? w-margin.left : x(rCrit.mean) : null;
+    // var xPosMinC = xPosC? x(rCrit.mean-rCrit.std) > x(1) ? x(1) : x(rCrit.mean-rCrit.std) : null;
+    // var xPosMaxC = xPosC ? x(rCrit.mean+rCrit.std) > x(1) ? x(1) : x(rCrit.mean+rCrit.std) : null;
+
+    // xPosC && g.append("rect")
+    //     .attr("width", xPosMinC > xPosC ? 10 : (xPosMaxC-xPosMinC)-2*margin.left)
+    //     .attr("height", 8)
+    //     .attr("fill", "red")
+    //     .attr("opacity", 0.8)
+    //     .attr("x", xPosC-margin.left)
+    //     .attr("y", -4)
+    //     .attr("rx", 10)
+    //     .attr("ry", 10);
 }
 
 function renderParamSpace(fullData, ranges){
 
     var margin = {top: 15, right: 10, bottom: 20, left: 10},
     width = 500 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom;
+    height = 280 - margin.top - margin.bottom;
     
     const devs = ["Missing", "Repetition", "Mismatch"];
     devs.map(err => {
 
         d3.select("#paramDeviation"+err).remove();
 
-        var svg = d3.select("#containerState")
+        var svg = d3.select("#container_middle")
         .append("svg")
         .attr("id", "paramDeviation"+err)
+        .attr("class", "paramDeviation")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-        .style("border-style", "dotted");
+        .style("border-style", "dotted")
+        .style("padding", "8px")
+        .style("margin", "5px")
+        .style("padding-bottom", 0);
         
         svg.append("text")
         .attr("y", margin.top)
@@ -213,12 +254,16 @@ function renderParamSpace(fullData, ranges){
     d3.select("#paramDeviationWeights").remove();
     d3.select("#btnParam").remove();
 
-    var svgLast = d3.select("#containerState")
+    var svgLast = d3.select("#container_middle")
         .append("svg")
         .attr("id", "paramDeviationWeights")
+        .attr("class", "paramDeviation")
         .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom - 100)
-        .style("border-style", "dotted");
+        .attr("height", height + margin.top + margin.bottom)
+        .style("border-style", "dotted")
+        .style("padding", "8px")
+        .style("margin", "5px")
+        .style("padding-bottom", 0);
     
     svgLast.append("text")
     .attr("y", margin.top)
@@ -245,10 +290,10 @@ function renderParamSpace(fullData, ranges){
             newEl = newCosts.find(e => e.incident_id === elem.incident_id)
             return newEl ? {
                 ...elem,
-                costMismatch: parseFloat(newEl.costMismatch),
-                costMissing: parseFloat(newEl.costMissing),
-                costRepetition: parseFloat(newEl.costRepetition),
-                costTotal: parseFloat(newEl.costTotal),
+                costMismatch: parseFloat(newEl.costMismatch)>1 ? 1 : parseFloat(newEl.costMismatch),
+                costMissing: parseFloat(newEl.costMissing)>1 ? 1 : parseFloat(newEl.costMissing),
+                costRepetition: parseFloat(newEl.costRepetition)>1 ? 1 : parseFloat(newEl.costRepetition),
+                costTotal: parseFloat(newEl.costTotal)>1 ? 1 : parseFloat(newEl.costTotal),
             } : {...elem}
         })
 
@@ -272,10 +317,14 @@ function renderParamSpace(fullData, ranges){
         }
 
         // renderParamAnalysis()
-        writePrecRecall()
+        // writePrecRecall() //restore
 
+        // console.log(filteredData);
+        renderMetrics(fullData);
+        renderPattern();
+        renderFitnessBlock(fullData);
       });
-    document.getElementById("containerState").appendChild(btn);
+    document.getElementById("container_middle").appendChild(btn);
 
 }
 
