@@ -197,7 +197,8 @@ background-color: #ccc;
 }
 
 #containerTraces {
-    overflow-y: scroll;
+    overflow-x: scroll;
     height: 150px;
+    width: 1800px;
 }
 

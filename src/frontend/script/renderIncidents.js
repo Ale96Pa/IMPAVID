@@ -19,11 +19,11 @@ function renderIncidentsBlock(fullData) {
         return {category: elem, value: countCategories[elem]}
     });
 
-    renderParallelIncidents(fullData, "parallelIncidents");
+    renderParallelIncidents(fullData, "parallelIncidents", countCategoriesArr);
     renderBarCategory(countCategoriesArr, fullData, "barIncidents");
 }
 
-function renderParallelIncidents(fullData, selector) {
+function renderParallelIncidents(fullData, selector, countCategoriesArr) {
 
     d3.select("#parallelIncidents").selectAll("*").remove();
 
@@ -52,6 +52,10 @@ function renderParallelIncidents(fullData, selector) {
         .range([0, width])
         .padding(1)
         .domain(dimensions);
+        
+    var c = d3.scaleLinear()
+    .range([0.2,1])
+    .domain(d3.extent(countCategoriesArr.map(e => e.value)));
 
     function path(d) {
         return d3.line()(dimensions.map(function(p) { return [x(p), y[p](d[p])]; }));
@@ -67,7 +71,7 @@ function renderParallelIncidents(fullData, selector) {
         .attr("d",  path)
         .style("fill", "none")
         .style("stroke", function(d) {return filteredData.map(e => e.incident_id).includes(d.incident_id) ? colorRectCat.checked : colorRectCat.notChecked; })
-        .style("opacity", function(d) {return filteredData.map(e => e.incident_id).includes(d.incident_id) ? 1 : 0.3; })
+        .style("opacity", function(d) {/*console.log(c(countCategoriesArr.find(e => e.category == d.category).value));*/ return c(countCategoriesArr.find(e => e.category == d.category).value)/*filteredData.map(e => e.incident_id).includes(d.incident_id) ? 1 : 0.3;*/ })
 
     svg.selectAll("myAxis")
         .data(dimensions).enter()
@@ -110,7 +114,7 @@ function renderParallelIncidents(fullData, selector) {
 
         renderDeviationsBlock(fullData);
         renderFitnessBlock(fullData);
-        renderParallelIncidents(fullData, "parallelIncidents");
+        renderParallelIncidents(fullData, "parallelIncidents", countCategoriesArr);
 
         renderPattern();
         renderDatasetAnalysis(fullData);
@@ -182,7 +186,7 @@ function renderBarCategory(data, fullData, selector){
 
         renderDeviationsBlock(fullData);
         renderFitnessBlock(fullData);
-        renderParallelIncidents(fullData, "parallelIncidents");
+        renderParallelIncidents(fullData, "parallelIncidents", data);
 
         renderPattern();
         renderDatasetAnalysis(fullData);

@@ -16,6 +16,9 @@ function renderMetrics(fullData){
     // Calculate average cost
     const avgC = (filteredData.reduce((acc,e) => {return acc + parseFloat(e.costTotal)},0)/numIncidents).toFixed(3);
 
+    // Calculate average reopen count
+    const avgR = (filteredData.reduce((acc,e) => {return acc + parseFloat(e.reopen)},0)/numIncidents).toFixed(3);
+
     var svgContainer = d3.select("#metrics")
     // .append("svg")
     // .attr("width", width*3 + margin.left + margin.right)
@@ -107,6 +110,27 @@ function renderMetrics(fullData){
         .append("tspan")
         .attr("font-weight", "bold")
         .text(avgC);
+    
+    var svgReopen = svgContainer
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
+    svgReopen.append("text")
+    .attr("y", 40)
+    .attr("x", 0)
+    .attr("font-family", "Helvetica")
+    .attr("font-size", "22px")
+    .text("Avg reopen: ")
+        .append("tspan")
+    // svgReopen.append("text")
+    //     .attr("y", 65)
+    //     .attr("x", 0)
+    //     .attr("font-family", "Helvetica")
+    //     .attr("font-size", "22px")
+        .attr("font-weight", "bold")
+        .text(avgR);
 }
 
 function renderLegendError(selector){

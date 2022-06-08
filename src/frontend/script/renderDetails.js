@@ -4,7 +4,7 @@ function renderDatasetAnalysis(fullData){
     d3.select("#containerTraces").selectAll("*").remove();
 
     var margin = {top: 10, right: 10, bottom: 20, left: 10},
-    width = 1850 - margin.left - margin.right,
+    width = 1800 - margin.left - margin.right,
     height = 50 - margin.top - margin.bottom;
 
     const allDates = fullDateRange.map(elem => {return {date: new Date(elem), value: 0, ids:[]}});
@@ -51,7 +51,7 @@ function renderDatasetAnalysis(fullData){
 
     const x = d3.scaleLinear()
     .domain([0, sum])
-    .range([0, width])
+    .range([0, width-200])
 
     svg.append("rect")
     .attr("y", 0)
@@ -62,6 +62,7 @@ function renderDatasetAnalysis(fullData){
     .style("stroke", "black")
     .style("stroke-width", 2);
 
+    allW = []
     distroSum.map((elem,i) => {
         var sumPrev=0;
         for(var j=0; j<i; j++){
@@ -76,8 +77,29 @@ function renderDatasetAnalysis(fullData){
         .attr("style", "fill:"+colorRectCat.checked)
         .on("click", function(d,i) {
             renderTraces(i);
-        });;
+        });
+        allW.push(sumPrev);
     })
+
+    var x1 = d3.scaleTime()
+    .domain(dateRange)
+    .range([ 0, width-200 ]);
+
+    console.log(part1[0].date, part2[0].date, part3[0].date, part4[0].date, part5[0].date)
+    console.log(allW)
+
+    var x1 = d3.scaleOrdinal()
+    .domain([part1[0].date, part2[0].date, part3[0].date, part4[0].date, part5[0].date])
+    .range(allW);
+
+    svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x1)
+            //.ticks(15/*d3.timeWeek.every(2)*/)
+            .tickFormat(d3.timeFormat('%-m/%-d/%y'))
+        )
+
+    
 
     const contDiv = d3.select("#containerTraces");
     
@@ -129,20 +151,18 @@ function renderDatasetAnalysis(fullData){
             return acc;
         }, []);
 
-        console.log(formatData);
 
-
+        var prevW = 0
+        var svg = contDiv.append("svg")
+        .attr("width", 6000 + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
         formatData.map((elem,i) => {
             const eventList = elem.structure.split(";").filter(e => !e.includes("M")).map(el => el.split("]")[1]).slice(0, -1);
             //width = eventList.length*dBlock+ margin.left + margin.right + 2*dBlock;
-    
-            var svg = contDiv.append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-    
+
             var container = svg.selectAll("containerTraces"+".item"+i)
             .data(eventList)
-            .enter().append('g')
+            .enter()/*.append('g')
             .attr("transform", function (d, i) {
                 if (i === 0) {
                     len = d.length + offset 
@@ -152,12 +172,12 @@ function renderDatasetAnalysis(fullData){
                     len +=  d.length + offset
                     return "translate(" + (prevLen) + ",0)"
                 }
-            });
+            });*/
     
             const wBar = x(elem.count) > 0 ? x(elem.count)+dBlock : dBlock
     
             container.append("rect")
-            .attr("x", function(d,i){return (i*dBlock)+wBar})
+            .attr("x", function(d,i){i==0 ? prevW += 2*dBlock : prevW+=dBlock/*+wBar*/; return prevW/*(i*dBlock)+wBar*/})
             .attr("y", dBlock)
             .attr("width", dBlock)
             .attr("height", dBlock)
@@ -166,7 +186,7 @@ function renderDatasetAnalysis(fullData){
             .style("stroke-width", 1); 
             container.append("text")
             .attr("y", dBlock+(dBlock/2)+(dBlock/4))
-            .attr("x", function(d,i){return (i*dBlock)+2+wBar})
+            .attr("x", function(d,i){return /*i==0 ? prevW-2*(eventList.length-i-1)*dBlock :*/ prevW-(eventList.length-i-1)*dBlock/*(i*dBlock)+2+wBar*/})
             .text(function(d){return d});
         });
     }
