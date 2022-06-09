@@ -313,7 +313,7 @@ function renderLineLog(data, selector, fullData){
         filterAll(fullData);
         
         renderMetrics(fullData);
-        renderSequences("focus");
+        renderSequences("focusTraces");
         d3.select("#focusLine").selectAll("*").remove();
         renderFocus(data, "focusLine")
 
