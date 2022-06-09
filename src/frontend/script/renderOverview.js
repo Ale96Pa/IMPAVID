@@ -35,7 +35,7 @@ function renderOverviewBlock(fullData){
 
 function renderSequences(selector){
 
-    const w = d3.select("#focus").node().offsetWidth;
+    // const w = d3.select("#focus").node().offsetWidth;
     // console.log(w)
 
     d3.select("#focus").selectAll("*").remove();
@@ -94,7 +94,8 @@ function renderSequences(selector){
     .attr("y", 5)
     .attr("text-align", "center")
     .attr("font-family", "Helvetica")
-    .text("Sequence Analysis  ("+data.length+" variants)");
+    .text("Trace Variants Analysis");
+    // .text("Sequence Analysis  ("+data.length+" variants)");
 
 
     // TODO: vedi se aggiustare width

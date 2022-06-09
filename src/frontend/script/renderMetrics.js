@@ -10,6 +10,10 @@ function renderMetrics(fullData){
     const numIncidents = filteredData.length;
     const totIncidents = fullData.length;
 
+    // Calculate number of variants
+    const numVariants = [...new Set(filteredData.map(e => e.alignment))].length;
+    const totVariants = [...new Set(fullData.map(e => e.alignment))].length;
+
     // Calculate average fitness
     const avgF = (filteredData.reduce((acc,e) => {return acc + parseFloat(e.fitness)},0)/numIncidents).toFixed(3);
 
@@ -36,13 +40,16 @@ function renderMetrics(fullData){
     .domain([0, totIncidents])
     .range([0, width])
 
+    const xV = d3.scaleLinear()
+    .domain([0, totVariants])
+    .range([0, width])
+
     var svgCount = svgContainer
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
     svgCount.append("rect")
     .attr("y", 50)
     .attr("x",0)
@@ -66,6 +73,36 @@ function renderMetrics(fullData){
         .append("tspan")
         .attr("font-weight", "bold")
         .text(numIncidents+" ("+(numIncidents/fullData.length*100).toFixed(2)+"%)");
+
+    var svgVariants = svgContainer
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    svgVariants.append("rect")
+    .attr("y", 50)
+    .attr("x",0)
+    .attr("width", xV(totVariants))
+    .attr("height", /*height/2*/20)
+    .attr("style", "fill:none")
+    .style("stroke", "black")
+    .style("stroke-width", 2);
+    svgVariants.append("rect")
+    .attr("y", 50)
+    .attr("x",0)
+    .attr("width", xV(numVariants))
+    .attr("height", /*height/2*/20)
+    .attr("style", "fill:"+colorRectCat.checked);
+    svgVariants.append("text")
+    .attr("y", 40)
+    .attr("x", "0")
+    .attr("font-family", "Helvetica")
+    .attr("font-size", "22px")
+    .text("N. variants: ")
+        .append("tspan")
+        .attr("font-weight", "bold")
+        .text(numVariants+" ("+(numVariants/totVariants*100).toFixed(2)+"%)");
 
     var svgFitness = svgContainer
     .append("svg")
@@ -111,26 +148,26 @@ function renderMetrics(fullData){
         .attr("font-weight", "bold")
         .text(avgC);
     
-    var svgReopen = svgContainer
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
-    svgReopen.append("text")
-    .attr("y", 40)
-    .attr("x", 0)
-    .attr("font-family", "Helvetica")
-    .attr("font-size", "22px")
-    .text("Avg reopen: ")
-        .append("tspan")
+    // var svgReopen = svgContainer
+    // .append("svg")
+    // .attr("width", width + margin.left + margin.right)
+    // .attr("height", height + margin.top + margin.bottom)
+    // .append("g")
+    // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");    
     // svgReopen.append("text")
-    //     .attr("y", 65)
-    //     .attr("x", 0)
-    //     .attr("font-family", "Helvetica")
-    //     .attr("font-size", "22px")
-        .attr("font-weight", "bold")
-        .text(avgR);
+    // .attr("y", 40)
+    // .attr("x", 0)
+    // .attr("font-family", "Helvetica")
+    // .attr("font-size", "22px")
+    // .text("Avg reopen: ")
+    //     .append("tspan")
+    // // svgReopen.append("text")
+    // //     .attr("y", 65)
+    // //     .attr("x", 0)
+    // //     .attr("font-family", "Helvetica")
+    // //     .attr("font-size", "22px")
+    //     .attr("font-weight", "bold")
+    //     .text(avgR);
 }
 
 function renderLegendError(selector){

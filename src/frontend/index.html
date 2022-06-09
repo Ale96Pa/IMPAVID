@@ -16,7 +16,9 @@
     <script>
       /* Configurations */
       const colorTab = {checked: "#ccc", notChecked:"#ddd"};
-      const colorDev = { tot:"grey", miss: "#bebada", rep: "#fdb462", mism: "#8dd3c7",
+      const colorDev = { tot:"grey", 
+                        //miss: "#bebada", rep: "#fdb462", mism: "#8dd3c7",
+                        miss: "#af8dc3", rep: "#f1a340", mism: "#5ab4ac",
                         N:"#80b1d3", A:"#b3de69", W:"#fb8072",R:"#fccde5",C:"#ffffb3"};
       const colorRectCat = {notChecked: "#e41a1c", checked: "#3182bd"}
       const fullDateRange = d3.timeDays(new Date(2016, 1, 19), new Date(2017, 2, 19));
@@ -89,7 +91,7 @@
 
   <div id="container_top">
     <div id="focus">
-      <p class="titleDev">Sequence Analysis</p>
+      <p class="titleDev">Trace Variants Analysis</p>
     </div>
     <div id="context">
       <p class="titleDev">Temporal Analysis</p>
@@ -133,6 +135,7 @@
     </div>
 
     <div id="detail">
+      <p class="titleDev">Sequence Analysis Distributed in Time</p>
       <div id="overviewBar"></div>
       <div id="containerTraces"></div>
     </div>

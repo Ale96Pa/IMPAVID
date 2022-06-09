@@ -17,9 +17,17 @@ function renderIncidentsBlock(fullData) {
     }, {});
     const countCategoriesArr = Object.keys(countCategories).map(elem => {
         return {category: elem, value: countCategories[elem]}
+    }).sort((a,b) => b.value - a.value);
+    
+    const sortCat = countCategoriesArr.sort((a,b) => b.value - a.value).map(e => e.category);
+  
+    const sortedByCat = fullData.sort( function (a, b) {
+        var A = a.category, B = b.category;
+        if (sortCat.indexOf(A) > sortCat.indexOf(B)) return 1;
+        else return -1;
     });
 
-    renderParallelIncidents(fullData, "parallelIncidents", countCategoriesArr);
+    renderParallelIncidents(sortedByCat, "parallelIncidents", countCategoriesArr);
     renderBarCategory(countCategoriesArr, fullData, "barIncidents");
 }
 
@@ -44,7 +52,7 @@ function renderParallelIncidents(fullData, selector, countCategoriesArr) {
     for (i in dimensions) {
         name = dimensions[i]
         y[name] = d3.scalePoint()
-        .domain( fullData.map(function(p) {return p[name]; }).sort() )
+        .domain( fullData.map(function(p) {return p[name]; }).reverse()/*.sort()*/ )
         .range([height, 0])
     }
 
@@ -54,7 +62,7 @@ function renderParallelIncidents(fullData, selector, countCategoriesArr) {
         .domain(dimensions);
         
     var c = d3.scaleLinear()
-    .range([0.2,1])
+    .range([0.2, 0.8])
     .domain(d3.extent(countCategoriesArr.map(e => e.value)));
 
     function path(d) {
@@ -150,7 +158,7 @@ function renderBarCategory(data, fullData, selector){
 
     var y = d3.scaleBand()
     .range([ 0, height ])
-    .domain(data.map(function(d) { return d.category; }).sort().reverse())
+    .domain(data.map(function(d) { return d.category; })/*.sort().reverse()*/)
     .padding(.1);
     svg.append("g")
     .call(d3.axisLeft(y))
