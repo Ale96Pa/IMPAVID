@@ -220,8 +220,8 @@ async function renderSingleSlider(svg, margin, width, p, i, err, ranges){
 function renderParamSpace(fullData, ranges){
 
     var margin = {top: 15, right: 10, bottom: 20, left: 10},
-    width = 500 - margin.left - margin.right,
-    height = 280 - margin.top - margin.bottom;
+    width = 480 - margin.left - margin.right,
+    height = 270 - margin.top - margin.bottom;
     
     const devs = ["Missing", "Repetition", "Mismatch"];
     devs.map(err => {
@@ -275,6 +275,23 @@ function renderParamSpace(fullData, ranges){
         renderSingleSlider(svgLast, margin, width, p, i, "Weigths", ranges);
     });
 
+    // var svgPrecRec = d3.select("#container_middle")
+    // .append("svg")
+    // .attr("id", "precRecall")
+    // .attr("class", "paramDeviation")
+    // .attr("width", 400)
+    // .attr("height", 300)
+    // .style("border-style", "dotted");
+    var svgPrecRec = null;
+    var divPrecRec = document.createElement("div");
+    divPrecRec.id = "precRecall";
+    divPrecRec.class = "paramDeviation";
+    divPrecRec.style.width = "400px";
+    divPrecRec.style.height = "280px";
+    divPrecRec.style.borderStyle = "dotted";
+    divPrecRec.style.margin = "5px";
+    document.getElementById("container_middle").appendChild(divPrecRec);
+
     var btn = document.createElement("button");
     btn.id = "btnParam"
     btn.innerHTML = "Submit";
@@ -323,55 +340,87 @@ function renderParamSpace(fullData, ranges){
         renderMetrics(fullData);
         renderPattern();
         renderFitnessBlock(fullData);
+        renderParamAnalysis(svgPrecRec, "precision");
+        renderParamAnalysis(svgPrecRec, "recall");
       });
+
     document.getElementById("container_middle").appendChild(btn);
 
+    renderParamAnalysis(svgPrecRec, "precision");
+    renderParamAnalysis(svgPrecRec, "recall");
+
+
+    // var svgRecall = d3.select("#container_middle")
+    //     .append("svg")
+    //     .attr("class", "paramDeviation")
+    //     .attr("width", width + margin.left + margin.right)
+    //     .attr("height", height + margin.top + margin.bottom)
+    //     .style("border-style", "dotted")
+    //     // .style("padding", "8px")
+    //     // .style("margin", "5px")
+    //     .style("padding-bottom", 0);
+    // // svgRecall.append("rect")
+    // // .attr("width", 20)
+    // // .attr("height", 20);
+    
 }
 
-function renderParamAnalysis(){
+function renderParamAnalysis(svg, metric){
 
-    d3.select("#paramFitness").remove();
+    d3.select("#"+metric+"Curve").remove();
 
-    var margin = {top: 20, right: 30, bottom: 30, left: 50},
-    width = 600 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom;
+    var margin = {top: 10, right: 30, bottom: 30, left: 20},
+    width = 400 - margin.left - margin.right,
+    height = 130 - margin.top - margin.bottom;
 
-    var svg = d3.select("#pattern")
+    // var svg = d3.select("#pattern")
+    // .append("svg")
+    // .attr("id", "paramFitness")
+    // .attr("width", width + margin.left + margin.right)
+    // .attr("height", height + margin.top + margin.bottom)
+    // .append("g")
+    // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+    var svgM = d3.select("#precRecall")
     .append("svg")
-    .attr("id", "paramFitness")
+    .attr("id", metric+"Curve")
+    .attr("class", "paramDeviation")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
+    // .style("border-style", "dotted")
+    // .style("padding", "8px")
+    // .style("margin", "5px")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // group the data: I want to draw one line per group
     const sumstat = d3.group(modelMetrics, d => d.severity);
 
-    // Add X axis --> recall
-    var x = d3.scaleLinear()
-    .domain([0,1]/*d3.extent(modelMetrics, function(d) { return d.recall; })*/) //0,1
-    .range([ 0, width ]);
-    svg.append("g")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x));
-    svg.append("text")
+    var x = d3.scaleBand()
+    .domain(/*[*/[...Array(modelMetrics.length/4).keys()]/*modelMetrics.length/4]*//*d3.extent(modelMetrics, function(d) { return d.recall; })*/) //0,1
+    .range([ 0, width-70 ]);
+    svgM.append("g")
+    .attr("transform", "translate("+margin.left+"," + (height+margin.top) + ")")
+    .call(d3.axisBottom(x).ticks(modelMetrics.length/4));
+    svgM.append("text")
         .attr("text-anchor", "end")
         .attr("x", width/2)
-        .attr("y", height + margin.top + 10)
-        .text("recall");
+        .attr("y", height + 3*margin.top - 5)
+        .text(metric);
 
     // Add Y axis --> precision
     var y = d3.scaleLinear()
     .domain([0, 1/*d3.max(modelMetrics, function(d) { return +d.precision; })*/]) //0,1
     .range([ height, 0 ]);
-    svg.append("g")
+    svgM.append("g")
+    .attr("transform", "translate("+ margin.left +","+ margin.top+")")
     .call(d3.axisLeft(y));
-    svg.append("text")
-        .attr("text-anchor", "end")
-        .attr("transform", "rotate(-90)")
-        .attr("y", -margin.left+20)
-        .attr("x", -margin.top)
-        .text("precision");
+    // svg.append("text")
+    //     .attr("text-anchor", "end")
+    //     .attr("transform", "rotate(-90)")
+    //     .attr("y", -margin.left)
+    //     .attr("x", margin.top)
+    //     .text("precision");
 
     // color palette
     var color = d3.scaleOrdinal()
@@ -380,11 +429,11 @@ function renderParamAnalysis(){
     // Draw legend
     var legend_keys = ["low", "medium", "high", "critical"]
 
-    var lineLegend = svg.selectAll(".lineLegend").data(legend_keys)
+    var lineLegend = svgM.selectAll(".lineLegend").data(legend_keys)
         .enter().append("g")
         .attr("class","lineLegend")
         .attr("transform", function (d,i) {
-                return "translate(" + (width-50) + "," + (i*20)+")"; //todo aggiustare
+                return "translate(" + (width-50) + "," + (i*20+5)+")"; //todo aggiustare
             });
 
     lineLegend.append("text").text(function (d) {return d;})
@@ -395,7 +444,7 @@ function renderParamAnalysis(){
         .attr("width", 10).attr("height", 10);
 
     // Draw the line
-    var lines = svg.selectAll(".line")
+    var lines = svgM.selectAll(".line")
     .data(sumstat);
 
     lines.exit().remove();
@@ -406,11 +455,10 @@ function renderParamAnalysis(){
     .attr("stroke-width", 1.5)
     .attr("d", function(d){
         return d3.line()
-        .x(function(d) {return x(d.recall); })
-        .y(function(d) {return y(+d.precision); })
+        .x(function(d,i) {return x(/*d.recall*/i)+margin.left; })
+        .y(function(d) {return y(+d[metric]/*.precision*/); })
         (d[1])
     })
-
 }
 
 function writePrecRecall(){

@@ -2,10 +2,14 @@ function removeAllFromParameters(){
 
     d3.select(".paramDeviation").remove();
     d3.select("#btnParam").remove();
+    d3.select("#precRecall").remove();
     d3.select("#paramFitness").remove();
     d3.select("#paramIncidents").remove();
     document.getElementById("deviation").style.display = "inline-block";
     document.getElementById("detail").style.display = "inline-block";
+
+    document.getElementById("container_header").style.padding = "10px";
+    document.getElementById("container_middle").style.padding = "10px";
 
  /*   
     // Remove parameters elements
@@ -36,6 +40,10 @@ function removeAllFromExploration(){
 
     document.getElementById("deviation").style.display = "none";
     document.getElementById("detail").style.display = "none";
+
+    document.getElementById("container_header").style.paddingTop = "0px";
+    document.getElementById("container_header").style.paddingBottom = "0px";
+    document.getElementById("container_middle").style.padding = "0px";
 
 
 /*
