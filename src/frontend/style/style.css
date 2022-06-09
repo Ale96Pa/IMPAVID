@@ -68,9 +68,14 @@ background-color: #ccc;
     height: 250px; /*todo: eliminare*/
     /* display: grid; */
     /*clear: both;*/
-    overflow-y: scroll;
+    /* overflow-y: scroll; */
     /* overflow-x: scroll;
     display: inline-grid; */
+}
+
+#focusTraces {
+    height: 215px;
+    overflow-y: scroll;
 }
 
 #context {

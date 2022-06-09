@@ -4,11 +4,12 @@ TODO: aggiustare width dinamica delle sequenze
 
 function renderOverviewBlock(fullData){
 
-    d3.select("#focus").selectAll("*").remove();
+    // d3.select("#focus").selectAll("*").remove();
+    d3.select("#focusTraces").selectAll("*").remove();
     d3.select("#focusLine").selectAll("*").remove();
     d3.select("#contextLine").selectAll("*").remove();
 
-    renderSequences("focus");
+    renderSequences("focusTraces");
     
     const allDates = fullDateRange.map(elem => {return {date: new Date(elem), value: 0}});
     var dataIncTime = filteredData.reduce((accumulator, elem) => {
@@ -38,7 +39,7 @@ function renderSequences(selector){
     // const w = d3.select("#focus").node().offsetWidth;
     // console.log(w)
 
-    d3.select("#focus").selectAll("*").remove();
+    d3.select("#focusTraces").selectAll("*").remove();
 
     var len = 0;
     const offset = 1;
@@ -86,16 +87,48 @@ function renderSequences(selector){
     // .attr("font-family", "Helvetica")
     // .text("Sequence Analysis");
 
+    // var svgHeader = d3.select("#"+selector);
     var svgContainer = d3.select("#"+selector);
 
-    /*todo: controllare */
-    svgContainer.append("text")
-    .attr("x", width/2)
-    .attr("y", 5)
-    .attr("text-align", "center")
-    .attr("font-family", "Helvetica")
-    .text("Trace Variants Analysis");
-    // .text("Sequence Analysis  ("+data.length+" variants)");
+    // /*todo: controllare */
+    // svgHeader.append("svg")
+    // .attr("height", 30)
+    // //.attr("width", width/2)
+    // .append("text")
+    // .attr("x", 10)
+    // .attr("y", 20)
+    // .attr("text-align", "center")
+    // .attr("font-family", "Helvetica")
+    // .text("Trace Variants Analysis");
+    // // .text("Sequence Analysis  ("+data.length+" variants)");
+
+
+
+    // var sliderParam = d3.sliderBottom()
+    // .min(0)
+    // .max(1)
+    // .width(width/2-50)
+    // //.tickFormat(d3.format('.2'))
+    // //.ticks(10)
+    // .default(0)
+    // .handle(
+    //   d3.symbol()
+    //     .type(d3.symbolCircle)
+    //     .size(200)()
+    // )
+    // .on('end', val => sliderChange(val));
+
+    // svgContainer.append("svg")
+    // .attr("height", 60)
+    // .attr("width", width/2)
+    // .append("g")
+    // .attr("transform", "translate("+ 20 +"," + 20 + ")")
+    // .call(sliderParam);
+
+    // function sliderChange(val){
+    //     console.log(val);
+    // }
+
 
 
     // TODO: vedi se aggiustare width
