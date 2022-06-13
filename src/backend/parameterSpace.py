@@ -364,11 +364,12 @@ dictAlfaMismatch = {"N":0.35,"A":0.35,"W":0.1,"R":0.1,"C":0.1}
 Tmism = 4
 dictAlfaCost = {"miss":0.33,"rep":0.34,"mism":0.33}
 def writeDataOnFile():
+    incidents = sorted(id.formatIncidents(fileLog), key=lambda d: d['incident_id'])
+
     aligns = pm.compute_trace_alignment(fileLog,fileModel)
     alignments = pm.compute_deviations(aligns, dictAlfaMiss, Tmiss, dictAlfaMult, Tmult, dictAlfaMismatch, Tmism, dictAlfaCost, True)
     # incidents = id.formatIncidents(fileLog)
     # print(alignments, incidents)
-    incidents = sorted(id.formatIncidents(fileLog), key=lambda d: d['incident_id']) 
 
     res = []
     i=0
@@ -396,7 +397,9 @@ def writeDataOnFile():
         "closeTs": incidents[i]["closeTs"],
         "reassignment": incidents[i]["reassignment"],
         "reopen": incidents[i]["reopen"],
-        "updates": incidents[i]["updates"]
+        "updates": incidents[i]["updates"],
+        "rfc": incidents[i]["rfc"],
+        "sla": incidents[i]["sla"]
         })
         i+=1
 
@@ -426,5 +429,5 @@ if __name__ == "__main__":
     # writeAlignmentTruth()
     # computeTruthWeights()
 
-    # writeDataOnFile()
-    paramanalysis()
+    writeDataOnFile()
+    # paramanalysis()
