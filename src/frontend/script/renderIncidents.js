@@ -50,7 +50,7 @@ function renderParallelIncidents(fullData, selector, countCategoriesArr) {
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    dimensions = Object.keys(fullData[0]).filter(function(d) { return d == "impact" || d=="urgency" || d=="priority" || d=="rfc" || d=="sla" /*|| d=="category"*/ });
+    dimensions = Object.keys(fullData[0]).filter(function(d) { return d == "impact" || d=="urgency" || d=="priority" /*|| d=="rfc" || d=="sla" || d=="category"*/ });
     dimensions.push("category")
 
     var y = {}
