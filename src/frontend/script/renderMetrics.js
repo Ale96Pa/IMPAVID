@@ -3,7 +3,7 @@ function renderMetrics(fullData){
     d3.select("#metrics").selectAll("*").remove();
 
     var margin = {top: 10, right: 10, bottom: 20, left: 10},
-    width = 300 - margin.left - margin.right,
+    width = 320 - margin.left - margin.right,
     height = 110 - margin.top - margin.bottom;
 
     // Calculate number of incidents

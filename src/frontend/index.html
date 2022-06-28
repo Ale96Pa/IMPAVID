@@ -45,7 +45,11 @@
       var paramMismatch = { N:0.2, A:0.2, W:0.2, R:0.2, C:0.2};
       var paramWeights = { miss: 0.33, rep: 0.33, mism: 0.33};
 
-      var modelMetrics = []
+      var modelMetrics = [
+        {severity:"low", precision:0.09, recall:0.93},
+        {severity:"medium", precision:0.83, recall:0.05},
+        {severity:"high", precision:0, recall:0},
+        {severity:"critical", precision:0, recall:0}]
 
       /* Shared data */
       var filteredData;
@@ -54,8 +58,8 @@
         eel.processData()();
         // // incidentsData = await d3.csv("outputInc.csv");
         // // alignmentsData = await d3.csv("output.csv"); 
-        // return await d3.csv("simpleFull.csv");
         return await d3.csv("simpleFull.csv");
+        // return await d3.csv("fullOutputFull.csv");
       }
 
     </script>

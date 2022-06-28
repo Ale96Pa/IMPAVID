@@ -459,6 +459,23 @@ function renderParamAnalysis(svg, metric){
         .y(function(d) {return y(+d[metric]/*.precision*/); })
         (d[1])
     })
+
+    var selectCircle = svgM.selectAll(".circle")
+    .data(modelMetrics)
+
+    numCircles = modelMetrics.length/4;
+
+    for(j=0;j<numCircles;j++){
+        selectCircle.enter().append("circle")
+            .attr("class", "circle")
+            .attr("r", 3)
+            .attr("cx", x(j)+margin.left)
+            .attr("cy", function(d) {
+                return y(d[metric])
+            })
+            .attr("fill",  function(d){ return color(d.severity) })
+        }
+    
 }
 
 function writePrecRecall(){

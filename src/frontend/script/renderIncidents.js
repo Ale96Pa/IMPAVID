@@ -67,7 +67,7 @@ function renderParallelIncidents(fullData, selector, countCategoriesArr) {
         .domain(dimensions);
         
     var c = d3.scaleLinear()
-    .range([0.2, 0.8])
+    .range([0, 0.8])
     .domain(d3.extent(countCategoriesArr.map(e => e.value)));
 
     function path(d) {
