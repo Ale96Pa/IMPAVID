@@ -70,6 +70,7 @@ function renderDatasetAnalysis(fullData){
         }
         svg.append("rect")
         .data([i])
+        .attr("id", "rect"+i)
         .attr("y", 0)
         .attr("x", i==0 ? 0 : sumPrev)
         .attr("width", x(elem)-20 > 20 ?  x(elem)-20 : 20)
@@ -111,22 +112,30 @@ function renderDatasetAnalysis(fullData){
         .domain(["N","A","W","R","C"])
         .range([colorDev.N,colorDev.A,colorDev.W,colorDev.R,colorDev.C]);
 
+        for(var j=0; j<5; j++){
+            d3.select("#rect"+j).style("opacity", "0.6");
+        }
         var data = [];
         switch(num){
             case 0:
                 data = part1;
+                d3.select("#rect0").style("opacity", "1");
                 break;
             case 1:
                 data = part2;
+                d3.select("#rect1").style("opacity", "1");
                 break;
             case 2:
                 data = part3;
+                d3.select("#rect2").style("opacity", "1");
                 break;
             case 3:
                 data = part4;
+                d3.select("#rect3").style("opacity", "1");
                 break;
             default:
                 data = part5;
+                d3.select("#rect4").style("opacity", "1");
                 break;
         }
 

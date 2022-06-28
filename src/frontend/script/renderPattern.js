@@ -36,6 +36,9 @@ function renderRadviz(data,selector){
     //     console.log(data);
     //     console.log(d,i);
     // });
+    radviz.setColorClassification("impact");
+    // radviz.setDefaultColorPoints("purple");
+    radviz.setColorPoint(2);
     
     d3.select('#'+selector)
     .attr("width", width + margin.left + margin.right)
