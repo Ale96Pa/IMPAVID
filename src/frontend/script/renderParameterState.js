@@ -460,21 +460,21 @@ function renderParamAnalysis(svg, metric){
         (d[1])
     })
 
-    var selectCircle = svgM.selectAll(".circle")
-    .data(modelMetrics)
+    // var selectCircle = svgM.selectAll(".circle")
+    // .data(modelMetrics)
 
-    numCircles = modelMetrics.length/4;
+    // numCircles = modelMetrics.length/4;
 
-    for(j=0;j<numCircles;j++){
-        selectCircle.enter().append("circle")
-            .attr("class", "circle")
-            .attr("r", 3)
-            .attr("cx", x(j)+margin.left)
-            .attr("cy", function(d) {
-                return y(d[metric])
-            })
-            .attr("fill",  function(d){ return color(d.severity) })
-        }
+    // for(j=0;j<numCircles;j++){
+    //     selectCircle.enter().append("circle")
+    //         .attr("class", "circle")
+    //         .attr("r", 3)
+    //         .attr("cx", x(j)+margin.left)
+    //         .attr("cy", function(d) {
+    //             return y(d[metric])
+    //         })
+    //         .attr("fill",  function(d){ return color(d.severity) })
+    //     }
     
 }
 
