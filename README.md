@@ -1,7 +1,7 @@
 ## IMPAVID: Incident Management Process Assessment through Visual Interactive Data analysis
 
 ### Case Study: demo video
-The Demo Video showing the usage of IMPAVID through a case study is available at: https://github.com/Ale96Pa/IMPAVID/tree/master/src/demo
+The Demo Video showing the usage of IMPAVID through a case study is available at: https://youtu.be/d1ZmI0LTccM
 
 ### Installation Requirements
 The following libraries are necessary for the correct functioning of the system:
