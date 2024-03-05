@@ -2,7 +2,7 @@
 
 ### Case Study: demo video
 
-The Demo Video showing the usage of IMPAVID through a case study is available at: https://youtu.be/d1ZmI0LTccM
+The Demo Video showing the usage of IMPAVID through a case study is available at: https://youtu.be/vcuLD4Hxckg
 
 ### Installation Requirements
 
